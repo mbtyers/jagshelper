@@ -125,13 +125,14 @@ trace_df <- function(df, nline, ...) {
 #' @param df Posterior df
 #' @param x Vector of X-coordinates for plotting.
 #' @param median Whether to include median line
-#' @param ci Vector of intervals to overlay.  Defaults to 50% and 95%.
+#' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param add Whether to add to existing plot
 #' @param dark Opacity (0-1) for envelopes.  Note that multiple overlapping intervals will darken the envelope.
 #' @param xlab X-axis label
 #' @param ylab Y-axis label
 #' @param main Plot title
 #' @param ... additional plotting arguments or arguments to trace_line
+#' @note Calling this function with argument ci=0 (or F) is effectively a tricksy way of producing a plot with just a median line.
 #' @author Matt Tyers
 #' @examples
 #' out_df <- jags_df(asdf_jags_out)

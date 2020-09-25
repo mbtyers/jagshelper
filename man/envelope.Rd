@@ -25,7 +25,7 @@ envelope(
 
 \item{median}{Whether to include median line}
 
-\item{ci}{Vector of intervals to overlay.  Defaults to 50% and 95%.}
+\item{ci}{Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.}
 
 \item{add}{Whether to add to existing plot}
 
@@ -41,6 +41,9 @@ envelope(
 }
 \description{
 Envelope plot of posterior df.  This would be best suited to a single posterior df representing a time series.  I've written and re-written this function many times!
+}
+\note{
+Calling this function with argument ci=0 (or F) is effectively a tricksy way of producing a plot with just a median line.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)
