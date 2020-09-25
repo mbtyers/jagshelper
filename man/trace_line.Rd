@@ -13,6 +13,8 @@ trace_line(x, nline, lwd = 1, main = "", ...)
 
 \item{lwd}{Line width}
 
+\item{main}{Plot title}
+
 \item{...}{additional plotting arguments}
 }
 \description{
@@ -24,7 +26,7 @@ out_df <- jags_df(asdf_jags_out)
 b1 <- pull_post(out_df,"b1")
 a <- pull_post(out_df,"a")
 
-trace_line(b1, nline=3)
+trace_line(b1, nline=3, main="b1")
 }
 \author{
 Matt Tyers
