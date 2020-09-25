@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1601054221309.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AEFCF7A9",
+    "lastKnownWriteTime" : 1601069097,
+    "last_content_update" : 1601069097168,
+    "path" : "~/jagshelper/R/jagshelper1.R",
+    "project_path" : "R/jagshelper1.R",
+    "properties" : {
+        "cursorPosition" : "167,0",
+        "scrollLine" : "121"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
