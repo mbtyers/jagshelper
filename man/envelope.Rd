@@ -12,6 +12,7 @@ envelope(
   col = 4,
   add = F,
   dark = 0.3,
+  outline = F,
   xlab = "",
   ylab = "",
   main = "",
@@ -30,6 +31,8 @@ envelope(
 \item{add}{Whether to add to existing plot}
 
 \item{dark}{Opacity (0-1) for envelopes.  Note that multiple overlapping intervals will darken the envelope.}
+
+\item{outline}{Whether to just envelope outlines}
 
 \item{xlab}{X-axis label}
 
@@ -53,6 +56,8 @@ a <- pull_post(out_df,"a")
 
 envelope(a)
 envelope(a, ci=seq(.1,.9,by=.1), dark=.15, lwd=3)
+envelope(a, ci=seq(.1,.9,by=.1), dark=.2, outline=T)
+envelope(a, ci=F, add=T, lwd=3)
 }
 \author{
 Matt Tyers

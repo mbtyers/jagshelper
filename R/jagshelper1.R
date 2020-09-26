@@ -128,6 +128,7 @@ trace_df <- function(df, nline, ...) {
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param add Whether to add to existing plot
 #' @param dark Opacity (0-1) for envelopes.  Note that multiple overlapping intervals will darken the envelope.
+#' @param outline Whether to just envelope outlines
 #' @param xlab X-axis label
 #' @param ylab Y-axis label
 #' @param main Plot title
@@ -142,8 +143,11 @@ trace_df <- function(df, nline, ...) {
 #'
 #' envelope(a)
 #' envelope(a, ci=seq(.1,.9,by=.1), dark=.15, lwd=3)
+#' envelope(a, ci=seq(.1,.9,by=.1), dark=.2, outline=T)
+#' envelope(a, ci=F, add=T, lwd=3)
 #' @export
-envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, xlab="", ylab="", main="", ...) {
+envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, outline=F, xlab="", ylab="", main="", ...) {
+  ci <- sort(ci)
   loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
   if(length(ci)==1) {
@@ -155,6 +159,15 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
   if(!add) {
     plot(x, med, type='l', col=ifelse(median, col, "white"), ylim=range(loq,hiq,na.rm=T), xlab=xlab, ylab=ylab, main=main, ...=...)
   }
-  else lines(x, med, type='l', col=ifelse(median, col, "white"))
-  for(i in 1:length(ci)) polygon(c(x,rev(x)), c(loq[i,],rev(hiq[i,])), col=adjustcolor(col,alpha.f=dark), border=NA)
+  else lines(x, med, type='l', col=ifelse(median, col, "white"), ...=...)
+  if(outline) {
+    darks <- rev(1-((1-dark)^(1:length(ci))))
+    for(i in 1:length(ci)) {
+      lines(x,loq[i,], col=adjustcolor(col,alpha.f=darks[i]), ...=...)
+      lines(x,hiq[i,], col=adjustcolor(col,alpha.f=darks[i]), ...=...)
+    }
+  }
+  else {
+    for(i in 1:length(ci)) polygon(c(x,rev(x)), c(loq[i,],rev(hiq[i,])), col=adjustcolor(col,alpha.f=dark), border=NA)
+  }
 }
