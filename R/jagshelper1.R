@@ -72,6 +72,43 @@ jags_df <- function(x) as.data.frame(as.matrix(x$samples))
 pull_post <- function(x, p) x[,substr(names(x),1,nchar(p))==p]
 
 
+jags_plist <- function(x, p=NULL) {
+  x_dflist <- lapply(x$samples, as.data.frame)
+  x2 <- lapply(1:length(x_dflist[[1]]), function(x) sapply(x_dflist, "[[",x))
+  names(x2) <- names(x_dflist[[1]])
+  if(!is.null(p)) x2 <- x2[substr(names(x2),1,nchar(p))==p]
+  return(x2)
+}
+
+#' Traceplot of jagsUI object
+#' @description Smarter traceplot of a whole jagsUI object, or subset.
+#' @param x Posterior jagsUI object
+#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param ... additional plotting arguments
+#' @author Matt Tyers
+#' @examples
+#'
+#' trace_jags(asdf_jags_out, parmfrow=c(4,2))
+#' trace_jags(asdf_jags_out, p="a", parmfrow=c(3,1))
+#' @export
+trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
+  x_plist <- jags_plist(x,p=p)
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+  }
+
+  nline <- ncol(x_plist[[1]])
+  cols <- adjustcolor(rainbow(nline),red.f=.9,blue.f=.9,green.f=.9,alpha.f=.6)
+  for(i in 1:length(x_plist)) {
+    plot(NA, xlim=c(1,nrow(x_plist[[i]])), ylim=range(x_plist[[i]]), main=names(x_plist)[i], ...=...)
+    for(j in 1:nline) lines(x_plist[[i]][,j], col=cols[j])
+  }
+
+  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+}
+
 #' Simple traceplot
 #' @description Traceplot of a single parameter.
 #' @param x Posterior vector
@@ -101,7 +138,8 @@ trace_line <- function(x, nline, lwd=1, main="", ...) {
 #' Traceplot of each column of a df
 #' @description Traceplot of each column of a posterior df.
 #' @param df Posterior df
-#' @param p nline Number of chains
+#' @param nline Number of chains
+#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to trace_line
 #' @author Matt Tyers
 #' @examples
@@ -112,11 +150,18 @@ trace_line <- function(x, nline, lwd=1, main="", ...) {
 #'
 #' par(mfrow=c(3,1))
 #' trace_df(a, nline=3)
+#'
+#' trace_df(a, nline=3, parmfrow=c(3,1))
 #' @export
-trace_df <- function(df, nline, ...) {
+trace_df <- function(df, nline, parmfrow=NULL, ...) {
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+  }
   for(i in 1:ncol(df)) {
     trace_line(df[,i],main=names(df)[i],nline=nline,...=...)
   }
+  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
@@ -126,6 +171,7 @@ trace_df <- function(df, nline, ...) {
 #' @param x Vector of X-coordinates for plotting.
 #' @param median Whether to include median line
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
+#' @param col Color for plotting
 #' @param add Whether to add to existing plot
 #' @param dark Opacity (0-1) for envelopes.  Note that multiple overlapping intervals will darken the envelope.
 #' @param outline Whether to just envelope outlines
@@ -145,6 +191,12 @@ trace_df <- function(df, nline, ...) {
 #' envelope(a, ci=seq(.1,.9,by=.1), dark=.15, lwd=3)
 #' envelope(a, ci=seq(.1,.9,by=.1), dark=.2, outline=T)
 #' envelope(a, ci=F, add=T, lwd=3)
+#'
+#' ts_out_df <- jags_df(ts_jags_out)
+#' mu <- pull_post(ts_out_df, "mu")
+#' ypred <- pull_post(ts_out_df, "ypred")
+#' envelope(x=2010:2020, mu)
+#' envelope(x=2010:2020, ypred, outline=T, median=F, add=T, ci=.95, col=1, lty=2)
 #' @export
 envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, outline=F, xlab="", ylab="", main="", ...) {
   ci <- sort(ci)
@@ -157,9 +209,11 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
   med <- apply(df, 2, median, na.rm=T)
   if(all(is.na(x))) x <- 1:ncol(df)
   if(!add) {
-    plot(x, med, type='l', col=ifelse(median, col, "white"), ylim=range(loq,hiq,na.rm=T), xlab=xlab, ylab=ylab, main=main, ...=...)
+    plot(NA, xlim=range(x),ylim=range(loq,hiq,na.rm=T), xlab=xlab, ylab=ylab, main=main, ...=...)
+    if(median) lines(x, med, col=col)
   }
-  else lines(x, med, type='l', col=ifelse(median, col, "white"), ...=...)
+  else
+    if(median) lines(x, med, type='l', col=col, ...=...)
   if(outline) {
     darks <- rev(1-((1-dark)^(1:length(ci))))
     for(i in 1:length(ci)) {
@@ -170,4 +224,57 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
   else {
     for(i in 1:length(ci)) polygon(c(x,rev(x)), c(loq[i,],rev(hiq[i,])), col=adjustcolor(col,alpha.f=dark), border=NA)
   }
+}
+
+
+
+#' Caterpillar plot
+#' @description Caterpillar plot of posterior df.  This would be best suited to a single posterior df representing random effects or group means.
+#' @param df Posterior df
+#' @param x Vector of X-coordinates for plotting.
+#' @param median Whether to include medians
+#' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
+#' @param col Color for plotting
+#' @param add Whether to add to existing plot
+#' @param lwd Base line width for plotting.  Defaults to 1.
+#' @param xlab X-axis label
+#' @param ylab Y-axis label
+#' @param main Plot title
+#' @param xax vector of possible x-axis tick labels.  Defaults to the df column names
+#' @param ... additional plotting arguments or arguments to trace_line
+#' @note Calling this function with argument ci=0 (or F) is effectively a tricksy way of producing a plot with just a median line.
+#' @author Matt Tyers
+#' @examples
+#' out_df <- jags_df(asdf_jags_out)
+#'
+#' b1 <- pull_post(out_df,"b1")
+#' a <- pull_post(out_df,"a")
+#'
+#' caterpillar(a)
+#' caterpillar(a, ci=seq(.1,.9,by=.1))
+#' caterpillar(a, lwd=2)
+#' caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
+#' @export
+caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, ...) {
+  ci <- rev(sort(ci))
+  loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
+  hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
+  if(length(ci)==1) {
+    loq <- t(as.matrix(loq))
+    hiq <- t(as.matrix(hiq))
+  }
+  med <- apply(df, 2, median, na.rm=T)
+  if(all(is.na(x))) x <- 1:ncol(df)
+  d <- diff(x[1:2])
+  nn <- ncol(df)
+  if(is.na(xax)) xax<-names(df)
+  lwds <- (1+2*(1:length(ci)-1))*lwd
+  if(!add) {
+    plot(NA, type='l', ylim=range(loq,hiq,na.rm=T), xlim=c(1-.2*d,nn+.2*d), xlab=xlab, ylab=ylab, main=main, xaxt="n", ...=...)
+    axis(1,x,labels=xax)
+  }
+  if(median) {
+    segments(x0=x-.2*d,x1=x+.2*d,y0=med,y1=med,col=col,lwd=lwds[1], lend=1)
+  }
+  for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
 }

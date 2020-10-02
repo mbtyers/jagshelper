@@ -4,14 +4,16 @@
 \alias{trace_df}
 \title{Traceplot of each column of a df}
 \usage{
-trace_df(df, nline, ...)
+trace_df(df, nline, parmfrow = NULL, ...)
 }
 \arguments{
 \item{df}{Posterior df}
 
-\item{...}{additional plotting arguments or arguments to trace_line}
+\item{nline}{Number of chains}
 
-\item{p}{nline Number of chains}
+\item{parmfrow}{Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
+
+\item{...}{additional plotting arguments or arguments to trace_line}
 }
 \description{
 Traceplot of each column of a posterior df.
@@ -24,6 +26,8 @@ a <- pull_post(out_df,"a")
 
 par(mfrow=c(3,1))
 trace_df(a, nline=3)
+
+trace_df(a, nline=3, parmfrow=c(3,1))
 }
 \author{
 Matt Tyers
