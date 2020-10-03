@@ -72,6 +72,18 @@ jags_df <- function(x) as.data.frame(as.matrix(x$samples))
 pull_post <- function(x, p) x[,substr(names(x),1,nchar(p))==p]
 
 
+#' Plist
+#' @description Extract a list of nrep X nchain matrices, one for each parameter.
+#' @param x jagsUI object
+#' @param p String to subset parameter names, if a subset is desired
+#' @author Matt Tyers
+#' @examples
+#' out_plist <- jags_plist(asdf_jags_out)
+#' str(out_plist)
+#'
+#' a_plist <- jags_plist(asdf_jags_out, p="a")
+#' str(a_plist)
+#' @export
 jags_plist <- function(x, p=NULL) {
   x_dflist <- lapply(x$samples, as.data.frame)
   x2 <- lapply(1:length(x_dflist[[1]]), function(x) sapply(x_dflist, "[[",x))
