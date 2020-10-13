@@ -155,6 +155,69 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
   if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
+
+#' Combination of trace plots and by-chain kernel densities of jagsUI object
+#' @description Combination of trace plots and by-chain kernel densities of a whole jagsUI object, or subset.
+#' @param x Posterior jagsUI object
+#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param ... additional plotting arguments
+#' @author Matt Tyers
+#' @examples
+#'
+#' tracedens_jags(asdf_jags_out, parmfrow=c(4,2))
+#' tracedens_jags(x=asdf_jags_out, p="a", parmfrow=c(3,1))
+#' @export
+tracedens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
+  x_plist <- jags_plist(x,p=p)
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+  }
+
+  nline <- ncol(x_plist[[1]])
+  cols <- adjustcolor(rainbow(nline),red.f=.9,blue.f=.9,green.f=.9,alpha.f=.6)
+  for(i in 1:length(x_plist)) {
+    allbw <- density(as.vector(x_plist[[i]]))$bw
+    denses <- apply(x_plist[[i]], 2, density, bw=allbw)
+    dx <- sapply(denses, function(x) x$x)
+    dy <- sapply(denses, function(x) x$y)
+    # abline(v=nrow(x_plist[[i]]))
+    dy1 <- (dy/max(dy)*0.3 + 1)*nrow(x_plist[[i]])
+    plot(NA, xlim=c(1, 1.3*nrow(x_plist[[i]])), ylim=range(x_plist[[i]]), main=names(x_plist)[i], xlab="iter", ylab="", ...=...)
+    for(j in 1:nline) lines(x_plist[[i]][,j], col=cols[j], lwd=lwd)
+    # plot(NA, xlim=range(dx), ylim=range(dy), main=names(x_plist)[i], xlab="",ylab="",...=...)
+    for(j in 1:nline) lines(dy1[,j], dx[,j], col=cols[j], lwd=lwd)
+  }
+
+  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+}
+
+#' Number of parameters
+#' @description Number of parameters saved in jagsUI output.
+#' @param x Output object from jagsUI::jags()
+#' @author Matt Tyers
+#' @examples
+#' head(jags_df(asdf_jags_out))
+#'
+#' nparam(asdf_jags_out)
+#' @export
+nparam <- function(x) ncol(jags_df(x))
+
+#' Number of parameters by parameter name
+#' @description Returns a summary of the numbers of parameters saved in jagsUI output by parameter name.
+#' @param x Output object from jagsUI::jags()
+#' @author Matt Tyers
+#' @examples
+#' head(jags_df(asdf_jags_out))
+#'
+#' nbyname(asdf_jags_out)
+#'
+#' nparam(ts_jags_out)
+#' nbyname(ts_jags_out)
+#' @export
+nbyname <- function(x) sapply(x$sims.list, function(x) ncol(as.matrix(x)))
+
 #' Simple traceplot
 #' @description Traceplot of a single parameter.
 #' @param x Posterior vector
