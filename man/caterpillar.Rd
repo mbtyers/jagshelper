@@ -16,6 +16,8 @@ caterpillar(
   ylab = "",
   main = "",
   xax = NA,
+  medlwd = lwd,
+  medwd = 1,
   ...
 )
 }
@@ -41,6 +43,10 @@ caterpillar(
 \item{main}{Plot title}
 
 \item{xax}{vector of possible x-axis tick labels.  Defaults to the df column names}
+
+\item{medlwd}{Line width of median line}
+
+\item{medwd}{Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?}
 
 \item{...}{additional plotting arguments or arguments to trace_line}
 }

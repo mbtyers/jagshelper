@@ -253,6 +253,8 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
 #' @param ylab Y-axis label
 #' @param main Plot title
 #' @param xax vector of possible x-axis tick labels.  Defaults to the df column names
+#' @param medlwd Line width of median line
+#' @param medwd Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?
 #' @param ... additional plotting arguments or arguments to trace_line
 #' @note Calling this function with argument ci=0 (or F) is effectively a tricksy way of producing a plot with just a median line.
 #' @author Matt Tyers
@@ -272,7 +274,7 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
 #' ypred <- pull_post(ts_out_df, "ypred")
 #' caterpillar(x=2010:2020, mu, xax=2010:2020)
 #' @export
-caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, ...) {
+caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, medlwd=lwd, medwd=1,...) {
   ci <- rev(sort(ci))
   loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
@@ -291,7 +293,7 @@ caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F,
     axis(1,x,labels=xax)
   }
   if(median) {
-    segments(x0=x-.2*d,x1=x+.2*d,y0=med,y1=med,col=col,lwd=lwds[1], lend=1)
+    segments(x0=x-.2*d*medwd,x1=x+.2*d*medwd,y0=med,y1=med,col=col,lwd=medlwd, lend=1)
   }
   for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
 }
