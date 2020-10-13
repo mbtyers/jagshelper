@@ -114,8 +114,42 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
   nline <- ncol(x_plist[[1]])
   cols <- adjustcolor(rainbow(nline),red.f=.9,blue.f=.9,green.f=.9,alpha.f=.6)
   for(i in 1:length(x_plist)) {
-    plot(NA, xlim=c(1,nrow(x_plist[[i]])), ylim=range(x_plist[[i]]), main=names(x_plist)[i], ...=...)
-    for(j in 1:nline) lines(x_plist[[i]][,j], col=cols[j])
+    plot(NA, xlim=c(1,nrow(x_plist[[i]])), ylim=range(x_plist[[i]]), main=names(x_plist)[i], xlab="iter", ylab="", ...=...)
+    for(j in 1:nline) lines(x_plist[[i]][,j], col=cols[j], lwd=lwd)
+  }
+
+  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+}
+
+
+#' By-chain kernel densities of jagsUI object
+#' @description By-chain kernel densities of a whole jagsUI object, or subset.
+#' @param x Posterior jagsUI object
+#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param ... additional plotting arguments
+#' @author Matt Tyers
+#' @examples
+#'
+#' chaindens_jags(asdf_jags_out, parmfrow=c(4,2))
+#' chaindens_jags(x=asdf_jags_out, p="a", parmfrow=c(3,1))
+#' @export
+chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
+  x_plist <- jags_plist(x,p=p)
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+  }
+
+  nline <- ncol(x_plist[[1]])
+  cols <- adjustcolor(rainbow(nline),red.f=.9,blue.f=.9,green.f=.9,alpha.f=.6)
+  for(i in 1:length(x_plist)) {
+    allbw <- density(as.vector(x_plist[[i]]))$bw
+    denses <- apply(x_plist[[i]], 2, density, bw=allbw)
+    dx <- sapply(denses, function(x) x$x)
+    dy <- sapply(denses, function(x) x$y)
+    plot(NA, xlim=range(dx), ylim=range(dy), main=names(x_plist)[i], xlab="",ylab="",...=...)
+    for(j in 1:nline) lines(dx[,j], dy[,j], col=cols[j], lwd=lwd)
   }
 
   if(!is.null(parmfrow)) par(mfrow=parmfrow1)
@@ -147,6 +181,39 @@ trace_line <- function(x, nline, lwd=1, main="", ...) {
   }
 }
 
+#' Simple by-chain kernel density plot
+#' @description By-chain kernel density plot of a single parameter.
+#' @param x Posterior vector
+#' @param nline Number of chains
+#' @param lwd Line width
+#' @param main Plot title
+#' @param ... additional plotting arguments
+#' @author Matt Tyers
+#' @examples
+#' out_df <- jags_df(asdf_jags_out)
+#'
+#' b1 <- pull_post(out_df,"b1")
+#' a <- pull_post(out_df,"a")
+#'
+#' chaindens_line(b1, nline=3, main="b1")
+#' @export
+chaindens_line <- function(x, nline, lwd=1, main="", ...) {
+  # if(is.null(nline)) nline <- length(x)/n
+  n <- length(x)/nline
+  cols <- adjustcolor(rainbow(nline),red.f=.9,blue.f=.9,green.f=.9,alpha.f=.6)
+  allbw <- density(x)$bw
+  denses <- list()
+  for(i in 1:nline) {
+    denses[[i]] <- density(x[(n*(i-1)+1):(n*i)], bw=allbw)
+  }
+  dx <- sapply(denses, function(x) x$x)
+  dy <- sapply(denses, function(x) x$y)
+  plot(NA,xlim=range(dx),ylim=range(dy),main=main,xlab="",ylab="", ...=...)
+  for(i in 1:nline) {
+    lines(dx[,i], dy[,i], col=cols[i],lwd=lwd)
+  }
+}
+
 #' Traceplot of each column of a df
 #' @description Traceplot of each column of a posterior df.
 #' @param df Posterior df
@@ -172,6 +239,35 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
   }
   for(i in 1:ncol(df)) {
     trace_line(df[,i],main=names(df)[i],nline=nline,...=...)
+  }
+  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+}
+
+#' By-chain kernel density of each column of a df
+#' @description By-chain kernel density plot of each column of a posterior df.
+#' @param df Posterior df
+#' @param nline Number of chains
+#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param ... additional plotting arguments or arguments to trace_line
+#' @author Matt Tyers
+#' @examples
+#' out_df <- jags_df(asdf_jags_out)
+#'
+#' b1 <- pull_post(out_df,"b1")
+#' a <- pull_post(out_df,"a")
+#'
+#' par(mfrow=c(3,1))
+#' trace_df(a, nline=3)
+#'
+#' chaindens_df(a, nline=3, parmfrow=c(3,1))
+#' @export
+chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+  }
+  for(i in 1:ncol(df)) {
+    chaindens_line(df[,i],main=names(df)[i],nline=nline,...=...)
   }
   if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
