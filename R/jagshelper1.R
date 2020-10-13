@@ -266,6 +266,11 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
 #' caterpillar(a, ci=seq(.1,.9,by=.1))
 #' caterpillar(a, lwd=2)
 #' caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
+#'
+#' ts_out_df <- jags_df(ts_jags_out)
+#' mu <- pull_post(ts_out_df, "mu")
+#' ypred <- pull_post(ts_out_df, "ypred")
+#' caterpillar(x=2010:2020, mu, xax=2010:2020)
 #' @export
 caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, ...) {
   ci <- rev(sort(ci))
@@ -282,7 +287,7 @@ caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F,
   if(is.na(xax)) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd
   if(!add) {
-    plot(NA, type='l', ylim=range(loq,hiq,na.rm=T), xlim=c(1-.2*d,nn+.2*d), xlab=xlab, ylab=ylab, main=main, xaxt="n", ...=...)
+    plot(NA, type='l', ylim=range(loq,hiq,na.rm=T), xlim=range(x-(.2*d),x+(.2*d)), xlab=xlab, ylab=ylab, main=main, xaxt="n", ...=...)
     axis(1,x,labels=xax)
   }
   if(median) {

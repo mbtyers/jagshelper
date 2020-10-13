@@ -60,6 +60,11 @@ caterpillar(a)
 caterpillar(a, ci=seq(.1,.9,by=.1))
 caterpillar(a, lwd=2)
 caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
+
+ts_out_df <- jags_df(ts_jags_out)
+mu <- pull_post(ts_out_df, "mu")
+ypred <- pull_post(ts_out_df, "ypred")
+caterpillar(x=2010:2020, mu, xax=2010:2020)
 }
 \author{
 Matt Tyers
