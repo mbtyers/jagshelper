@@ -404,6 +404,7 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
 #' @param df Posterior df
 #' @param x Vector of X-coordinates for plotting.
 #' @param median Whether to include medians
+#' @param mean Whether to include means
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param col Color for plotting
 #' @param add Whether to add to existing plot
@@ -433,7 +434,7 @@ envelope <- function(df, x=NA, median=T, ci=c(0.5,0.95), col=4, add=F, dark=.3, 
 #' ypred <- pull_post(ts_out_df, "ypred")
 #' caterpillar(x=2010:2020, mu, xax=2010:2020)
 #' @export
-caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, medlwd=lwd, medwd=1,...) {
+caterpillar <- function(df, x=NA, median=T, mean=F, ci=c(0.5,0.95), lwd=1, col=4, add=F, xlab="", ylab="", main="", xax=NA, medlwd=lwd, medwd=1,...) {
   ci <- rev(sort(ci))
   loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
@@ -445,7 +446,7 @@ caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F,
   if(all(is.na(x))) x <- 1:ncol(df)
   d <- diff(x[1:2])
   nn <- ncol(df)
-  if(is.na(xax)) xax<-names(df)
+  if(all(is.na(xax))) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd
   if(!add) {
     plot(NA, type='l', ylim=range(loq,hiq,na.rm=T), xlim=range(x-(.2*d),x+(.2*d)), xlab=xlab, ylab=ylab, main=main, xaxt="n", ...=...)
@@ -454,5 +455,6 @@ caterpillar <- function(df, x=NA, median=T, ci=c(0.5,0.95), lwd=1, col=4, add=F,
   if(median) {
     segments(x0=x-.2*d*medwd,x1=x+.2*d*medwd,y0=med,y1=med,col=col,lwd=medlwd, lend=1)
   }
+  if(mean) points(x,colMeans(df, na.rm=T), pch=16, col=col)
   for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
 }

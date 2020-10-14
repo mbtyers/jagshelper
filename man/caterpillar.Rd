@@ -8,6 +8,7 @@ caterpillar(
   df,
   x = NA,
   median = T,
+  mean = F,
   ci = c(0.5, 0.95),
   lwd = 1,
   col = 4,
@@ -27,6 +28,8 @@ caterpillar(
 \item{x}{Vector of X-coordinates for plotting.}
 
 \item{median}{Whether to include medians}
+
+\item{mean}{Whether to include means}
 
 \item{ci}{Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.}
 
