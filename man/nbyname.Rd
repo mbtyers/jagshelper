@@ -4,13 +4,17 @@
 \alias{nbyname}
 \title{Number of parameters by parameter name}
 \usage{
-nbyname(x)
+nbyname(x, justtotal = FALSE)
 }
 \arguments{
 \item{x}{Output object from jagsUI::jags()}
+
+\item{justtotal}{Whether to just report the total number of parameters, as opposed to dims.}
 }
 \description{
 Returns a summary of the numbers of parameters saved in jagsUI output by parameter name.
+As a default, what is actually returned is a vector of the array dimensions (excluding the number of mcmc iterations),
+or alternately, just the total number of parameters
 }
 \examples{
 head(jags_df(asdf_jags_out))
