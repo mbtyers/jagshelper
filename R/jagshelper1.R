@@ -204,9 +204,13 @@ tracedens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' @export
 nparam <- function(x) ncol(jags_df(x))
 
+
 #' Number of parameters by parameter name
 #' @description Returns a summary of the numbers of parameters saved in jagsUI output by parameter name.
+#' As a default, what is actually returned is a vector of the array dimensions (excluding the number of mcmc iterations),
+#' or alternately, just the total number of parameters
 #' @param x Output object from jagsUI::jags()
+#' @param justtotal Whether to just report the total number of parameters, as opposed to dims.
 #' @author Matt Tyers
 #' @examples
 #' head(jags_df(asdf_jags_out))
@@ -216,7 +220,58 @@ nparam <- function(x) ncol(jags_df(x))
 #' nparam(ts_jags_out)
 #' nbyname(ts_jags_out)
 #' @export
-nbyname <- function(x) sapply(x$sims.list, function(x) ncol(as.matrix(x)))
+nbyname <- function(x, justtotal=FALSE) {
+  # sapply(x$sims.list, function(x) ncol(as.matrix(x)))
+  out1 <- sapply(x$sims.list, function(x) dim(x)[-1])
+  out1[sapply(out1, is.null)] <- 1
+  if(!justtotal) return(out1)
+  if(justtotal) return(sapply(out1, prod))
+}
+
+
+#' Quick summary of Rhat values by parameter name
+#' @description Returns the mean number of Rhat values (by each parameter) that are less than a specified threshold criterion.
+#' @param x Output object from jagsUI::jags()
+#' @param thresh Threshold value (defaults to 1.1)
+#' @author Matt Tyers
+#' @examples
+#' check_Rhat(ts_jags_out)
+#' @export
+check_Rhat <- function(x, thresh=1.1) sapply(x$Rhat, function(x) mean(x<thresh, na.rm=T))
+
+
+#' Quick summary of n.eff values by parameter name
+#' @description Returns the mean number of n.eff values (by each parameter) that are greater than a specified threshold criterion.
+#' @param x Output object from jagsUI::jags()
+#' @param thresh Threshold value (defaults to 500)
+#' @author Matt Tyers
+#' @examples
+#' check_neff(ts_jags_out)
+#' @export
+check_neff <- function(x, thresh=500) sapply(x$n.eff, function(x) mean(x>thresh, na.rm=T))
+
+
+#' Logit
+#' @description Logit log(x/(1-x)
+#' @param x A number
+#' @author Matt Tyers
+#' @examples
+#' logit(0.5)
+#' @export
+logit <- function(x) log(x/(1-x))
+
+
+#' Expit, or inverse logit
+#' @description Inverse logit, where logit is log(x/(1-x).  Expit is exp(x)/(1+exp(x))
+#' @param x A number
+#' @author Matt Tyers
+#' @examples
+#' expit(0)
+#' @export
+expit <- function(x) exp(x)/(1+exp(x))
+
+
+
 
 #' Simple traceplot
 #' @description Traceplot of a single parameter.
@@ -300,9 +355,13 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
   }
+  thencol <- ifelse(is.null(ncol(df)), 1, ncol(df))
+  if(thencol==1) {
+    trace_line(df,nline=nline,...=...)
+  } else {
   for(i in 1:ncol(df)) {
     trace_line(df[,i],main=names(df)[i],nline=nline,...=...)
-  }
+  }}
   if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
