@@ -1,0 +1,90 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# jagshelper
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of jagshelper is to streamline Bayesian analysis in JAGS using the `jagsUI` package.  
+Functions are provided for extracting output in a simpler form, assessing model convergence,
+and plotting model output.  Also included is a function giving a template model in JAGS syntax
+with the associated `jagsUI` code.
+
+## Installation
+
+You can install the development version of jagshelper like so:
+
+``` r
+devtools::install_github("mbtyers/jagshelper")
+```
+
+## Model template
+
+The `skeleton()` function prints a JAGS model template to the screen, along with 
+an associated simulated dataset.
+
+```{r example1}
+library(jagshelper)
+skeleton("EXAMPLE")
+```
+
+## Assessing convergence - a simple model
+
+In the example below, there are relatively few parameters saved, and it is 
+feasible to examine the trace plots associated with each parameter.
+
+```{r example2}
+nparam(asdf_jags_out)  # how many parameters in total
+nbyname(asdf_jags_out)  # how many parameters (or dimensions) per parameter name
+tracedens_jags(asdf_jags_out, parmfrow=c(2,2))  #trace plots
+check_Rhat(asdf_jags_out)  # proportion of Rhats below a threshold of 1.1
+plotRhats(asdf_jags_out)  # plotting Rhat values
+```
+
+## Assessing convergence - a more complex model
+
+In the example below, there are relatively many parameters saved, and it is 
+perhaps more illustrative to examine the trace plots associated with the least-
+converged parameters, as measured by Rhat value.
+
+```{r example3}
+nparam(SS_jags)  # how many parameters in total
+nbyname(SS_jags)  # how many parameters (or dimensions) per parameter name
+traceworstRhat(SS_jags, parmfrow=c(2,2))  #trace plots
+check_Rhat(SS_jags)  # proportion of Rhats below a threshold of 1.1
+plotRhats(SS_jags)  # plotting Rhat values
+```
+
+## Extracting output as data.frame
+
+The `jags_df()` function extracts the full posterior from an output object returned
+by `jagsUI::jags()` as a `data.frame`, which may be preferable for some users.
+
+```{r example4}
+out_df <- jags_df(asdf_jags_out)
+str(out_df)
+```
+
+## Plotting output matrices
+
+The `caterpillar()` and `envelope()` functions plot output for 2-dimensional parameter
+matrices, and `comparecat()`, `comparedens()` and `overlayenvelope()` functions allow comparison
+between multiple models or parameter matrices.
+
+```{r example5}
+caterpillar(asdf_jags_out,"a")
+envelope(SS_jags,"rate", x=xss)
+```

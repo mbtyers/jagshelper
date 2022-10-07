@@ -1,0 +1,25 @@
+Package: jagshelper
+Type: Package
+Title: Functions for Extracting and Plotting Output from 'jagsUI'
+Version: 0.1.2
+Date: 2022-09-22
+Author: Matt Tyers [aut, cre]
+Authors@R: person("Matt", "Tyers", email = "matttyersstat@gmail.com",
+    role = c("aut", "cre"))
+Maintainer: Matt Tyers <matttyersstat@gmail.com>
+Description: Functions are provided to help run Bayesian analyses in JAGS using 
+    the 'jagsUI' package.  Included are functions for extracting output in 
+    simpler format, functions for streamlining assessment of convergence, and 
+    functions for producing summary plots of output.  Also included is a 
+    function that provides a simple template for running JAGS from R.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 3.5.0)
+Imports: jagsUI, MASS
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
