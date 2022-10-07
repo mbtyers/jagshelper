@@ -3,7 +3,7 @@
 \docType{data}
 \name{xss}
 \alias{xss}
-\title{State-space X}
+\title{Example data: state-space X}
 \format{
 An object of class \code{numeric} of length 61.
 }

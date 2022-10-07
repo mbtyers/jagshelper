@@ -3,7 +3,7 @@
 \docType{data}
 \name{SS_jags}
 \alias{SS_jags}
-\title{SS jags out}
+\title{Example data: SS jags out}
 \format{
 An object of class \code{jagsUI} of length 24.
 }
@@ -11,6 +11,6 @@ An object of class \code{jagsUI} of length 24.
 SS_jags
 }
 \description{
-A more complicated time series model
+A time series model with multiple observations of a single time series
 }
 \keyword{datasets}

@@ -26,8 +26,8 @@ head(jags_df(asdf_jags_out))
 
 nbyname(asdf_jags_out)
 
-nparam(ts_jags_out)
-nbyname(ts_jags_out)
+nparam(SS2d_jags)
+nbyname(SS2d_jags)
 }
 \seealso{
 \link{nparam}

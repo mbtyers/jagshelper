@@ -1,0 +1,192 @@
+---
+title: "jagshelper-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{jagshelper-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=8,
+  fig.height=6
+)
+```
+
+```{r setup}
+library(jagshelper)
+```
+
+# jagshelper
+
+The goal of `jagshelper` is to streamline Bayesian analysis in JAGS using the `jagsUI` package.  
+Functions are provided for extracting output in a simpler form, assessing model convergence,
+and plotting model output.  Also included is a function giving a template model in JAGS syntax
+with the associated `jagsUI` code.
+
+Most of the `jagshelper` functionality is illustrated below, with steps approximately 
+corresponding to those of a typical Bayesian analysis using JAGS.
+
+## Model template
+
+When starting a Bayesian analysis in JAGS from scratch, I can never remember the 
+exact structure for doing so, and sometimes need reminding of basic JAGS model syntax.
+
+The `skeleton()` function prints a JAGS model template to the screen, along with 
+code to simulate a corresponding dataset.  
+
+```{r}
+library(jagshelper)
+skeleton("EXAMPLE")
+```
+
+## Output summary & Assessing convergence
+
+### A simple model
+
+Having run a model for the first time, it can be useful to see how many parameter nodes
+have been saved, or how many nodes of each named parameter.  This can aid in 
+deciding the appropriate strategy for assessing convergence: whether trace plots 
+and/or numerical convergence diagnostics can be feasibly addressed for all parameter 
+nodes in the model, or just a subset.
+
+In the example below, there are relatively few parameters saved and all trace
+plots can be examined.
+
+```{r}
+nparam(asdf_jags_out)  # how many parameters in total
+nbyname(asdf_jags_out)  # how many parameters (or dimensions) per parameter name
+tracedens_jags(asdf_jags_out, parmfrow=c(2,2))  # trace plots for all parameters
+check_Rhat(asdf_jags_out)  # proportion of Rhats below a threshold of 1.1
+plotRhats(asdf_jags_out)  # plotting Rhat values
+```
+
+### A more complex model
+
+In the example below, there are many more parameters saved, and it is 
+perhaps more illustrative to examine the trace plots associated with the least-
+converged parameter nodes, as measured by Rhat value.
+
+```{r}
+nparam(SS_jags)  # how many parameters in total
+nbyname(SS_jags)  # how many parameters (or dimensions) per parameter name
+traceworstRhat(SS_jags, parmfrow=c(2,2))  # trace plots for least-converged nodes
+check_Rhat(SS_jags)  # proportion of Rhats below a threshold of 1.1
+plotRhats(SS_jags)  # plotting Rhat values
+```
+
+### Additional functionality
+
+* The function `check_neff()` behaves very similarly to `check_Rhat()`, but makes
+comparisons based on effective sample size `n.eff` rather than Gelman-Rubin convergence
+diagnostic `Rhat`.  
+
+* The functions `traceworstRhat()` and `check_Rhat()` both contain
+an optional `n.eff=` argument.  When set to `TRUE`, the functions will compare 
+or plot based on the value of `n.eff` rather than `Rhat`.
+
+* The function `tracedens_jags()` is likely to be the most useful and concise trace
+plot version.  However, if only line trace plots or by-chain kernel density plots 
+are desired (rather than both), older versions `trace_jags()` and `chaindens_jags()`
+are preserved.
+
+## Extracting output as data.frame
+
+The `jags_df()` function extracts the full posterior from an output object returned
+by `jagsUI::jags()` as a `data.frame`, which may be preferable for some users.
+
+```{r}
+out_df <- jags_df(asdf_jags_out)
+str(out_df)
+```
+
+### Additional functionality
+
+* Functions for trace plots and by-chain kernel density are available with `trace_df()`
+and `chaindens_df()`, respectively, if model output is only saved in `data.frame`
+form.  Note that both functions contain an additional `nline=` argument corresponding
+to the number of MCMC chains that were run.
+
+* Functions `trace_line()` and `chaindens_line()` are also included for completeness, 
+which take a single vector of MCMC iterations (associated with a single parameter)
+as input.  Note that both functions contain an additional `nline=` argument corresponding
+to the number of MCMC chains that were run.
+
+## Plotting a matrix associated with a vector of parameter nodes
+
+### A single matrix
+
+The `caterpillar()` and `envelope()` functions plot output associated with a vector
+of parameter nodes.  This is often expressed as a two-dimensional matrix or `data.frame`,
+with a column for each parameter node and a row for each MCMC iteration.  Both 
+`caterpillar()` and `envelope()` were originally written to accept such `data.frame`s
+as inputs, but now also accept a `jagsUI` output object and parameter name.
+
+It is anticipated that `caterpillar()` could be used for effect sizes associated 
+with a categorical variable, in which plotting order may or may not matter.
+
+```{r}
+caterpillar(asdf_jags_out, "a")
+```
+
+By contrast, `envelope()` is intended for a matrix associated with a sequence of 
+parameter nodes, such as in a time series.
+
+```{r}
+envelope(SS_jags, "rate", x=xss)
+```
+
+### Multiple matrices or multiple models
+
+It may be appropriate to make by-element comparisons of multiple such matrices, 
+perhaps between multiple candidate models.
+
+Function `comparecat()` produces interleaved caterpillar plots for a list of `jagsUI`
+output objects and an optional list of parameters, plotting parameters common to 
+a set of models adjacent to one another.  The example below uses the same output
+object three times, but will show functionality.
+
+```{r}
+comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
+           p=c("a","b","sig"))
+```
+
+Function `comparedens()` behaves similarly, but produces left- and right-facing 
+kernel density plots for TWO `jagsUI` output objects and an optional list of parameters.
+The example below uses the same output object twice, but will show functionality.
+
+```{r}
+comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"))
+```
+
+Function `overlayenvelope()` will automatically overlay multiple `envelope()` plots,
+and may be used with a variety of input structures:
+
+* A `list()` of 2-dimensional posterior `data.frame`s or matrices
+
+* A 3-dimensional `array`, in which multiple 2-dimensional posterior matrices 
+are joined along the third dimension
+
+* A `list()` of `jagsUI` output objects, plus a parameter name
+
+* A single `jagsUI` output objects, plus a vector of parameter names
+
+```{r}
+par(mfrow=c(2,2))
+
+## usage with list of input data.frames
+overlayenvelope(df=list(SS2d_jags$sims.list$rate[,,1],
+                            SS2d_jags$sims.list$rate[,,2]))
+
+## usage with a 3-d input array
+overlayenvelope(df=SS2d_jags$sims.list$rate)
+
+## usage with a jagsUI output object and parameter name (2-d parameter)
+overlayenvelope(df=SS2d_jags, p="rate")
+
+## usage with a single jagsUI output object and multiple parameters
+overlayenvelope(df=SS_jags, p=c("trend","rate"))
+```

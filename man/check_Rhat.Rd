@@ -18,7 +18,7 @@ Numeric (named) giving the proportion of Rhat values below the given threshold.
 Returns the mean number of Rhat values (by each parameter) that are less than a specified threshold criterion.
 }
 \examples{
-check_Rhat(ts_jags_out)
+check_Rhat(SS2d_jags)
 }
 \seealso{
 \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}

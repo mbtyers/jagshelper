@@ -311,8 +311,8 @@ nparam <- function(x) {
 #'
 #' nbyname(asdf_jags_out)
 #'
-#' nparam(ts_jags_out)
-#' nbyname(ts_jags_out)
+#' nparam(SS2d_jags)
+#' nbyname(SS2d_jags)
 #' @export
 nbyname <- function(x, justtotal=FALSE) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -332,7 +332,7 @@ nbyname <- function(x, justtotal=FALSE) {
 #' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
-#' check_Rhat(ts_jags_out)
+#' check_Rhat(SS2d_jags)
 #' @export
 check_Rhat <- function(x, thresh=1.1) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -348,7 +348,7 @@ check_Rhat <- function(x, thresh=1.1) {
 #' @seealso \link{check_Rhat}
 #' @author Matt Tyers
 #' @examples
-#' check_neff(ts_jags_out)
+#' check_neff(SS2d_jags)
 #' @export
 check_neff <- function(x, thresh=500) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -758,7 +758,7 @@ overlayenvelope <- function(df,
   if(is.null(ylim)) ylim <- range(bounds)
 
   if(length(col) != length(df)) {
-    cols <- rcolors(length(df))  ## betterize this??
+    cols <- c(4,2,3,rcolors(100))[1:length(df)]  ## betterize this??
   } else {
     cols <- col
   }
@@ -928,31 +928,26 @@ caterpillar <- function(df,
 }
 
 
-#' Asdf jags out
+#' Example data: asdf jags out
 #'
 #' A simple model
 #'
 "asdf_jags_out"
 
-#' TS jags out
+#' Example data: SS jags out
 #'
-#' A simple time series model
-#'
-"ts_jags_out"
-
-#' SS jags out
-#'
-#' A more complicated time series model
+#' A time series model with multiple observations of a single time series
 #'
 "SS_jags"
 
-#' SS 2D jags out
+#' Example data: SS 2D jags out
 #'
-#' A more complicated time series model, with 2 dimensions
+#' A more complicated time series model with 2 dimensions (multiple
+#' observations of 2 columns of data)
 #'
 "SS2d_jags"
 
-#' State-space X
+#' Example data: state-space X
 #'
 #' The time variable associated with the time series models SS_jags and SS2d_jags
 #'

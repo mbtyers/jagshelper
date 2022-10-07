@@ -3,7 +3,7 @@
 \docType{data}
 \name{asdf_jags_out}
 \alias{asdf_jags_out}
-\title{Asdf jags out}
+\title{Example data: asdf jags out}
 \format{
 An object of class \code{jagsUI} of length 24.
 }

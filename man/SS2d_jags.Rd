@@ -3,7 +3,7 @@
 \docType{data}
 \name{SS2d_jags}
 \alias{SS2d_jags}
-\title{SS 2D jags out}
+\title{Example data: SS 2D jags out}
 \format{
 An object of class \code{jagsUI} of length 24.
 }
@@ -11,6 +11,7 @@ An object of class \code{jagsUI} of length 24.
 SS2d_jags
 }
 \description{
-A more complicated time series model, with 2 dimensions
+A more complicated time series model with 2 dimensions (multiple
+observations of 2 columns of data)
 }
 \keyword{datasets}
