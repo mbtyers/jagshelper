@@ -319,7 +319,7 @@ nbyname <- function(x, justtotal=FALSE) {
   # sapply(x$sims.list, function(x) ncol(as.matrix(x)))
   out1 <- sapply(x$sims.list, function(x) dim(x)[-1])
   out1[sapply(out1, is.null)] <- 1
-  if(!justtotal) return(out1)
+  if(!justtotal) return(out1) #comment
   if(justtotal) return(sapply(out1, prod))
 }
 
