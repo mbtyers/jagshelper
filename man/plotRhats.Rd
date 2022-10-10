@@ -23,24 +23,24 @@ plotRhats(
 \item{n.eff}{Optionally, whether to plot \code{n.eff} instead of \code{Rhat}.  Defaults to \code{FALSE}.}
 
 \item{fence}{Value of horizontal lines to overlay as reference.  Accepting the default value (\code{NULL}) will give \code{fence} values
-of 1.1 (a commonly used value) and 1.01 for Rhat, or 100 and 500 for n.eff.}
+of 1.1 (a commonly used value) and 1.01 for Rhat, or 100 and 500 for \code{n.eff.}}
 
 \item{plotsequence}{Whether to plot parameter vectors (or matrices) in a sequence, running left to right, which may
 be useful for time series models, etc.  If the default (\code{FALSE}) is used, a vertical cluster will be plotted
-for each parameter, resulting in a simpler plot if there are many parameters.  Note that the Rhat values will still be
+for each parameter, resulting in a simpler plot if there are many parameters.  Note that the \code{Rhat} values will still be
 plotted in sequence if the default (\code{FALSE}) is used.}
 
 \item{splitarr}{Whether to split 2+ dimensional parameter arrays by a given dimension, rather than plotting the full
 array in one vertical cluster or continuous sequence.  This may be recommended in the case of large arrays.  Defaults to \code{FALSE}.}
 
-\item{margin}{If splitarr is set to TRUE, which array margin to split by.  In the case of a 2-dimensional array, setting
+\item{margin}{If \verb{splitarr=} is set to \code{TRUE}, which array margin to split by.  In the case of a 2-dimensional array, setting
 \code{margin=2} will separate the array by column.  If the default (\code{NULL}) is accepted, the function will split by the smallest dimension,
 therefore splitting into the fewest groups.}
 
 \item{...}{additional plotting arguments}
 }
 \description{
-Plotting all values of Rhat (or alternately n.eff) from an output object returned by \code{jagsUI}, or perhaps a subset of parameters.
+Plotting all values of \code{Rhat} (or alternately \code{n.eff}) from an output object returned by \code{jagsUI}, or perhaps a subset of parameters.
 This function is intended as a quick graphical check of which parameters have adequately converged.
 }
 \examples{

@@ -2,12 +2,12 @@
 % Please edit documentation in R/jagshelper1.R
 \name{trace_df}
 \alias{trace_df}
-\title{Traceplot of each column of a data.frame}
+\title{Trace plot of each column of a \code{data.frame}}
 \usage{
 trace_df(df, nline, parmfrow = NULL, ...)
 }
 \arguments{
-\item{df}{Posterior df}
+\item{df}{Posterior data.frame}
 
 \item{nline}{Number of chains}
 
@@ -16,7 +16,7 @@ trace_df(df, nline, parmfrow = NULL, ...)
 \item{...}{additional plotting arguments or arguments to \code{trace_line()}}
 }
 \description{
-Traceplot of each column of a posterior 'data.frame'.
+Trace plot of each column of a posterior 'data.frame'.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

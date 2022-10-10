@@ -7,7 +7,7 @@
 comparecat(x, p = NULL, ci = c(0.5, 0.95), ylim = NULL, ...)
 }
 \arguments{
-\item{x}{List of output objects returned from \code{jagsUI} or \code{data.frame}}
+\item{x}{List of output objects returned from \code{jagsUI} or \code{data.frame}s}
 
 \item{p}{Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 string supplied will be returned.  If the default (\code{NULL}) is accepted, all parameters will be plotted.}

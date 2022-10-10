@@ -15,7 +15,7 @@ check_Rhat(x, thresh = 1.1)
 Numeric (named) giving the proportion of Rhat values below the given threshold.
 }
 \description{
-Returns the mean number of Rhat values (by each parameter) that are less than a specified threshold criterion.
+Returns the mean number of \code{Rhat} values (by each parameter) that are less than a specified threshold criterion.
 }
 \examples{
 check_Rhat(SS2d_jags)

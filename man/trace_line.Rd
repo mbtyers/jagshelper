@@ -2,14 +2,14 @@
 % Please edit documentation in R/jagshelper1.R
 \name{trace_line}
 \alias{trace_line}
-\title{Simple traceplot}
+\title{Simple trace plot}
 \usage{
 trace_line(x, nline, lwd = 1, main = "", ...)
 }
 \arguments{
 \item{x}{Posterior vector}
 
-\item{nline}{Number of chains}
+\item{nline}{Number of MCMC chains}
 
 \item{lwd}{Line width}
 
@@ -18,7 +18,7 @@ trace_line(x, nline, lwd = 1, main = "", ...)
 \item{...}{additional plotting arguments}
 }
 \description{
-Traceplot of a single parameter.
+Trace plot of a single parameter.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

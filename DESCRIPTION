@@ -1,7 +1,7 @@
 Package: jagshelper
 Type: Package
-Title: Functions for Extracting and Plotting Output from 'jagsUI'
-Version: 0.1.3
+Title: Functions for Extracting and Visualizing Output from 'jagsUI'
+Version: 0.1.4
 Date: 2022-10-07
 Author: Matt Tyers [aut, cre]
 Authors@R: person("Matt", "Tyers", email = "matttyersstat@gmail.com",

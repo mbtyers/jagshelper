@@ -11,7 +11,7 @@ pull_post(x, p = NULL, exact = FALSE)
 
 \item{p}{String to begin posterior names.  If \code{NULL} is used, all parameters will be returned.}
 
-\item{exact}{Whether name must be an exact match (\code{TRUE}) or with first part matching only supplied characters (\code{FALSE}).
+\item{exact}{Whether name must be an exact match (\code{TRUE}) or with initial sub-string matching only supplied characters (\code{FALSE}).  Defaults to \code{FALSE}.
 Defaults to \code{FALSE.}}
 }
 \value{
@@ -19,7 +19,7 @@ A \code{data.frame} with a column associated with each (subsetted) parameter and
 associated with each MCMC iteration.
 }
 \description{
-Extract a subset vector or \code{data.frame} from posterior \code{data.frame}, with parameter names matching a given name.
+Extracts a subset vector or \code{data.frame} from a larger (likely posterior) \code{data.frame}, such that column names match a name given in the \verb{p=} argument.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

@@ -36,9 +36,9 @@ input to \code{df} is a single \code{jagsUI} output object.}
 
 \item{x}{Optional vector of X-coordinates for plotting.}
 
-\item{row}{Row to subset, in the case of a 2-d parameter matrix.}
+\item{row}{Row to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 
-\item{column}{Column to subset, in the case of a 2-d parameter matrix.}
+\item{column}{Column to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 
 \item{median}{Whether to include median line}
 
@@ -56,7 +56,7 @@ input to \code{df} is a single \code{jagsUI} output object.}
 
 \item{ylab}{Y-axis label}
 
-\item{main}{Plot title.  If the default (\code{NULL}) is accepted and argument p is used, p will be used for the title.}
+\item{main}{Plot title.  If the default (\code{NULL}) is accepted and argument \verb{p=} is used, \code{p} will be used for the title.}
 
 \item{ylim}{Y-axis limits for plotting.  If the default (\code{NULL}) is accepted, these will be determined automatically.}
 
@@ -67,8 +67,8 @@ input to \code{df} is a single \code{jagsUI} output object.}
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
 \description{
-Overlay multiple envelope plots of posterior \code{data.frames}, or outputs returned from \code{jagsUI}.
-This would be best suited to a set of posterior \code{data.frames} or 2-d matrices representing time series.
+Overlays multiple envelope plots of posterior \code{data.frames}, or outputs returned from \code{jagsUI}.
+This would be best suited to a set of posterior \code{data.frames} or 2-d matrices representing sequential vectors of parameter nodes.
 }
 \examples{
 ## usage with list of input data.frames

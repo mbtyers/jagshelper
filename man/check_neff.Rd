@@ -12,10 +12,10 @@ check_neff(x, thresh = 500)
 \item{thresh}{Threshold value (defaults to 500)}
 }
 \value{
-Numeric (named) giving the proportion of n.eff values above the given threshold.
+Numeric (named) giving the proportion of \code{n.eff} values above the given threshold.
 }
 \description{
-Returns the mean number of n.eff values (by each parameter) that are greater than a specified threshold criterion.
+Returns the mean number of \code{n.eff} values (by each parameter) that are greater than a specified threshold criterion.
 }
 \examples{
 check_neff(SS2d_jags)

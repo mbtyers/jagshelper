@@ -14,7 +14,10 @@ A \code{data.frame} with a column associated with each parameter and a row
 associated with each MCMC iteration.
 }
 \description{
-Extract \code{data.frame} from \code{jagsUI} output.
+Extracts the posterior from \code{jagsUI} output in the form of
+a \code{data.frame}.  This simpler construction has a few benefits: operations may
+be more straightforward, posterior objects will be smaller files, and can be
+written to an external table or .csv, etc.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

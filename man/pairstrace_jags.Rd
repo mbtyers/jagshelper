@@ -34,7 +34,8 @@ pairstrace_jags(
 }
 \description{
 Two-dimensional trace plots (or alternately, scatter plots or contour plots) of each possible pair of
-parameters from a possible subset
+parameters from a possible subset.  May be useful in assessing correlation between parameter nodes, or problematic
+posterior surfaces.
 }
 \examples{
 pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), lwd=2)

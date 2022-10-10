@@ -2,14 +2,14 @@
 % Please edit documentation in R/jagshelper1.R
 \name{nbyname}
 \alias{nbyname}
-\title{Number of parameters by parameter name}
+\title{Number of parameter nodes by parameter name}
 \usage{
 nbyname(x, justtotal = FALSE)
 }
 \arguments{
 \item{x}{Output object from \code{jagsUI::jags()}}
 
-\item{justtotal}{Whether to just report the total number of parameters, as opposed to dims.}
+\item{justtotal}{Whether to just report the total number of parameters, as opposed to dimensions.}
 }
 \value{
 A \code{list} with an element associated with each parameter.  Each element
@@ -17,8 +17,9 @@ can be interpreted as the vector length or array dimension associated with the
 given parameter.
 }
 \description{
-Returns a summary of the numbers of parameters saved in \code{jagsUI} output by parameter name.
-As a default, what is actually returned is a vector of the array dimensions (excluding the number of mcmc iterations),
+Returns a summary of the numbers of parameter nodes saved in \code{jagsUI} output, by parameter name.
+As a default, what is returned for each list element is a vector of the array dimensions within the JAGS model
+(excluding the number of MCMC iterations),
 or alternately, just the total number of parameters
 }
 \examples{

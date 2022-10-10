@@ -19,6 +19,10 @@ each MCMC iteration.
 \description{
 Extract a list of nrep X nchain matrices, one for each parameter.
 }
+\note{
+It is unlikely that a user will need this function; it is included
+primarily as a helper function used by other functions in this package.
+}
 \examples{
 out_plist <- jags_plist(asdf_jags_out)
 str(out_plist)

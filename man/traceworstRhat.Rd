@@ -11,19 +11,19 @@ traceworstRhat(x, p = NULL, n.eff = FALSE, margin = NULL, parmfrow = NULL, ...)
 
 \item{p}{Optional vector of parameters to subset}
 
-\item{n.eff}{Whether to plot parameters with the smallest associated values of n.eff instead.  Defaults to \code{FALSE}.}
+\item{n.eff}{Whether to plot parameters with the smallest associated values of \code{n.eff} instead.  Defaults to \code{FALSE}.}
 
 \item{margin}{In the case of a 2+ dimensional array associated with a given parameter, this will have the effect
-of plotting the worst Rhat corresponding to each margin specified.  For example, specifying \code{margin=2} (column)
-will plot the parameter with the worst Rhat value from each column.  In contrast, specifying \code{margin=NULL} (the default)
+of plotting the worst \code{Rhat} corresponding to each margin specified.  For example, specifying \code{margin=2} (column)
+will plot the parameter with the worst \code{Rhat} value from each column.  In contrast, specifying \code{margin=NULL} (the default)
 will cause the function to plot the single array element with the largest Rhat value.}
 
-\item{parmfrow}{Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
+\item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
 
 \item{...}{additional plotting arguments or arguments to \code{tracedens_jags()}}
 }
 \description{
-Trace plots with kernel densities will be created for parameters with the largest associated values of Rhat.
+Trace plots with kernel densities will be created for parameters with the largest (worst) associated values of \code{Rhat}.
 This function is primarily intended for parameters with a vector (or array) of values.
 }
 \examples{

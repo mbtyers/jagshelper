@@ -12,6 +12,11 @@ skeleton(NAME = "NAME")
 \description{
 Provides a paste-able skeleton of code with an example JAGS model and output.
 }
+\note{
+The printed code will use the \code{cat()} function to write the model code to an
+external text file.  It may be desirable to use a call to \verb{\link{tempfile}()}
+instead, to eliminate creation of unneeded files.
+}
 \examples{
 skeleton("asdf")
 }

@@ -7,9 +7,9 @@
 comparedens(x1, x2, p = NULL, ...)
 }
 \arguments{
-\item{x1}{Output object returned from \code{jagsUI} or \code{data.frame}}
+\item{x1}{Output object returned from \code{jagsUI}; or alternately a \code{data.frame}}
 
-\item{x2}{Second output object returned from \code{jagsUI} or \code{data.frame}}
+\item{x2}{Second output object returned from \code{jagsUI}; or alternately a \code{data.frame}}
 
 \item{p}{Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 string supplied will be returned.  If the default (\code{NULL}) is accepted, all parameters will be plotted.}

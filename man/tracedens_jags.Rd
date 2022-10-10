@@ -9,7 +9,7 @@ tracedens_jags(x, p = NULL, parmfrow = NULL, lwd = 1, shade = TRUE, ...)
 \arguments{
 \item{x}{Posterior \code{jagsUI} object}
 
-\item{p}{parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.}
+\item{p}{Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.}
 
 \item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
 

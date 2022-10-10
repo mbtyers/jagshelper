@@ -24,15 +24,17 @@ envelope(
 )
 }
 \arguments{
-\item{df}{Posterior \code{data.frame}, or output object returned from \code{jagsUI::jags()}.}
+\item{df}{Output object returned from \code{jagsUI::jags()}; or alternately,
+two-dimensional \code{data.frame} or matrix in which parameter node element is
+given by column and MCMC iteration is given by row.}
 
 \item{p}{Parameter name, if input to \code{df} is a \code{jagsUI} output object.}
 
 \item{x}{Vector of X-coordinates for plotting.}
 
-\item{row}{Row to subset, in the case of a 2-d parameter matrix.}
+\item{row}{Row to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 
-\item{column}{Column to subset, in the case of a 2-d parameter matrix.}
+\item{column}{Column to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 
 \item{median}{Whether to include median line}
 
@@ -57,8 +59,8 @@ envelope(
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
 \description{
-Envelope plot of posterior \code{data.frame}, or output returned from \code{jagsUI}.
-This would be best suited to a single posterior \code{data.frame} or 2-d matrix representing a time series.
+Envelope plot of the posterior densities of a vector of parameter nodes,
+in which the sequential order of nodes is important, such as a time series.
 }
 \examples{
 ## usage with input data.frame

@@ -10,10 +10,10 @@ nparam(x)
 \item{x}{Output object from \code{jagsUI::jags()}}
 }
 \value{
-A single numeric value giving the number of parameters.
+A single numeric value giving the number of parameter nodes.
 }
 \description{
-Number of parameters saved in \code{jagsUI} output.
+Number of individual parameter nodes saved in \code{jagsUI} output.
 }
 \examples{
 head(jags_df(asdf_jags_out))

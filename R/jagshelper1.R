@@ -1,6 +1,9 @@
 #' Skeleton
 #' @description Provides a paste-able skeleton of code with an example JAGS model and output.
 #' @param NAME Name to append to JAGS model object, etc.
+#' @note The printed code will use the `cat()` function to write the model code to an
+#' external text file.  It may be desirable to use a call to `\link{tempfile}()`
+#' instead, to eliminate creation of unneeded files.
 #' @author Matt Tyers
 #' @importFrom grDevices adjustcolor rainbow
 #' @importFrom graphics axis lines par points polygon segments
@@ -65,7 +68,10 @@ ncores <- 3
 }
 
 #' Extract data.frame
-#' @description Extract `data.frame` from `jagsUI` output.
+#' @description Extracts the posterior from `jagsUI` output in the form of
+#' a `data.frame`.  This simpler construction has a few benefits: operations may
+#' be more straightforward, posterior objects will be smaller files, and can be
+#' written to an external table or .csv, etc.
 #' @param x Output object from `jagsUI::jags()`
 #' @return A `data.frame` with a column associated with each parameter and a row
 #' associated with each MCMC iteration.
@@ -82,10 +88,10 @@ jags_df <- function(x) {
 
 
 #' Subset from posterior data.frame
-#' @description Extract a subset vector or `data.frame` from posterior `data.frame`, with parameter names matching a given name.
+#' @description Extracts a subset vector or `data.frame` from a larger (likely posterior) `data.frame`, such that column names match a name given in the `p=` argument.
 #' @param x Posterior `data.frame`
 #' @param p String to begin posterior names.  If `NULL` is used, all parameters will be returned.
-#' @param exact Whether name must be an exact match (`TRUE`) or with first part matching only supplied characters (`FALSE`).
+#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).  Defaults to `FALSE`.
 #' Defaults to `FALSE.`
 #' @return A `data.frame` with a column associated with each (subsetted) parameter and a row
 #' associated with each MCMC iteration.
@@ -131,6 +137,8 @@ pull_post <- function(x, p=NULL, exact=FALSE) {
 #' @return A `list` with an element associated with each parameter.  Each element
 #' will be a matrix with a column associated with each MCMC chain and a row for
 #' each MCMC iteration.
+#' @note It is unlikely that a user will need this function; it is included
+#' primarily as a helper function used by other functions in this package.
 #' @author Matt Tyers
 #' @examples
 #' out_plist <- jags_plist(asdf_jags_out)
@@ -157,10 +165,10 @@ jags_plist <- function(x, p=NULL) {
   return(x2)
 }
 
-#' Traceplot of jagsUI object
-#' @description Smarter traceplot of a whole `jagsUI` object, or subset.
+#' Trace plot of jagsUI object
+#' @description Trace plot of a whole `jagsUI` object, or subset.
 #' @param x Posterior `jagsUI` object
-#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
@@ -194,7 +202,7 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' By-chain kernel densities of `jagsUI` object
 #' @description By-chain kernel densities of a whole `jagsUI` object, or subset.
 #' @param x Posterior `jagsUI` object
-#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
@@ -232,7 +240,7 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' Combination of trace plots and by-chain kernel densities of `jagsUI` object
 #' @description Combination of trace plots and by-chain kernel densities of a whole `jagsUI` object, or subset.
 #' @param x Posterior `jagsUI` object
-#' @param p parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param shade Whether to add semi-transparent shading to by-chain kernel densities.  Defaults to `TRUE`.
@@ -279,9 +287,9 @@ tracedens_jags <- function (x, p = NULL, parmfrow = NULL, lwd = 1, shade=TRUE, .
 }
 
 #' Number of parameters
-#' @description Number of parameters saved in `jagsUI` output.
+#' @description Number of individual parameter nodes saved in `jagsUI` output.
 #' @param x Output object from `jagsUI::jags()`
-#' @return A single numeric value giving the number of parameters.
+#' @return A single numeric value giving the number of parameter nodes.
 #' @seealso \link{nbyname}
 #' @author Matt Tyers
 #' @examples
@@ -295,12 +303,13 @@ nparam <- function(x) {
 }
 
 
-#' Number of parameters by parameter name
-#' @description Returns a summary of the numbers of parameters saved in `jagsUI` output by parameter name.
-#' As a default, what is actually returned is a vector of the array dimensions (excluding the number of mcmc iterations),
+#' Number of parameter nodes by parameter name
+#' @description Returns a summary of the numbers of parameter nodes saved in `jagsUI` output, by parameter name.
+#' As a default, what is returned for each list element is a vector of the array dimensions within the JAGS model
+#'  (excluding the number of MCMC iterations),
 #' or alternately, just the total number of parameters
 #' @param x Output object from `jagsUI::jags()`
-#' @param justtotal Whether to just report the total number of parameters, as opposed to dims.
+#' @param justtotal Whether to just report the total number of parameters, as opposed to dimensions.
 #' @return A `list` with an element associated with each parameter.  Each element
 #' can be interpreted as the vector length or array dimension associated with the
 #' given parameter.
@@ -325,7 +334,7 @@ nbyname <- function(x, justtotal=FALSE) {
 
 
 #' Quick summary of Rhat values by parameter name
-#' @description Returns the mean number of Rhat values (by each parameter) that are less than a specified threshold criterion.
+#' @description Returns the mean number of `Rhat` values (by each parameter) that are less than a specified threshold criterion.
 #' @param x Output object from `jagsUI::jags()`
 #' @param thresh Threshold value (defaults to 1.1)
 #' @return Numeric (named) giving the proportion of Rhat values below the given threshold.
@@ -341,10 +350,10 @@ check_Rhat <- function(x, thresh=1.1) {
 
 
 #' Quick summary of n.eff values by parameter name
-#' @description Returns the mean number of n.eff values (by each parameter) that are greater than a specified threshold criterion.
+#' @description Returns the mean number of `n.eff` values (by each parameter) that are greater than a specified threshold criterion.
 #' @param x Output object from `jagsUI::jags()`
 #' @param thresh Threshold value (defaults to 500)
-#' @return Numeric (named) giving the proportion of n.eff values above the given threshold.
+#' @return Numeric (named) giving the proportion of `n.eff` values above the given threshold.
 #' @seealso \link{check_Rhat}
 #' @author Matt Tyers
 #' @examples
@@ -369,7 +378,9 @@ logit <- function(x) log(x/(1-x))
 
 
 #' Expit, or inverse logit
-#' @description Inverse logit, where logit is log(x/(1-x).  Expit is exp(x)/(1+exp(x))
+#' @description Inverse logit, where logit is defined as log(x/(1-x).
+#'
+#' Expit (inverse logit) is defined as exp(x)/(1+exp(x)).
 #' @param x Numeric vector
 #' @return Numeric vector
 #' @seealso \link{logit}
@@ -382,10 +393,10 @@ expit <- function(x) exp(x)/(1+exp(x))
 
 
 
-#' Simple traceplot
-#' @description Traceplot of a single parameter.
+#' Simple trace plot
+#' @description Trace plot of a single parameter.
 #' @param x Posterior vector
-#' @param nline Number of chains
+#' @param nline Number of MCMC chains
 #' @param lwd Line width
 #' @param main Plot title
 #' @param ... additional plotting arguments
@@ -447,9 +458,9 @@ chaindens_line <- function(x, nline, lwd=1, main="", ...) {
   }
 }
 
-#' Traceplot of each column of a data.frame
-#' @description Traceplot of each column of a posterior 'data.frame'.
-#' @param df Posterior df
+#' Trace plot of each column of a `data.frame`
+#' @description Trace plot of each column of a posterior 'data.frame'.
+#' @param df Posterior data.frame
 #' @param nline Number of chains
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `trace_line()`
@@ -515,13 +526,15 @@ chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
 
 
 #' Envelope plot
-#' @description Envelope plot of posterior `data.frame`, or output returned from `jagsUI`.
-#' This would be best suited to a single posterior `data.frame` or 2-d matrix representing a time series.
-#' @param df Posterior `data.frame`, or output object returned from `jagsUI::jags()`.
+#' @description Envelope plot of the posterior densities of a vector of parameter nodes,
+#' in which the sequential order of nodes is important, such as a time series.
+#' @param df Output object returned from `jagsUI::jags()`; or alternately,
+#' two-dimensional `data.frame` or matrix in which parameter node element is
+#' given by column and MCMC iteration is given by row.
 #' @param p Parameter name, if input to `df` is a `jagsUI` output object.
 #' @param x Vector of X-coordinates for plotting.
-#' @param row Row to subset, in the case of a 2-d parameter matrix.
-#' @param column Column to subset, in the case of a 2-d parameter matrix.
+#' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
+#' @param column Column to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param median Whether to include median line
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param col Color for plotting
@@ -642,8 +655,8 @@ envelope <- function(df,
 
 
 #' Overlay envelope plots
-#' @description Overlay multiple envelope plots of posterior `data.frames`, or outputs returned from `jagsUI`.
-#' This would be best suited to a set of posterior `data.frames` or 2-d matrices representing time series.
+#' @description Overlays multiple envelope plots of posterior `data.frames`, or outputs returned from `jagsUI`.
+#' This would be best suited to a set of posterior `data.frames` or 2-d matrices representing sequential vectors of parameter nodes.
 #' @param df Primary input can be specified in a number of ways: either a `list()` of posterior `data.frame`s or matrices,
 #' a `list` of output objects returned from `jagsUI::jags()`, a 3-dimensional `array` in which the input matrices to plot
 #' are separated according to the 3rd array dimension, or a single output object returned from `jagsUI::jags()` with multiple
@@ -651,8 +664,8 @@ envelope <- function(df,
 #' @param p Parameter name, if input to `df` is a list of `jagsUI` output objects; or a vector of parameter names, if
 #' input to `df` is a single `jagsUI` output object.
 #' @param x Optional vector of X-coordinates for plotting.
-#' @param row Row to subset, in the case of a 2-d parameter matrix.
-#' @param column Column to subset, in the case of a 2-d parameter matrix.
+#' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
+#' @param column Column to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param median Whether to include median line
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param col Vector of colors for plotting
@@ -661,7 +674,7 @@ envelope <- function(df,
 #' @param outline Whether to just envelope outlines
 #' @param xlab X-axis label
 #' @param ylab Y-axis label
-#' @param main Plot title.  If the default (`NULL`) is accepted and argument p is used, p will be used for the title.
+#' @param main Plot title.  If the default (`NULL`) is accepted and argument `p=` is used, `p` will be used for the title.
 #' @param ylim Y-axis limits for plotting.  If the default (`NULL`) is accepted, these will be determined automatically.
 #' @param legend Whether to automatically try to add a legend.  Defaults to `TRUE`.
 #' @param legendnames Optional vector of names for a legend.
@@ -799,13 +812,15 @@ overlayenvelope <- function(df,
 
 
 #' Caterpillar plot
-#' @description Caterpillar plot of posterior `data.frame`.
-#' This would be best suited to a single posterior `data.frame` representing random effects or group means.
-#' @param df Posterior `data.frame`, or output object returned from `jagsUI::jags()`.
+#' @description Caterpillar plot of the posterior densities of a vector of parameter nodes,
+#' in which the sequential order of nodes might not be important, such as vector of random effects.
+#' @param df Output object returned from `jagsUI::jags()`; or alternately,
+#' two-dimensional `data.frame` or matrix in which parameter node element is
+#' given by column and MCMC iteration is given by row.
 #' @param p Parameter name, if input to `df` is a `jagsUI` output object.
 #' @param x Vector of X-coordinates for plotting.
-#' @param row Row to subset, in the case of a 2-d parameter matrix.
-#' @param column Column to subset, in the case of a 2-d parameter matrix.
+#' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
+#' @param column Column to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param median Whether to include medians
 #' @param mean Whether to include means
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
@@ -956,16 +971,16 @@ caterpillar <- function(df,
 
 
 #' Trace plots corresponding to the worst values of Rhat
-#' @description Trace plots with kernel densities will be created for parameters with the largest associated values of Rhat.
+#' @description Trace plots with kernel densities will be created for parameters with the largest (worst) associated values of `Rhat`.
 #' This function is primarily intended for parameters with a vector (or array) of values.
 #' @param x Output object returned from `jagsUI`
 #' @param p Optional vector of parameters to subset
-#' @param n.eff Whether to plot parameters with the smallest associated values of n.eff instead.  Defaults to `FALSE`.
+#' @param n.eff Whether to plot parameters with the smallest associated values of `n.eff` instead.  Defaults to `FALSE`.
 #' @param margin In the case of a 2+ dimensional array associated with a given parameter, this will have the effect
-#' of plotting the worst Rhat corresponding to each margin specified.  For example, specifying `margin=2` (column)
-#' will plot the parameter with the worst Rhat value from each column.  In contrast, specifying `margin=NULL` (the default)
+#' of plotting the worst `Rhat` corresponding to each margin specified.  For example, specifying `margin=2` (column)
+#' will plot the parameter with the worst `Rhat` value from each column.  In contrast, specifying `margin=NULL` (the default)
 #' will cause the function to plot the single array element with the largest Rhat value.
-#' @param parmfrow Optional call to par(mfrow) for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
 #' @seealso \link{plotRhats}, \link{check_Rhat}
 #' @author Matt Tyers
@@ -1065,20 +1080,20 @@ rcolors <- function(n) {
 
 
 #' Plotting all Rhat values
-#' @description Plotting all values of Rhat (or alternately n.eff) from an output object returned by `jagsUI`, or perhaps a subset of parameters.
+#' @description Plotting all values of `Rhat` (or alternately `n.eff`) from an output object returned by `jagsUI`, or perhaps a subset of parameters.
 #' This function is intended as a quick graphical check of which parameters have adequately converged.
 #' @param x Output object returned from `jagsUI`
 #' @param p Optional vector of parameters to subset
 #' @param n.eff Optionally, whether to plot `n.eff` instead of `Rhat`.  Defaults to `FALSE`.
 #' @param fence Value of horizontal lines to overlay as reference.  Accepting the default value (`NULL`) will give `fence` values
-#' of 1.1 (a commonly used value) and 1.01 for Rhat, or 100 and 500 for n.eff.
+#' of 1.1 (a commonly used value) and 1.01 for Rhat, or 100 and 500 for `n.eff.`
 #' @param plotsequence Whether to plot parameter vectors (or matrices) in a sequence, running left to right, which may
 #' be useful for time series models, etc.  If the default (`FALSE`) is used, a vertical cluster will be plotted
-#' for each parameter, resulting in a simpler plot if there are many parameters.  Note that the Rhat values will still be
+#' for each parameter, resulting in a simpler plot if there are many parameters.  Note that the `Rhat` values will still be
 #' plotted in sequence if the default (`FALSE`) is used.
 #' @param splitarr Whether to split 2+ dimensional parameter arrays by a given dimension, rather than plotting the full
 #' array in one vertical cluster or continuous sequence.  This may be recommended in the case of large arrays.  Defaults to `FALSE`.
-#' @param margin If splitarr is set to TRUE, which array margin to split by.  In the case of a 2-dimensional array, setting
+#' @param margin If `splitarr=` is set to `TRUE`, which array margin to split by.  In the case of a 2-dimensional array, setting
 #' `margin=2` will separate the array by column.  If the default (`NULL`) is accepted, the function will split by the smallest dimension,
 #' therefore splitting into the fewest groups.
 #' @seealso \link{traceworstRhat}, \link{check_Rhat}
@@ -1212,8 +1227,8 @@ plotRhats <- function(x,
 #'
 #' Kernel densities are plotted vertically, either left- or right-facing.  Parameters with the same name are
 #'  plotted facing one another.
-#' @param x1 Output object returned from `jagsUI` or `data.frame`
-#' @param x2 Second output object returned from `jagsUI` or `data.frame`
+#' @param x1 Output object returned from `jagsUI`; or alternately a `data.frame`
+#' @param x2 Second output object returned from `jagsUI`; or alternately a `data.frame`
 #' @param p Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 #' string supplied will be returned.  If the default (`NULL`) is accepted, all parameters will be plotted.
 #' @param ... additional plotting arguments
@@ -1273,7 +1288,7 @@ comparedens <- function(x1,x2, p=NULL,...) {
 #' Compare Caterpillar Plots
 #' @description Interleaved caterpillar plots for all parameters (or a specified subset) from a list of `jagsUI`
 #' output objects or `data.frame`s.  The intent of this function is easy comparison of inferences from multiple comparable models.
-#' @param x List of output objects returned from `jagsUI` or `data.frame`
+#' @param x List of output objects returned from `jagsUI` or `data.frame`s
 #' @param p Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 #' string supplied will be returned.  If the default (`NULL`) is accepted, all parameters will be plotted.
 #' @param ci Credible intervals widths to plot.  Defaults to 50% and 95%.
@@ -1337,7 +1352,8 @@ comparecat <- function(x,p=NULL,ci=c(0.5,0.95),ylim=NULL,...) {
 
 #' Pairs trace plot
 #' @description Two-dimensional trace plots (or alternately, scatter plots or contour plots) of each possible pair of
-#' parameters from a possible subset
+#' parameters from a possible subset.  May be useful in assessing correlation between parameter nodes, or problematic
+#' posterior surfaces.
 #' @param x Output object returned from `jagsUI`
 #' @param p Optional vector of parameters to subset
 #' @param points Whether to plot as scatter plots instead.  Defaults to `FALSE`.

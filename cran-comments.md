@@ -1,3 +1,7 @@
+## Submission notes
+* This is a new package submission to CRAN.
+* I have read and agree to all CRAN policies.
+
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 

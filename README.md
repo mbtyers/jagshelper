@@ -125,7 +125,7 @@ plotRhats(asdf_jags_out)  # plotting Rhat values
 
 In the example below, there are relatively many parameters saved, and it
 is perhaps more illustrative to examine the trace plots associated with
-the least- converged parameters, as measured by Rhat value.
+the least- converged parameters, as measured by `Rhat` value.
 
 ``` r
 nparam(SS_jags)  # how many parameters in total
@@ -193,12 +193,12 @@ str(out_df)
 #>  $ deviance: num  90.9 94.3 91.6 90.3 106 ...
 ```
 
-## Plotting output matrices
+## Visualizing posteriors of vectors of parameter nodes
 
-The `caterpillar()` and `envelope()` functions plot output for
-2-dimensional parameter matrices, and `comparecat()`, `comparedens()`
-and `overlayenvelope()` functions allow comparison between multiple
-models or parameter matrices.
+The `caterpillar()` and `envelope()` functions plot output for vectors
+of parameter nodes, and `comparecat()`, `comparedens()` and
+`overlayenvelope()` functions allow comparison between multiple models
+or parameter vectors.
 
 ``` r
 caterpillar(asdf_jags_out,"a")

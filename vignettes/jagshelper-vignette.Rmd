@@ -93,6 +93,11 @@ plot version.  However, if only line trace plots or by-chain kernel density plot
 are desired (rather than both), older versions `trace_jags()` and `chaindens_jags()`
 are preserved.
 
+* The function `pairstrace_jags()` gives methods for plotting two-dimensional trace plots, 
+scatter plots, or contour plots, in which each possible pairing of parameter nodes are
+plotted with respect to one another.  In addition to convergence, this may provide
+a graphical check for correlation between parameter nodes, or problematic posterior surface shapes.
+
 ## Extracting output as data.frame
 
 The `jags_df()` function extracts the full posterior from an output object returned

@@ -2,14 +2,14 @@
 % Please edit documentation in R/jagshelper1.R
 \name{trace_jags}
 \alias{trace_jags}
-\title{Traceplot of jagsUI object}
+\title{Trace plot of jagsUI object}
 \usage{
 trace_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
 }
 \arguments{
 \item{x}{Posterior \code{jagsUI} object}
 
-\item{p}{parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.}
+\item{p}{Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.}
 
 \item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
 
@@ -18,7 +18,7 @@ trace_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
 \item{...}{additional plotting arguments}
 }
 \description{
-Smarter traceplot of a whole \code{jagsUI} object, or subset.
+Trace plot of a whole \code{jagsUI} object, or subset.
 }
 \examples{
 
