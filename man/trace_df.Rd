@@ -15,6 +15,9 @@ trace_df(df, nline, parmfrow = NULL, ...)
 
 \item{...}{additional plotting arguments or arguments to \code{trace_line()}}
 }
+\value{
+\code{NULL}
+}
 \description{
 Trace plot of each column of a posterior 'data.frame'.
 }

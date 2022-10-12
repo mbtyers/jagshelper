@@ -17,6 +17,9 @@ chaindens_line(x, nline, lwd = 1, main = "", ...)
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 By-chain kernel density plot of a single parameter.
 }

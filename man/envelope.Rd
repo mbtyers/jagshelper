@@ -58,23 +58,25 @@ given by column and MCMC iteration is given by row.}
 
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
+\value{
+\code{NULL}
+}
 \description{
 Envelope plot of the posterior densities of a vector of parameter nodes,
 in which the sequential order of nodes is important, such as a time series.
 }
 \examples{
 ## usage with input data.frame
-SS_df <- jags_df(SS_jags)
+SS_df <- jags_df(SS_out)
 trend <- pull_post(SS_df, "trend")
-envelope(trend, x=seq(2010,2015,by=1/12))
+envelope(trend, x=SS_data$x)
 
 ## usage with jagsUI object
-envelope(SS_jags, p="trend")
+envelope(SS_out, p="trend")
 
 ## usage with 2-d jagsUI object
-envelope(SS2d_jags, p="trend", column=1)
-envelope(SS2d_jags, p="rate", column=1, main="rate")
-envelope(SS2d_jags, p="rate", column=2, col=2, add=TRUE)  ## overlay
+envelope(SS_out, p="cycle_s", column=1, main="cycle")
+envelope(SS_out, p="cycle_s", column=2, col=2, add=TRUE)  ## overlay
 }
 \seealso{
 \link{overlayenvelope}, \link{caterpillar}

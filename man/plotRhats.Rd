@@ -39,26 +39,28 @@ therefore splitting into the fewest groups.}
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 Plotting all values of \code{Rhat} (or alternately \code{n.eff}) from an output object returned by \code{jagsUI}, or perhaps a subset of parameters.
 This function is intended as a quick graphical check of which parameters have adequately converged.
 }
 \examples{
 ## plotting everything
-plotRhats(SS_jags)
-str(SS_jags$Rhat)  # the associated values
+plotRhats(SS_out)
+str(SS_out$Rhat)  # the associated values
 
-plotRhats(SS_jags, n.eff=TRUE)
-str(SS_jags$n.eff)  # the associated values
+plotRhats(SS_out, n.eff=TRUE)
+str(SS_out$n.eff)  # the associated values
 
 ## behavior of splitarr and margin are shown
-plotRhats(SS2d_jags)
-plotRhats(SS2d_jags, splitarr=TRUE, n.eff=TRUE)
-plotRhats(SS2d_jags, splitarr=TRUE, margin=2)
-str(SS2d_jags$Rhat) # the associated values
+plotRhats(SS_out)
+plotRhats(SS_out, splitarr=TRUE)
+str(SS_out$Rhat) # the associated values
 
 ## plotsequence may be useful in the case of a sequence of values
-plotRhats(SS2d_jags, p=c("trend", "cycle"), splitarr=TRUE, plotsequence=TRUE)
+plotRhats(SS_out, p=c("trend", "cycle_s"), splitarr=TRUE, plotsequence=TRUE)
 }
 \seealso{
 \link{traceworstRhat}, \link{check_Rhat}

@@ -16,6 +16,9 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 Side-by-side kernel density plots for all parameters (or a specified subset) from two \code{jagsUI}
 output objects or \code{data.frame}s.  The intent of this function is easy comparison of inferences from two comparable models.

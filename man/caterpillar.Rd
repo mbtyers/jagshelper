@@ -62,7 +62,10 @@ given by column and MCMC iteration is given by row.}
 
 \item{medwd}{Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?}
 
-\item{...}{additional plotting arguments or arguments to trace_line}
+\item{...}{additional plotting arguments}
+}
+\value{
+\code{NULL}
 }
 \description{
 Caterpillar plot of the posterior densities of a vector of parameter nodes,
@@ -84,11 +87,11 @@ caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
 
 ## usage with input as jagsUI object
 caterpillar(asdf_jags_out, p="a")
-caterpillar(SS_jags, p="rate")
+caterpillar(SS_out, p="rate")
 
 ## usage with a 2-d parameter matrix
-caterpillar(SS2d_jags, p="rate", column=1)
-caterpillar(SS2d_jags, p="rate", column=2)
+caterpillar(SS_out, p="cycle_s", column=1)
+caterpillar(SS_out, p="cycle_s", column=2)
 }
 \seealso{
 \link{envelope}

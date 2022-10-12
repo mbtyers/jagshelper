@@ -17,6 +17,9 @@ trace_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 Trace plot of a whole \code{jagsUI} object, or subset.
 }

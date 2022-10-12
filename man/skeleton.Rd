@@ -9,6 +9,9 @@ skeleton(NAME = "NAME")
 \arguments{
 \item{NAME}{Name to append to JAGS model object, etc.}
 }
+\value{
+\code{NULL}
+}
 \description{
 Provides a paste-able skeleton of code with an example JAGS model and output.
 }

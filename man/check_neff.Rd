@@ -18,7 +18,7 @@ Numeric (named) giving the proportion of \code{n.eff} values above the given thr
 Returns the mean number of \code{n.eff} values (by each parameter) that are greater than a specified threshold criterion.
 }
 \examples{
-check_neff(SS2d_jags)
+check_neff(SS_out)
 }
 \seealso{
 \link{check_Rhat}

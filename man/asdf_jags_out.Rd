@@ -11,6 +11,6 @@ An object of class \code{jagsUI} of length 24.
 asdf_jags_out
 }
 \description{
-A simple model
+A simple model, equivalent to that produced by the output produced by \verb{\link{skeleton}}.
 }
 \keyword{datasets}

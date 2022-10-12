@@ -22,24 +22,27 @@ will cause the function to plot the single array element with the largest Rhat v
 
 \item{...}{additional plotting arguments or arguments to \code{tracedens_jags()}}
 }
+\value{
+\code{NULL}
+}
 \description{
 Trace plots with kernel densities will be created for parameters with the largest (worst) associated values of \code{Rhat}.
 This function is primarily intended for parameters with a vector (or array) of values.
 }
 \examples{
 ## plotting everything
-traceworstRhat(SS_jags, parmfrow=c(3,2))
-SS_jags$Rhat  # the associated values
+traceworstRhat(SS_out, parmfrow=c(3,2))
+SS_out$Rhat  # the associated values
 
-traceworstRhat(SS_jags, parmfrow=c(3,2), n.eff=TRUE)
-SS_jags$n.eff  # the associated values
+traceworstRhat(SS_out, parmfrow=c(3,2), n.eff=TRUE)
+SS_out$n.eff  # the associated values
 
 ## in the case of a 2-D array, setting margin=2 gives the max Rhat
 ## associated with each column, rather than the global max
-traceworstRhat(x=SS2d_jags, p=c("trend","cycle"), margin=2, parmfrow=c(2,2))
-SS2d_jags$Rhat
-traceworstRhat(x=SS2d_jags, p=c("trend","cycle"), margin=2, parmfrow=c(2,2), n.eff=TRUE)
-SS2d_jags$n.eff
+traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2))
+SS_out$Rhat
+traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2), n.eff=TRUE)
+SS_out$n.eff
 }
 \seealso{
 \link{plotRhats}, \link{check_Rhat}

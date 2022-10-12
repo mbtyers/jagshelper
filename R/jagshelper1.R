@@ -1,6 +1,7 @@
 #' Skeleton
 #' @description Provides a paste-able skeleton of code with an example JAGS model and output.
 #' @param NAME Name to append to JAGS model object, etc.
+#' @return `NULL`
 #' @note The printed code will use the `cat()` function to write the model code to an
 #' external text file.  It may be desirable to use a call to `\link{tempfile}()`
 #' instead, to eliminate creation of unneeded files.
@@ -172,6 +173,7 @@ jags_plist <- function(x, p=NULL) {
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{pairstrace_jags}, \link{trace_df}, \link{trace_line}
 #' @author Matt Tyers
 #' @examples
@@ -186,6 +188,7 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
 
   nline <- ncol(x_plist[[1]])
@@ -195,7 +198,7 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
     for(j in 1:nline) lines(x_plist[[i]][,j], col=cols[j], lwd=lwd)
   }
 
-  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
@@ -206,6 +209,7 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{trace_jags}, \link{chaindens_line}, \link{chaindens_df}
 #' @author Matt Tyers
 #' @examples
@@ -220,6 +224,7 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
 
   nline <- ncol(x_plist[[1]])
@@ -233,7 +238,7 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
     for(j in 1:nline) lines(dx[,j], dy[,j], col=cols[j], lwd=lwd)
   }
 
-  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
@@ -245,6 +250,7 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param shade Whether to add semi-transparent shading to by-chain kernel densities.  Defaults to `TRUE`.
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{trace_jags}, \link{chaindens_jags}, \link{pairstrace_jags}
 #' @author Matt Tyers
 #' @examples
@@ -320,8 +326,8 @@ nparam <- function(x) {
 #'
 #' nbyname(asdf_jags_out)
 #'
-#' nparam(SS2d_jags)
-#' nbyname(SS2d_jags)
+#' nparam(SS_out)
+#' nbyname(SS_out)
 #' @export
 nbyname <- function(x, justtotal=FALSE) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -341,7 +347,7 @@ nbyname <- function(x, justtotal=FALSE) {
 #' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
-#' check_Rhat(SS2d_jags)
+#' check_Rhat(SS_out)
 #' @export
 check_Rhat <- function(x, thresh=1.1) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -357,7 +363,7 @@ check_Rhat <- function(x, thresh=1.1) {
 #' @seealso \link{check_Rhat}
 #' @author Matt Tyers
 #' @examples
-#' check_neff(SS2d_jags)
+#' check_neff(SS_out)
 #' @export
 check_neff <- function(x, thresh=500) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -400,6 +406,7 @@ expit <- function(x) exp(x)/(1+exp(x))
 #' @param lwd Line width
 #' @param main Plot title
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{trace_jags}, \link{trace_df}, \link{chaindens_line}
 #' @author Matt Tyers
 #' @examples
@@ -429,6 +436,7 @@ trace_line <- function(x, nline, lwd=1, main="", ...) {
 #' @param lwd Line width
 #' @param main Plot title
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{chaindens_jags}, \link{chaindens_df}
 #' @author Matt Tyers
 #' @examples
@@ -464,6 +472,7 @@ chaindens_line <- function(x, nline, lwd=1, main="", ...) {
 #' @param nline Number of chains
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `trace_line()`
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{trace_jags}, \link{trace_line}
 #' @author Matt Tyers
 #' @examples
@@ -482,6 +491,7 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
   thencol <- ifelse(is.null(ncol(df)), 1, ncol(df))
   if(thencol==1) {
@@ -490,7 +500,7 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
   for(i in 1:ncol(df)) {
     trace_line(df[,i],main=names(df)[i],nline=nline,...=...)
   }}
-  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 #' By-chain kernel density of each column of a `data.frame`
@@ -498,7 +508,8 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
 #' @param df Posterior `data.frame`
 #' @param nline Number of chains
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
-#' @param ... additional plotting arguments or arguments to `trace_line()`
+#' @param ... additional plotting arguments or arguments
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}, \link{trace_jags}, \link{trace_line}
 #' @author Matt Tyers
 #' @examples
@@ -517,11 +528,12 @@ chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
   for(i in 1:ncol(df)) {
     chaindens_line(df[,i],main=names(df)[i],nline=nline,...=...)
   }
-  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
@@ -546,21 +558,21 @@ chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
 #' @param main Plot title.  If the default (`NULL`) is accepted and argument p is used, p will be used for the title.
 #' @param ylim Y-axis limits for plotting.  If the default (`NULL`) is accepted, these will be determined automatically.
 #' @param ... additional plotting arguments or arguments to `lines()`
+#' @return `NULL`
 #' @seealso \link{overlayenvelope}, \link{caterpillar}
 #' @author Matt Tyers
 #' @examples
 #' ## usage with input data.frame
-#' SS_df <- jags_df(SS_jags)
+#' SS_df <- jags_df(SS_out)
 #' trend <- pull_post(SS_df, "trend")
-#' envelope(trend, x=seq(2010,2015,by=1/12))
+#' envelope(trend, x=SS_data$x)
 #'
 #' ## usage with jagsUI object
-#' envelope(SS_jags, p="trend")
+#' envelope(SS_out, p="trend")
 #'
 #' ## usage with 2-d jagsUI object
-#' envelope(SS2d_jags, p="trend", column=1)
-#' envelope(SS2d_jags, p="rate", column=1, main="rate")
-#' envelope(SS2d_jags, p="rate", column=2, col=2, add=TRUE)  ## overlay
+#' envelope(SS_out, p="cycle_s", column=1, main="cycle")
+#' envelope(SS_out, p="cycle_s", column=2, col=2, add=TRUE)  ## overlay
 #' @export
 envelope <- function(df,
                      p=NULL,
@@ -679,21 +691,22 @@ envelope <- function(df,
 #' @param legend Whether to automatically try to add a legend.  Defaults to `TRUE`.
 #' @param legendnames Optional vector of names for a legend.
 #' @param ... additional plotting arguments or arguments to `lines()`
+#' @return `NULL`
 #' @seealso \link{envelope}
 #' @author Matt Tyers
 #' @examples
 #' ## usage with list of input data.frames
-#' overlayenvelope(df=list(SS2d_jags$sims.list$rate[,,1],
-#'                             SS2d_jags$sims.list$rate[,,2]))
+#' overlayenvelope(df=list(SS_out$sims.list$cycle_s[,,1],
+#'                             SS_out$sims.list$cycle_s[,,2]))
 #'
 #' ## usage with a 3-d input array
-#' overlayenvelope(df=SS2d_jags$sims.list$rate)
+#' overlayenvelope(df=SS_out$sims.list$cycle_s)
 #'
 #' ## usage with a jagsUI output object and parameter name (2-d parameter)
-#' overlayenvelope(df=SS2d_jags, p="rate")
+#' overlayenvelope(df=SS_out, p="cycle_s")
 #'
 #' ## usage with a single jagsUI output object and multiple parameters
-#' overlayenvelope(df=SS_jags, p=c("trend","rate"))
+#' overlayenvelope(df=SS_out, p=c("trend","rate"))
 #' @export
 overlayenvelope <- function(df,
                             p=NULL,
@@ -833,7 +846,8 @@ overlayenvelope <- function(df,
 #' @param xax Vector of possible x-axis tick labels.  Defaults to the `data.frame` column names.
 #' @param medlwd Line width of median line
 #' @param medwd Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?
-#' @param ... additional plotting arguments or arguments to trace_line
+#' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{envelope}
 #' @author Matt Tyers
 #' @examples
@@ -852,11 +866,11 @@ overlayenvelope <- function(df,
 #'
 #' ## usage with input as jagsUI object
 #' caterpillar(asdf_jags_out, p="a")
-#' caterpillar(SS_jags, p="rate")
+#' caterpillar(SS_out, p="rate")
 #'
 #' ## usage with a 2-d parameter matrix
-#' caterpillar(SS2d_jags, p="rate", column=1)
-#' caterpillar(SS2d_jags, p="rate", column=2)
+#' caterpillar(SS_out, p="cycle_s", column=1)
+#' caterpillar(SS_out, p="cycle_s", column=2)
 #' @export
 caterpillar <- function(df,
                         p=NULL,
@@ -945,28 +959,25 @@ caterpillar <- function(df,
 
 #' Example data: asdf jags out
 #'
-#' A simple model
+#' A simple model, equivalent to that produced by the output produced by `\link{skeleton}`.
 #'
 "asdf_jags_out"
 
-#' Example data: SS jags out
+#' Example data: SS JAGS out
 #'
-#' A time series model with multiple observations of a single time series
+#' A time series model with multiple observations of a single time series, a
+#' nd with two stochastic cycle components.
 #'
-"SS_jags"
+#' This model is included partly to show a model with vectors or 2-dimensional
+#' matrices of parameter nodes, and also to give an example of poor model convergence.
+#'
+"SS_out"
 
-#' Example data: SS 2D jags out
+#' Example data: Time series associated with SS JAGS out
 #'
-#' A more complicated time series model with 2 dimensions (multiple
-#' observations of 2 columns of data)
+#' The time series and time measurements associated with the time series model `\link{SS_out}`.
 #'
-"SS2d_jags"
-
-#' Example data: state-space X
-#'
-#' The time variable associated with the time series models SS_jags and SS2d_jags
-#'
-"xss"
+"SS_data"
 
 
 
@@ -982,22 +993,23 @@ caterpillar <- function(df,
 #' will cause the function to plot the single array element with the largest Rhat value.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
+#' @return `NULL`
 #' @seealso \link{plotRhats}, \link{check_Rhat}
 #' @author Matt Tyers
 #' @examples
 #' ## plotting everything
-#' traceworstRhat(SS_jags, parmfrow=c(3,2))
-#' SS_jags$Rhat  # the associated values
+#' traceworstRhat(SS_out, parmfrow=c(3,2))
+#' SS_out$Rhat  # the associated values
 #'
-#' traceworstRhat(SS_jags, parmfrow=c(3,2), n.eff=TRUE)
-#' SS_jags$n.eff  # the associated values
+#' traceworstRhat(SS_out, parmfrow=c(3,2), n.eff=TRUE)
+#' SS_out$n.eff  # the associated values
 #'
 #' ## in the case of a 2-D array, setting margin=2 gives the max Rhat
 #' ## associated with each column, rather than the global max
-#' traceworstRhat(x=SS2d_jags, p=c("trend","cycle"), margin=2, parmfrow=c(2,2))
-#' SS2d_jags$Rhat
-#' traceworstRhat(x=SS2d_jags, p=c("trend","cycle"), margin=2, parmfrow=c(2,2), n.eff=TRUE)
-#' SS2d_jags$n.eff
+#' traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2))
+#' SS_out$Rhat
+#' traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2), n.eff=TRUE)
+#' SS_out$n.eff
 #' @export
 traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
@@ -1005,6 +1017,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
   if(!n.eff) {
     if(is.null(p)) {
@@ -1024,7 +1037,6 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
   if(length(rhatlist)==0) stop("No parameters with matching names")
   for(i in 1:length(rhatlist)) {
     pp <- p[i]
-    # rhats <- x$Rhat[names(x$Rhat)==pp][[1]]
     rhats <- rhatlist[[i]]
     if(!is.null(dim(rhats))) {
       if(!is.null(margin)) {
@@ -1033,17 +1045,22 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
           if(n.eff) maxes <- apply(rhats, MARGIN=margin, min, na.rm=T)
           thenames <- NULL
           for(imax in 1:length(maxes)) {
-            whichone1 <- which(rhats==maxes[imax], arr.ind=T)#[1,]#[1]  ## here was the problem
+            whichone1 <- which(rhats==maxes[imax], arr.ind=T)
             whichone <- whichone1[which.max(whichone1[,2]==imax),]
             thenames <- c(thenames, paste0(pp,"[",paste(whichone,collapse=","),"]"))
           }
         } else {
-          stop("invalid margin argument")
+          stop("invalid margin argument")    ##### add functionality of using margin when applicable??  SS_out doesn't work
         }
 
-      } else{
-        if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1]
-        if(n.eff) whichones <- which(rhats==min(rhats,na.rm=T), arr.ind=T)[1]
+      } else {
+        if(length(dim(rhats))>1) {  ##### this might not work as intended for >2d
+          if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1,]
+          if(n.eff) whichones <- which(rhats==min(rhats,na.rm=T), arr.ind=T)[1,]
+        } else {
+          if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1]
+          if(n.eff) whichones <- which(rhats==min(rhats,na.rm=T), arr.ind=T)[1]
+        }
         thenames <- paste0(pp,"[",paste(whichones,collapse=","),"]")
       }
     } else {
@@ -1051,7 +1068,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
     }
     tracedens_jags(x,p=thenames,...=...)
   }
-  if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
@@ -1096,25 +1113,25 @@ rcolors <- function(n) {
 #' @param margin If `splitarr=` is set to `TRUE`, which array margin to split by.  In the case of a 2-dimensional array, setting
 #' `margin=2` will separate the array by column.  If the default (`NULL`) is accepted, the function will split by the smallest dimension,
 #' therefore splitting into the fewest groups.
+#' @return `NULL`
 #' @seealso \link{traceworstRhat}, \link{check_Rhat}
 #' @param ... additional plotting arguments
 #' @author Matt Tyers
 #' @examples
 #' ## plotting everything
-#' plotRhats(SS_jags)
-#' str(SS_jags$Rhat)  # the associated values
+#' plotRhats(SS_out)
+#' str(SS_out$Rhat)  # the associated values
 #'
-#' plotRhats(SS_jags, n.eff=TRUE)
-#' str(SS_jags$n.eff)  # the associated values
+#' plotRhats(SS_out, n.eff=TRUE)
+#' str(SS_out$n.eff)  # the associated values
 #'
 #' ## behavior of splitarr and margin are shown
-#' plotRhats(SS2d_jags)
-#' plotRhats(SS2d_jags, splitarr=TRUE, n.eff=TRUE)
-#' plotRhats(SS2d_jags, splitarr=TRUE, margin=2)
-#' str(SS2d_jags$Rhat) # the associated values
+#' plotRhats(SS_out)
+#' plotRhats(SS_out, splitarr=TRUE)
+#' str(SS_out$Rhat) # the associated values
 #'
 #' ## plotsequence may be useful in the case of a sequence of values
-#' plotRhats(SS2d_jags, p=c("trend", "cycle"), splitarr=TRUE, plotsequence=TRUE)
+#' plotRhats(SS_out, p=c("trend", "cycle_s"), splitarr=TRUE, plotsequence=TRUE)
 #' @export
 plotRhats <- function(x,
                       p=NULL,
@@ -1232,6 +1249,7 @@ plotRhats <- function(x,
 #' @param p Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 #' string supplied will be returned.  If the default (`NULL`) is accepted, all parameters will be plotted.
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{comparecat}
 #' @author Matt Tyers
 #' @examples
@@ -1294,6 +1312,7 @@ comparedens <- function(x1,x2, p=NULL,...) {
 #' @param ci Credible intervals widths to plot.  Defaults to 50% and 95%.
 #' @param ylim Y-axis limits for plotting
 #' @param ... additional plotting arguments
+#' @return `NULL`
 #' @seealso \link{caterpillar}, \link{comparedens}
 #' @author Matt Tyers
 #' @examples
@@ -1362,12 +1381,13 @@ comparecat <- function(x,p=NULL,ci=c(0.5,0.95),ylim=NULL,...) {
 #' @param alpha Opacity of lines (or points, when `points=TRUE`).  Defaults to 0.2.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
+#' @return `NULL`
 #' @seealso \link{tracedens_jags}
 #' @author Matt Tyers
 #' @examples
-#' pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), lwd=2)
-#' pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), points=TRUE)
-#' pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), contour=TRUE)
+#' pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), lwd=2)
+#' pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), points=TRUE)
+#' pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), contour=TRUE)
 #'
 #' pairstrace_jags(asdf_jags_out, parmfrow=c(3,3))
 #' pairstrace_jags(asdf_jags_out, parmfrow=c(3,3), points=TRUE)

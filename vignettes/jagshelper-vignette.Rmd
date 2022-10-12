@@ -11,8 +11,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=8,
-  fig.height=6
+  fig.width=7,
+  fig.height=7
 )
 ```
 
@@ -59,9 +59,9 @@ plots can be examined.
 ```{r}
 nparam(asdf_jags_out)  # how many parameters in total
 nbyname(asdf_jags_out)  # how many parameters (or dimensions) per parameter name
-tracedens_jags(asdf_jags_out, parmfrow=c(2,2))  # trace plots for all parameters
+tracedens_jags(asdf_jags_out, parmfrow=c(3,3))  # trace plots for all parameters
 check_Rhat(asdf_jags_out)  # proportion of Rhats below a threshold of 1.1
-plotRhats(asdf_jags_out)  # plotting Rhat values
+asdf_jags_out$Rhat  #  Rhat values
 ```
 
 ### A more complex model
@@ -71,11 +71,14 @@ perhaps more illustrative to examine the trace plots associated with the least-
 converged parameter nodes, as measured by Rhat value.
 
 ```{r}
-nparam(SS_jags)  # how many parameters in total
-nbyname(SS_jags)  # how many parameters (or dimensions) per parameter name
-traceworstRhat(SS_jags, parmfrow=c(2,2))  # trace plots for least-converged nodes
-check_Rhat(SS_jags)  # proportion of Rhats below a threshold of 1.1
-plotRhats(SS_jags)  # plotting Rhat values
+nparam(SS_out)  # how many parameters in total
+nbyname(SS_out)  # how many parameters (or dimensions) per parameter name
+traceworstRhat(SS_out, parmfrow=c(3,2))  # trace plots for least-converged nodes
+check_Rhat(SS_out)  # proportion of Rhats below a threshold of 1.1
+```
+
+```{r,fig.width=6,fig.height=5}
+plotRhats(SS_out)  # plotting Rhat values
 ```
 
 ### Additional functionality
@@ -96,7 +99,13 @@ are preserved.
 * The function `pairstrace_jags()` gives methods for plotting two-dimensional trace plots, 
 scatter plots, or contour plots, in which each possible pairing of parameter nodes are
 plotted with respect to one another.  In addition to convergence, this may provide
-a graphical check for correlation between parameter nodes, or problematic posterior surface shapes.
+a graphical check for correlation between parameter nodes, or problematic posterior 
+surface shapes.  An example is shown below.
+
+```{r, fig.width=6}
+pairstrace_jags(asdf_jags_out, p=c("a","sig_a"), points=TRUE, parmfrow=c(3,2))
+```
+
 
 ## Extracting output as data.frame
 
@@ -133,15 +142,13 @@ as inputs, but now also accept a `jagsUI` output object and parameter name.
 It is anticipated that `caterpillar()` could be used for effect sizes associated 
 with a categorical variable, in which plotting order may or may not matter.
 
-```{r}
-caterpillar(asdf_jags_out, "a")
-```
-
 By contrast, `envelope()` is intended for a matrix associated with a sequence of 
 parameter nodes, such as in a time series.
 
-```{r}
-envelope(SS_jags, "rate", x=xss)
+```{r,fig.width=5,fig.height=8}
+par(mfrow=c(2,1))
+caterpillar(asdf_jags_out, "a")
+envelope(SS_out, "rate", x=SS_data$x)
 ```
 
 ### Multiple matrices or multiple models
@@ -154,16 +161,14 @@ output objects and an optional list of parameters, plotting parameters common to
 a set of models adjacent to one another.  The example below uses the same output
 object three times, but will show functionality.
 
-```{r}
-comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
-           p=c("a","b","sig"))
-```
-
 Function `comparedens()` behaves similarly, but produces left- and right-facing 
 kernel density plots for TWO `jagsUI` output objects and an optional list of parameters.
 The example below uses the same output object twice, but will show functionality.
 
-```{r}
+```{r,fig.width=5,fig.height=8}
+par(mfrow=c(2,1))
+comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
+           p=c("a","b","sig"))
 comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"))
 ```
 
@@ -183,15 +188,15 @@ are joined along the third dimension
 par(mfrow=c(2,2))
 
 ## usage with list of input data.frames
-overlayenvelope(df=list(SS2d_jags$sims.list$rate[,,1],
-                            SS2d_jags$sims.list$rate[,,2]))
+overlayenvelope(df=list(SS_out$sims.list$cycle_s[,,1],
+                            SS_out$sims.list$cycle_s[,,2]))
 
 ## usage with a 3-d input array
-overlayenvelope(df=SS2d_jags$sims.list$rate)
+overlayenvelope(df=SS_out$sims.list$cycle_s)
 
 ## usage with a jagsUI output object and parameter name (2-d parameter)
-overlayenvelope(df=SS2d_jags, p="rate")
+overlayenvelope(df=SS_out, p="cycle_s")
 
 ## usage with a single jagsUI output object and multiple parameters
-overlayenvelope(df=SS_jags, p=c("trend","rate"))
+overlayenvelope(df=SS_out, p=c("trend","rate"))
 ```

@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  eval=FALSE
 )
 ```
 
@@ -18,14 +19,14 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of jagshelper is to streamline Bayesian analysis in JAGS using the `jagsUI` package.  
+The goal of `jagshelper` is to streamline Bayesian analysis in `JAGS` using the `jagsUI` package.  
 Functions are provided for extracting output in a simpler form, assessing model convergence,
-and plotting model output.  Also included is a function giving a template model in JAGS syntax
+and plotting model output.  Also included is a function giving a template model in `JAGS` syntax
 with the associated `jagsUI` code.
 
 ## Installation
 
-You can install the development version of jagshelper like so:
+You can install the development version of `jagshelper` like so:
 
 ``` r
 devtools::install_github("mbtyers/jagshelper")
@@ -33,7 +34,7 @@ devtools::install_github("mbtyers/jagshelper")
 
 ## Model template
 
-The `skeleton()` function prints a JAGS model template to the screen, along with 
+The `skeleton()` function prints a `JAGS` model template to the screen, along with 
 an associated simulated dataset.
 
 ```{r example1}
@@ -61,11 +62,11 @@ perhaps more illustrative to examine the trace plots associated with the least-
 converged parameters, as measured by `Rhat` value.
 
 ```{r example3}
-nparam(SS_jags)  # how many parameters in total
-nbyname(SS_jags)  # how many parameters (or dimensions) per parameter name
-traceworstRhat(SS_jags, parmfrow=c(2,2))  #trace plots
-check_Rhat(SS_jags)  # proportion of Rhats below a threshold of 1.1
-plotRhats(SS_jags)  # plotting Rhat values
+nparam(SS_out)  # how many parameters in total
+nbyname(SS_out)  # how many parameters (or dimensions) per parameter name
+traceworstRhat(SS_out, parmfrow=c(2,2))  #trace plots
+check_Rhat(SS_out)  # proportion of Rhats below a threshold of 1.1
+plotRhats(SS_out)  # plotting Rhat values
 ```
 
 ## Extracting output as data.frame
@@ -86,5 +87,5 @@ between multiple models or parameter vectors.
 
 ```{r example5}
 caterpillar(asdf_jags_out,"a")
-envelope(SS_jags,"rate", x=xss)
+envelope(SS_out, "rate", x=SS_data$x)
 ```

@@ -17,6 +17,9 @@ trace_line(x, nline, lwd = 1, main = "", ...)
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 Trace plot of a single parameter.
 }

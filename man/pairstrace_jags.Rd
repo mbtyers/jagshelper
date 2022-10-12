@@ -32,15 +32,18 @@ pairstrace_jags(
 
 \item{...}{additional plotting arguments or arguments to \code{tracedens_jags()}}
 }
+\value{
+\code{NULL}
+}
 \description{
 Two-dimensional trace plots (or alternately, scatter plots or contour plots) of each possible pair of
 parameters from a possible subset.  May be useful in assessing correlation between parameter nodes, or problematic
 posterior surfaces.
 }
 \examples{
-pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), lwd=2)
-pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), points=TRUE)
-pairstrace_jags(SS2d_jags, p="sig", parmfrow=c(2,3), contour=TRUE)
+pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), lwd=2)
+pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), points=TRUE)
+pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), contour=TRUE)
 
 pairstrace_jags(asdf_jags_out, parmfrow=c(3,3))
 pairstrace_jags(asdf_jags_out, parmfrow=c(3,3), points=TRUE)

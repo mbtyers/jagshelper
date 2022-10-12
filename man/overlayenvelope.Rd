@@ -66,23 +66,26 @@ input to \code{df} is a single \code{jagsUI} output object.}
 
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
+\value{
+\code{NULL}
+}
 \description{
 Overlays multiple envelope plots of posterior \code{data.frames}, or outputs returned from \code{jagsUI}.
 This would be best suited to a set of posterior \code{data.frames} or 2-d matrices representing sequential vectors of parameter nodes.
 }
 \examples{
 ## usage with list of input data.frames
-overlayenvelope(df=list(SS2d_jags$sims.list$rate[,,1],
-                            SS2d_jags$sims.list$rate[,,2]))
+overlayenvelope(df=list(SS_out$sims.list$cycle_s[,,1],
+                            SS_out$sims.list$cycle_s[,,2]))
 
 ## usage with a 3-d input array
-overlayenvelope(df=SS2d_jags$sims.list$rate)
+overlayenvelope(df=SS_out$sims.list$cycle_s)
 
 ## usage with a jagsUI output object and parameter name (2-d parameter)
-overlayenvelope(df=SS2d_jags, p="rate")
+overlayenvelope(df=SS_out, p="cycle_s")
 
 ## usage with a single jagsUI output object and multiple parameters
-overlayenvelope(df=SS_jags, p=c("trend","rate"))
+overlayenvelope(df=SS_out, p=c("trend","rate"))
 }
 \seealso{
 \link{envelope}

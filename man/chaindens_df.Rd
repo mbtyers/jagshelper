@@ -13,7 +13,10 @@ chaindens_df(df, nline, parmfrow = NULL, ...)
 
 \item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
 
-\item{...}{additional plotting arguments or arguments to \code{trace_line()}}
+\item{...}{additional plotting arguments or arguments}
+}
+\value{
+\code{NULL}
 }
 \description{
 By-chain kernel density plot of each column of a posterior \code{data.frame}.

@@ -18,6 +18,9 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 
 \item{...}{additional plotting arguments}
 }
+\value{
+\code{NULL}
+}
 \description{
 Interleaved caterpillar plots for all parameters (or a specified subset) from a list of \code{jagsUI}
 output objects or \code{data.frame}s.  The intent of this function is easy comparison of inferences from multiple comparable models.
