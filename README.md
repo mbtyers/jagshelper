@@ -1,82 +1,88 @@
+# jagshelper 
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+### Extracting and Visualizing Output from 'jagsUI'
 
-# jagshelper
+Tools are provided to streamline Bayesian analyses in 'JAGS' using 
+the 'jagsUI' package.  Included are functions for extracting output in 
+simpler format, functions for streamlining assessment of convergence, and 
+functions for producing summary plots of output.  Also included is a 
+function that provides a simple template for running 'JAGS' from 'R'.
 
-<!-- badges: start -->
-<!-- badges: end -->
+### Commonly-used functions: Model construction and output summary
 
-The goal of `jagshelper` is to streamline Bayesian analysis in `JAGS`
-using the `jagsUI` package.  
-Functions are provided for extracting output in a simpler form,
-assessing model convergence, and plotting model output. Also included is
-a function giving a template model in `JAGS` syntax with the associated
-`jagsUI` code.
+* `skeleton()` prints an example 'JAGS' model and associated 'jagsUI' code to 
+the console, along with code to simulate a corresponding dataset.  This is 
+intended to serve as a template that can be altered as needed by the user.
 
-## Installation
+* `nparam()` and `nbyname()` give the total number of parameter nodes and the 
+number (or array dimensions) per parameter name, respectively.  It can be 
+useful to know how many parameter nodes have been saved before performing further
+model diagnostics.
 
-You can install the development version of `jagshelper` like so:
+### Commonly-used functions: Assessing model convergence
 
-``` r
-devtools::install_github("mbtyers/jagshelper")
-```
+* `check_Rhat()` and `check_neff()` give the proportion of parameter nodes to 
+meet a given threshold of `Rhat` (Gelman-Rubin convergence diagnostic) or `n.eff` 
+(effective sample size), respectively.
 
-## Model template
+* `plotRhats()` plots all `Rhat` values from a model output (or alternately `n.eff`),
+which can serve as a quick visualization to assess whether adequate convergence 
+has been achieved.  
 
-The `skeleton()` function prints a `JAGS` model template to the screen,
-along with an associated simulated dataset.
+* `tracedens_jags()` produces trace plots and overlayed by-chain kernel densities
+of all parameter nodes, or a subset given by the user.  
 
-``` r
-library(jagshelper)
-skeleton("EXAMPLE")
-```
+Note that functions are 
+also provided to give trace plots or by-chain kernel densities by themselves, with
+inputs of 'jagsUI' output objects, `data.frame`s, or single vectors.
 
-## Assessing convergence - a simple model
+* `traceworstRhat()` is a wrapper of `tracedens_jags()` that produces trace plots
+of the parameter nodes with the worst (largest) associated values of `Rhat`, or 
+alternately, the smallest values of `n.eff`.  This can be useful if a model contains
+vectors or arrays of many parameter nodes.
 
-In the example below, there are relatively few parameters saved, and it
-is feasible to examine the trace plots associated with each parameter.
+* `pairstrace_jags()` gives methods for plotting two-dimensional trace plots, 
+scatter plots, or contour plots, in which each possible pairing of parameter nodes are
+plotted with respect to one another.  In addition to convergence, this may provide
+a graphical check for correlation between parameter nodes, or problematic posterior 
+surface shapes.
 
-``` r
-nparam(asdf_jags_out)  # how many parameters in total
-nbyname(asdf_jags_out)  # how many parameters (or dimensions) per parameter name
-tracedens_jags(asdf_jags_out, parmfrow=c(2,2))  #trace plots
-check_Rhat(asdf_jags_out)  # proportion of Rhats below a threshold of 1.1
-plotRhats(asdf_jags_out)  # plotting Rhat values
-```
+### Commonly-used functions: Extracting simplified model output
 
-## Assessing convergence - a more complex model
+* `jags_df()` extracts the MCMC iterations from a 'jagsUI' output object as a `data.frame`,
+which may be preferable to some users.
 
-In the example below, there are relatively many parameters saved, and it
-is perhaps more illustrative to examine the trace plots associated with
-the least- converged parameters, as measured by `Rhat` value.
+* `pull_post()` extracts a subset of columns of a posterior formatted as a `data.frame`.
 
-``` r
-nparam(SS_out)  # how many parameters in total
-nbyname(SS_out)  # how many parameters (or dimensions) per parameter name
-traceworstRhat(SS_out, parmfrow=c(2,2))  #trace plots
-check_Rhat(SS_out)  # proportion of Rhats below a threshold of 1.1
-plotRhats(SS_out)  # plotting Rhat values
-```
+### Commonly-used functions: Plotting model output
 
-## Extracting output as data.frame
+* `envelope()` overlays a set of credible interval envelopes (default values are 50%
+and 95%) and a median line, for a sequence of parameter nodes.  This 
+function is intended for plotting the posterior densities of a vector of parameter
+nodes in which order does matter, such as in a time series.
 
-The `jags_df()` function extracts the full posterior from an output
-object returned by `jagsUI::jags()` as a `data.frame`, which may be
-preferable for some users.
+* `overlayenvelope()` is a wrapper for `envelope()` allowing for multiple envelope
+plots to be overlayed.
 
-``` r
-out_df <- jags_df(asdf_jags_out)
-str(out_df)
-```
+* `caterpillar()` overlays a set of credible interval bars (default values are 50%
+and 95%) and median markings, for a set of parameter nodes side-by-side.  This 
+function is intended for plotting the posterior densities of a vector of parameter
+nodes in which order may not matter, such as a set of random effects.
 
-## Visualizing posteriors of vectors of parameter nodes
+* `comparecat()` produces an interleaved caterpillar plot for multiple 'jagsUI' 
+output objects or `data.frame`s, in which parameter nodes with the same name across
+output objects are plotted next to one another.  The intent of this function is to
+allow comparison among multiple candidate models.
 
-The `caterpillar()` and `envelope()` functions plot output for vectors
-of parameter nodes, and `comparecat()`, `comparedens()` and
-`overlayenvelope()` functions allow comparison between multiple models
-or parameter vectors.
+* `comparedens()` is similar in use to `comparecat()`, but instead plots left- 
+and right-facing vertically-oriented kernel densities for TWO model output objects,
+with parameter nodes with the same names plotted facing one another.
 
-``` r
-caterpillar(asdf_jags_out,"a")
-envelope(SS_out, "rate", x=SS_data$x)
-```
+
+### Installation
+
+The development version is currently available on Github, and can be installed in R with the following code:
+
+`install.packages("devtools",dependencies=T)`
+
+`devtools::install_github("mbtyers/jagshelper")`

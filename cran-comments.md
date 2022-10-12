@@ -1,5 +1,8 @@
 ## Submission notes
-* This is a new package submission to CRAN.
+* This is a new package submission to CRAN.  I have addressed all feedback from
+the previous CRAN submission, and hope that the reduction in package size is
+acceptable.
+
 * I have read and agree to all CRAN policies.
 
 ## R CMD check results
@@ -7,14 +10,10 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
-*   installed size is 24.1Mb
+*   installed size is 5.4Mb
     sub-directories of 1Mb or more:
-      data  22.0Mb
-      doc    1.4Mb
-      
-The included data is relatively large as much of the functionality of this 
-package is in plotting large MCMC objects, and it is necessary to include 
-non-trivial examples to show package functionality.
+      data  4.0Mb
+      doc    1.2Mb
 
 ## Downstream dependencies
 This is a new package and there are no downstream dependencies.
