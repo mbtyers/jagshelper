@@ -965,8 +965,7 @@ caterpillar <- function(df,
 
 #' Example data: SS JAGS out
 #'
-#' A time series model with multiple observations of a single time series, a
-#' nd with two stochastic cycle components.
+#' A time series model with multiple observations of a single time series, and with two stochastic cycle components.
 #'
 #' This model is included partly to show a model with vectors or 2-dimensional
 #' matrices of parameter nodes, and also to give an example of poor model convergence.

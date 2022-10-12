@@ -11,8 +11,7 @@ An object of class \code{jagsUI} of length 24.
 SS_out
 }
 \description{
-A time series model with multiple observations of a single time series, a
-nd with two stochastic cycle components.
+A time series model with multiple observations of a single time series, and with two stochastic cycle components.
 }
 \details{
 This model is included partly to show a model with vectors or 2-dimensional
