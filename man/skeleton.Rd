@@ -13,7 +13,9 @@ skeleton(NAME = "NAME")
 \code{NULL}
 }
 \description{
-Provides a paste-able skeleton of code with an example JAGS model and output.
+Prints an example 'JAGS' model and associated 'jagsUI' code to
+the console, along with code to simulate a corresponding dataset.  This is
+intended to serve as a template that can be altered as needed by the user.
 }
 \note{
 The printed code will use the \code{cat()} function to write the model code to an

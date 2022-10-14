@@ -21,7 +21,7 @@ chaindens_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
 \code{NULL}
 }
 \description{
-By-chain kernel densities of a whole \code{jagsUI} object, or subset.
+By-chain kernel densities of a whole \code{jagsUI} object, or optional subset of parameter nodes.
 }
 \examples{
 

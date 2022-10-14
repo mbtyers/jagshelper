@@ -17,10 +17,10 @@ can be interpreted as the vector length or array dimension associated with the
 given parameter.
 }
 \description{
-Returns a summary of the numbers of parameter nodes saved in \code{jagsUI} output, by parameter name.
+Returns a list of the numbers of parameter nodes saved in \code{jagsUI} output, by parameter name.
 As a default, what is returned for each list element is a vector of the array dimensions within the JAGS model
-(excluding the number of MCMC iterations),
-or alternately, just the total number of parameters
+(that is, excluding the dimension associated with the number of MCMC samples for each parameter node),
+or alternately, just the total number of parameter nodes.
 }
 \examples{
 head(jags_df(asdf_jags_out))

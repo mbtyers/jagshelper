@@ -21,7 +21,7 @@ chaindens_line(x, nline, lwd = 1, main = "", ...)
 \code{NULL}
 }
 \description{
-By-chain kernel density plot of a single parameter.
+By-chain kernel density plot of a single parameter node.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

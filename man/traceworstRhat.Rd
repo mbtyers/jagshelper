@@ -28,6 +28,12 @@ will cause the function to plot the single array element with the largest Rhat v
 \description{
 Trace plots with kernel densities will be created for parameters with the largest (worst) associated values of \code{Rhat}.
 This function is primarily intended for parameters with a vector (or array) of values.
+
+\code{Rhat} (Gelman-Rubin Convergence Diagnostic, or Potential Scale Reduction Factor)
+is calculated within 'JAGS', and is
+commonly used as a measure of convergence for a given paramter node.  Values close
+to 1 are seen as evidence of adequate convergence.  \code{n.eff} is also calculated within 'JAGS', and may be interpreted as a crude measure of
+effective sample size for a given parameter node.
 }
 \examples{
 ## plotting everything
@@ -43,6 +49,10 @@ traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2))
 SS_out$Rhat
 traceworstRhat(x=SS_out, p="cycle_s", margin=2, parmfrow=c(2,2), n.eff=TRUE)
 SS_out$n.eff
+}
+\references{
+Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
+Using Multiple Sequences. \emph{Statistical Science, 7}(4), 457–472. http://www.jstor.org/stable/2246093
 }
 \seealso{
 \link{plotRhats}, \link{check_Rhat}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/jagshelper1.R
 \name{trace_df}
 \alias{trace_df}
-\title{Trace plot of each column of a \code{data.frame}}
+\title{Trace plot of each column of a \code{data.frame}.}
 \usage{
 trace_df(df, nline, parmfrow = NULL, ...)
 }

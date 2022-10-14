@@ -12,6 +12,7 @@ Description: Tools are provided to streamline Bayesian analyses in 'JAGS' using
     simpler format, functions for streamlining assessment of convergence, and 
     functions for producing summary plots of output.  Also included is a 
     function that provides a simple template for running 'JAGS' from 'R'.
+    Referenced materials can be found at <DOI:10.1214/ss/1177011136>.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

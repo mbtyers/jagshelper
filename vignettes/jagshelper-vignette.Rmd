@@ -27,7 +27,7 @@ Functions are provided for extracting output in a simpler form, assessing model 
 and plotting model output.  Also included is a function giving a template model in JAGS syntax
 with the associated `jagsUI` code.
 
-Most of the `jagshelper` functionality is illustrated below, with steps approximately 
+Some of the `jagshelper` functionality is illustrated below, with steps approximately 
 corresponding to those of a typical Bayesian analysis using JAGS.
 
 ## Model template
@@ -48,9 +48,9 @@ skeleton("EXAMPLE")
 ### A simple model
 
 Having run a model for the first time, it can be useful to see how many parameter nodes
-have been saved, or how many nodes of each named parameter.  This can aid in 
-deciding the appropriate strategy for assessing convergence: whether trace plots 
-and/or numerical convergence diagnostics can be feasibly addressed for all parameter 
+have been saved in total, or how many nodes exist for each named parameter.  This can aid in 
+deciding the appropriate strategy for assessing convergence: for example, whether trace plots 
+can be feasibly assessed for all parameter 
 nodes in the model, or just a subset.
 
 In the example below, there are relatively few parameters saved and all trace
@@ -68,7 +68,7 @@ asdf_jags_out$Rhat  #  Rhat values
 
 In the example below, there are many more parameters saved, and it is 
 perhaps more illustrative to examine the trace plots associated with the least-
-converged parameter nodes, as measured by Rhat value.
+converged parameter nodes, as measured by `Rhat` value (Gelman & Rubin 1992).
 
 ```{r}
 nparam(SS_out)  # how many parameters in total
@@ -84,7 +84,7 @@ plotRhats(SS_out)  # plotting Rhat values
 ### Additional functionality
 
 * The function `check_neff()` behaves very similarly to `check_Rhat()`, but makes
-comparisons based on effective sample size `n.eff` rather than Gelman-Rubin convergence
+comparisons based on `n.eff` (a crude measure of effective sample size) rather than Gelman-Rubin convergence
 diagnostic `Rhat`.  
 
 * The functions `traceworstRhat()` and `check_Rhat()` both contain
@@ -109,7 +109,7 @@ pairstrace_jags(asdf_jags_out, p=c("a","sig_a"), points=TRUE, parmfrow=c(3,2))
 
 ## Extracting output as data.frame
 
-The `jags_df()` function extracts the full posterior from an output object returned
+The `jags_df()` function extracts all posterior samples from an output object returned
 by `jagsUI::jags()` as a `data.frame`, which may be preferable for some users.
 
 ```{r}

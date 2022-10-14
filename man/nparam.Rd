@@ -13,7 +13,7 @@ nparam(x)
 A single numeric value giving the number of parameter nodes.
 }
 \description{
-Number of individual parameter nodes saved in \code{jagsUI} output.
+Total number of individual parameter nodes saved in \code{jagsUI} output.
 }
 \examples{
 head(jags_df(asdf_jags_out))

@@ -21,7 +21,7 @@ trace_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
 \code{NULL}
 }
 \description{
-Trace plot of a whole \code{jagsUI} object, or subset.
+Trace plot of a whole \code{jagsUI} object, or optional subset of parameter nodes.
 }
 \examples{
 

@@ -64,6 +64,10 @@ given by column and MCMC iteration is given by row.}
 \description{
 Envelope plot of the posterior densities of a vector of parameter nodes,
 in which the sequential order of nodes is important, such as a time series.
+
+This produces a plot of overlayed shaded strips, each corresponding to a given
+interval width (defaults to 50 percent and 95 percent), with an overlayed
+median line.
 }
 \examples{
 ## usage with input data.frame

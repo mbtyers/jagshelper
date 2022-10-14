@@ -19,7 +19,9 @@ A \code{data.frame} with a column associated with each (subsetted) parameter and
 associated with each MCMC iteration.
 }
 \description{
-Extracts a subset vector or \code{data.frame} from a larger (likely posterior) \code{data.frame}, such that column names match a name given in the \verb{p=} argument.
+Extracts a subset vector or \code{data.frame} from a \code{data.frame} consisting of more columns,
+such that column names match a name given in the \verb{p=} argument.  This may be useful
+in creating smaller objects consisting of MCMC samples.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

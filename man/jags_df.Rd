@@ -14,9 +14,9 @@ A \code{data.frame} with a column associated with each parameter and a row
 associated with each MCMC iteration.
 }
 \description{
-Extracts the posterior from \code{jagsUI} output in the form of
+Extracts the posterior samples from \code{jagsUI} output in the form of
 a \code{data.frame}.  This simpler construction has a few benefits: operations may
-be more straightforward, posterior objects will be smaller files, and can be
+be more straightforward, and posterior objects will be smaller files and can be
 written to an external table or .csv, etc.
 }
 \examples{

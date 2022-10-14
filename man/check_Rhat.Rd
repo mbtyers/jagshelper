@@ -15,10 +15,20 @@ check_Rhat(x, thresh = 1.1)
 Numeric (named) giving the proportion of Rhat values below the given threshold.
 }
 \description{
-Returns the mean number of \code{Rhat} values (by each parameter) that are less than a specified threshold criterion.
+Returns the mean number of \code{Rhat} values for each parameter (by each parameter)
+that are less than a specified threshold criterion.
+
+\code{Rhat} (Gelman-Rubin Convergence Diagnostic, or Potential Scale Reduction Factor)
+is calculated within 'JAGS', and is
+commonly used as a measure of convergence for a given paramter node.  Values close
+to 1 are seen as evidence of adequate convergence.
 }
 \examples{
 check_Rhat(SS_out)
+}
+\references{
+Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
+Using Multiple Sequences. \emph{Statistical Science, 7}(4), 457–472. http://www.jstor.org/stable/2246093
 }
 \seealso{
 \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}

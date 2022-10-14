@@ -23,7 +23,7 @@ tracedens_jags(x, p = NULL, parmfrow = NULL, lwd = 1, shade = TRUE, ...)
 \code{NULL}
 }
 \description{
-Combination of trace plots and by-chain kernel densities of a whole \code{jagsUI} object, or subset.
+Combination of trace plots and by-chain kernel densities of a whole \code{jagsUI} object, or optional subset of parameter nodes.
 }
 \examples{
 

@@ -72,6 +72,10 @@ input to \code{df} is a single \code{jagsUI} output object.}
 \description{
 Overlays multiple envelope plots of posterior \code{data.frames}, or outputs returned from \code{jagsUI}.
 This would be best suited to a set of posterior \code{data.frames} or 2-d matrices representing sequential vectors of parameter nodes.
+
+Here a single \link{envelope} plot is defined as a set of overlayed shaded strips, each corresponding to a given
+interval width (defaults to 50 percent and 95 percent), with an overlayed
+median line.
 }
 \examples{
 ## usage with list of input data.frames

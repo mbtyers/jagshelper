@@ -24,6 +24,9 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 \description{
 Interleaved caterpillar plots for all parameters (or a specified subset) from a list of \code{jagsUI}
 output objects or \code{data.frame}s.  The intent of this function is easy comparison of inferences from multiple comparable models.
+
+Here a \link{caterpillar} plot is defined as a set of overlayed interval bars (default values are 50 percent and 95 percent),
+with overlayed median markings, for each of a vector of parameter nodes.
 }
 \examples{
 ## This is the same output object three times, but shows functionality.

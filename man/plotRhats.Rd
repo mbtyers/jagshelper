@@ -45,6 +45,12 @@ therefore splitting into the fewest groups.}
 \description{
 Plotting all values of \code{Rhat} (or alternately \code{n.eff}) from an output object returned by \code{jagsUI}, or perhaps a subset of parameters.
 This function is intended as a quick graphical check of which parameters have adequately converged.
+
+\code{Rhat} (Gelman-Rubin Convergence Diagnostic, or Potential Scale Reduction Factor)
+is calculated within 'JAGS', and is
+commonly used as a measure of convergence for a given paramter node.  Values close
+to 1 are seen as evidence of adequate convergence.  \code{n.eff} is also calculated within 'JAGS', and may be interpreted as a crude measure of
+effective sample size for a given parameter node.
 }
 \examples{
 ## plotting everything
@@ -61,6 +67,10 @@ str(SS_out$Rhat) # the associated values
 
 ## plotsequence may be useful in the case of a sequence of values
 plotRhats(SS_out, p=c("trend", "cycle_s"), splitarr=TRUE, plotsequence=TRUE)
+}
+\references{
+Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
+Using Multiple Sequences. \emph{Statistical Science, 7}(4), 457–472. http://www.jstor.org/stable/2246093
 }
 \seealso{
 \link{traceworstRhat}, \link{check_Rhat}

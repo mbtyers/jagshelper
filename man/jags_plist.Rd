@@ -17,7 +17,10 @@ will be a matrix with a column associated with each MCMC chain and a row for
 each MCMC iteration.
 }
 \description{
-Extract a list of nrep X nchain matrices, one for each parameter.
+Extracts a list of matrices, one for each saved parameter node.  Each
+list element will be all posterior samples from that parameter node, arranged in
+a matrix with a column associated with each MCMC chain and a row for
+each MCMC iteration.
 }
 \note{
 It is unlikely that a user will need this function; it is included

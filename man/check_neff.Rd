@@ -16,6 +16,9 @@ Numeric (named) giving the proportion of \code{n.eff} values above the given thr
 }
 \description{
 Returns the mean number of \code{n.eff} values (by each parameter) that are greater than a specified threshold criterion.
+
+\code{n.eff} is calculated within 'JAGS', and may be interpreted as a crude measure of
+effective sample size for a given parameter node.
 }
 \examples{
 check_neff(SS_out)

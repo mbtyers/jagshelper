@@ -13,7 +13,7 @@ expit(x)
 Numeric vector
 }
 \description{
-Inverse logit, where logit is defined as log(x/(1-x).
+Inverse logit, where logit is defined as log(x/(1-x)).
 
 Expit (inverse logit) is defined as exp(x)/(1+exp(x)).
 }

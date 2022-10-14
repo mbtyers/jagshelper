@@ -21,7 +21,7 @@ trace_line(x, nline, lwd = 1, main = "", ...)
 \code{NULL}
 }
 \description{
-Trace plot of a single parameter.
+Trace plot of a single parameter node.
 }
 \examples{
 out_df <- jags_df(asdf_jags_out)

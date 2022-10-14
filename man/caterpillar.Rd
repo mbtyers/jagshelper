@@ -70,6 +70,9 @@ given by column and MCMC iteration is given by row.}
 \description{
 Caterpillar plot of the posterior densities of a vector of parameter nodes,
 in which the sequential order of nodes might not be important, such as vector of random effects.
+
+This produces a set of overlayed interval bars (default values are 50 percent and 95 percent),
+with overlayed median markings, for each of a vector of parameter nodes.
 }
 \examples{
 ## usage with input data.frame

@@ -2,7 +2,7 @@
 % Please edit documentation in R/jagshelper1.R
 \name{chaindens_df}
 \alias{chaindens_df}
-\title{By-chain kernel density of each column of a \code{data.frame}}
+\title{By-chain kernel density of each column of a \code{data.frame}.}
 \usage{
 chaindens_df(df, nline, parmfrow = NULL, ...)
 }

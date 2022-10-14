@@ -13,7 +13,7 @@ logit(x)
 Numeric vector
 }
 \description{
-Logit log(x/(1-x)
+Logit log(x/(1-x))
 }
 \examples{
 logit(0.5)
