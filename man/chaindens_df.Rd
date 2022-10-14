@@ -27,8 +27,7 @@ out_df <- jags_df(asdf_jags_out)
 b1 <- pull_post(out_df,"b1")
 a <- pull_post(out_df,"a")
 
-par(mfrow=c(3,1))
-trace_df(a, nline=3)
+trace_df(a, nline=3, parmfrow=c(3,1))
 
 chaindens_df(a, nline=3, parmfrow=c(3,1))
 }

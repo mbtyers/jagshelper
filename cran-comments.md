@@ -1,7 +1,6 @@
 ## Submission notes
 * This is a new package submission to CRAN.  I have addressed all feedback from
-the previous CRAN submission, and hope that the reduction in package size is
-acceptable.
+the previous CRAN submission.
 
 * I have read and agree to all CRAN policies.
 

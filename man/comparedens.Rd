@@ -4,7 +4,7 @@
 \alias{comparedens}
 \title{Compare Density}
 \usage{
-comparedens(x1, x2, p = NULL, ...)
+comparedens(x1, x2, p = NULL, minCI = 0.99, ...)
 }
 \arguments{
 \item{x1}{Output object returned from \code{jagsUI}; or alternately a \code{data.frame}}
@@ -13,6 +13,9 @@ comparedens(x1, x2, p = NULL, ...)
 
 \item{p}{Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 string supplied will be returned.  If the default (\code{NULL}) is accepted, all parameters will be plotted.}
+
+\item{minCI}{Minimum CI width for plotting.  This is intended as a method for excluding far-outlying MCMC
+samples when determining the appropriate y-axis limits for plotting.  Defaults to 99\%.}
 
 \item{...}{additional plotting arguments}
 }

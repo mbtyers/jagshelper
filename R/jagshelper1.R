@@ -266,6 +266,7 @@ tracedens_jags <- function (x, p = NULL, parmfrow = NULL, lwd = 1, shade=TRUE, .
   if (!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow = parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
   nline <- ncol(x_plist[[1]])
   cols <- adjustcolor(rainbow(nline), red.f = 0.9, blue.f = 0.9,
@@ -288,8 +289,8 @@ tracedens_jags <- function (x, p = NULL, parmfrow = NULL, lwd = 1, shade=TRUE, .
                                  col=adjustcolor(cols[j], alpha.f=.2))
     }
   }
-  if (!is.null(parmfrow))
-    par(mfrow = parmfrow1)
+  # if (!is.null(parmfrow))
+  #   par(mfrow = parmfrow1)
 }
 
 #' Number of parameters
@@ -481,8 +482,7 @@ chaindens_line <- function(x, nline, lwd=1, main="", ...) {
 #' b1 <- pull_post(out_df,"b1")
 #' a <- pull_post(out_df,"a")
 #'
-#' par(mfrow=c(3,1))
-#' trace_df(a, nline=3)
+#' trace_df(a, nline=3, parmfrow=c(3,1))
 #'
 #' trace_df(a, nline=3, parmfrow=c(3,1))
 #' @export
@@ -518,8 +518,7 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
 #' b1 <- pull_post(out_df,"b1")
 #' a <- pull_post(out_df,"a")
 #'
-#' par(mfrow=c(3,1))
-#' trace_df(a, nline=3)
+#' trace_df(a, nline=3, parmfrow=c(3,1))
 #'
 #' chaindens_df(a, nline=3, parmfrow=c(3,1))
 #' @export
@@ -1247,6 +1246,8 @@ plotRhats <- function(x,
 #' @param x2 Second output object returned from `jagsUI`; or alternately a `data.frame`
 #' @param p Optional vector of parameters to subset.  All parameters with names matching the beginning of the
 #' string supplied will be returned.  If the default (`NULL`) is accepted, all parameters will be plotted.
+#' @param minCI Minimum CI width for plotting.  This is intended as a method for excluding far-outlying MCMC
+#' samples when determining the appropriate y-axis limits for plotting.  Defaults to 99%.
 #' @param ... additional plotting arguments
 #' @return `NULL`
 #' @seealso \link{comparecat}
@@ -1255,7 +1256,7 @@ plotRhats <- function(x,
 #' ## This is the same output object twice, but shows functionality.
 #' comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"))
 #' @export
-comparedens <- function(x1,x2, p=NULL,...) {
+comparedens <- function(x1,x2, p=NULL, minCI=0.99, ...) {
   # if(!inherits(x1,"jagsUI") | !inherits(x2,"jagsUI")) {
   #   stop("Inputs must both a output objects returned from jagsUI::jags().")
   # }
@@ -1285,7 +1286,12 @@ comparedens <- function(x1,x2, p=NULL,...) {
 
   allparms <- sort(unique(c(names(parmx1),names(parmx2))))
 
-  plot(NA,xlim=c(0,length(allparms)+1), ylim=range(parmx1,parmx2,na.rm=T), ylab="",xlab="",xaxt="n",...=...)
+  cilo1 <- apply(parmx1, 2, quantile, p=(1-minCI)/2)
+  cilo2 <- apply(parmx2, 2, quantile, p=(1-minCI)/2)
+  cihi1 <- apply(parmx1, 2, quantile, p=1-((1-minCI)/2))
+  cihi2 <- apply(parmx2, 2, quantile, p=1-((1-minCI)/2))
+
+  plot(NA,xlim=c(0,length(allparms)+1), ylim=range(cilo1,cihi1,cilo2,cihi2,na.rm=T), ylab="",xlab="",xaxt="n",...=...)
   axis(1,at=1:length(allparms),labels=allparms,las=2)
   abline(v=1:length(allparms),lty=3)
 
@@ -1400,6 +1406,7 @@ pairstrace_jags <- function (x, p = NULL, points=FALSE, contour=FALSE, lwd = 1, 
   if (!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
     par(mfrow = parmfrow)
+    on.exit(par(mfrow=parmfrow1))
   }
   nline <- ncol(x_plist[[1]])
   cols <- adjustcolor(rainbow(nline), red.f = 0.9, blue.f = 0.9,
@@ -1428,8 +1435,8 @@ pairstrace_jags <- function (x, p = NULL, points=FALSE, contour=FALSE, lwd = 1, 
       }
     }
   }
-  if (!is.null(parmfrow))
-    par(mfrow = parmfrow1)
+  # if (!is.null(parmfrow))
+  #   par(mfrow = parmfrow1)
 }
 
 
