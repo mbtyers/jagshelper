@@ -1,6 +1,8 @@
 ## Submission notes
-* This is a new package submission to CRAN.  I have addressed all feedback from
-the previous CRAN submission.
+* This is a new package submission to CRAN.  
+* I have addressed all feedback from the previous CRAN submission.
+* I have made some additional revisions to the package documentation (notably, 
+added a reference) since the previous CRAN submission.
 
 * I have read and agree to all CRAN policies.
 
