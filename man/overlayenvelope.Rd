@@ -22,6 +22,7 @@ overlayenvelope(
   ylim = NULL,
   legend = TRUE,
   legendnames = NULL,
+  legendpos = "topleft",
   ...
 )
 }
@@ -63,6 +64,8 @@ input to \code{df} is a single \code{jagsUI} output object.}
 \item{legend}{Whether to automatically try to add a legend.  Defaults to \code{TRUE}.}
 
 \item{legendnames}{Optional vector of names for a legend.}
+
+\item{legendpos}{Position for optional legend.  Defaults to \code{"topleft"}.}
 
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }

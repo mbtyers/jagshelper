@@ -4,7 +4,15 @@
 \alias{comparedens}
 \title{Compare Density}
 \usage{
-comparedens(x1, x2, p = NULL, minCI = 0.99, ...)
+comparedens(
+  x1,
+  x2,
+  p = NULL,
+  minCI = 0.99,
+  legendnames = NULL,
+  legendpos = "topleft",
+  ...
+)
 }
 \arguments{
 \item{x1}{Output object returned from \code{jagsUI}; or alternately a \code{data.frame}}
@@ -16,6 +24,10 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 
 \item{minCI}{Minimum CI width for plotting.  This is intended as a method for excluding far-outlying MCMC
 samples when determining the appropriate y-axis limits for plotting.  Defaults to 99\%.}
+
+\item{legendnames}{Names for optional legend.  If the default \code{NULL} is accepted, no legend will be drawn.}
+
+\item{legendpos}{Position for optional legend.  Defaults to \code{"topleft"}.}
 
 \item{...}{additional plotting arguments}
 }
@@ -31,7 +43,8 @@ plotted facing one another.
 }
 \examples{
 ## This is the same output object twice, but shows functionality.
-comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"))
+comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"),
+            legendnames=c("Model 1", "Model 2"))
 }
 \seealso{
 \link{comparecat}

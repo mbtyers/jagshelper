@@ -766,6 +766,7 @@ envelope <- function(df,
 #' @param ylim Y-axis limits for plotting.  If the default (`NULL`) is accepted, these will be determined automatically.
 #' @param legend Whether to automatically try to add a legend.  Defaults to `TRUE`.
 #' @param legendnames Optional vector of names for a legend.
+#' @param legendpos Position for optional legend.  Defaults to `"topleft"`.
 #' @param ... additional plotting arguments or arguments to `lines()`
 #' @return `NULL`
 #' @seealso \link{envelope}
@@ -793,7 +794,7 @@ overlayenvelope <- function(df,
                             col=NULL, add=FALSE, dark=.3, outline=FALSE,
                             xlab="", ylab="", main=NULL,
                             ylim=NULL,
-                            legend=TRUE, legendnames=NULL, ...) {
+                            legend=TRUE, legendnames=NULL, legendpos="topleft",...) {
   conditionmet <- F
   ## list of dfs
   # do nothing
@@ -894,7 +895,7 @@ overlayenvelope <- function(df,
     }
   }
   if(legend & !is.null(legendnames)) {
-    legend("topleft",legend=legendnames, fill=adjustcolor(cols, alpha.f=.5), border=cols)
+    legend(legendpos,legend=legendnames, fill=adjustcolor(cols, alpha.f=.5), border=cols)
   }
 }
 
@@ -1344,15 +1345,18 @@ plotRhats <- function(x,
 #' string supplied will be returned.  If the default (`NULL`) is accepted, all parameters will be plotted.
 #' @param minCI Minimum CI width for plotting.  This is intended as a method for excluding far-outlying MCMC
 #' samples when determining the appropriate y-axis limits for plotting.  Defaults to 99%.
+#' @param legendnames Names for optional legend.  If the default `NULL` is accepted, no legend will be drawn.
+#' @param legendpos Position for optional legend.  Defaults to `"topleft"`.
 #' @param ... additional plotting arguments
 #' @return `NULL`
 #' @seealso \link{comparecat}
 #' @author Matt Tyers
 #' @examples
 #' ## This is the same output object twice, but shows functionality.
-#' comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"))
+#' comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"),
+#'             legendnames=c("Model 1", "Model 2"))
 #' @export
-comparedens <- function(x1,x2, p=NULL, minCI=0.99, ...) {
+comparedens <- function(x1,x2, p=NULL, minCI=0.99, legendnames=NULL, legendpos="topleft", ...) {
   # if(!inherits(x1,"jagsUI") | !inherits(x2,"jagsUI")) {
   #   stop("Inputs must both a output objects returned from jagsUI::jags().")
   # }
@@ -1400,6 +1404,10 @@ comparedens <- function(x1,x2, p=NULL, minCI=0.99, ...) {
       xxx <- density(parmx2[,which(names(parmx2)==allparms[i])])
       polygon(i+xxx$y/max(xxx$y)*.4, xxx$x, col=adjustcolor(4,alpha.f=.5), border=4)
     }
+  }
+
+  if(!is.null(legendnames)) {
+    legend(legendpos,legend=legendnames, fill=adjustcolor(c(2,4), alpha.f=.5), border=c(2,4))
   }
 }
 
@@ -1451,8 +1459,8 @@ comparecat <- function(x,p=NULL,ci=c(0.5,0.95),ylim=NULL,...) {
   if(!is.null(ylim)) {
     ylims <- ylim
   } else {
-    ylims <- c(min(sapply(parmx, function(x) apply(x,2,quantile,p=min(cilo))),na.rm=T),
-               max(sapply(parmx, function(x) apply(x,2,quantile,p=max(cihi))),na.rm=T))
+    ylims <- c(min(unlist(sapply(parmx, function(x) apply(x,2,quantile,p=min(cilo),na.rm=T)))),
+               max(unlist(sapply(parmx, function(x) apply(x,2,quantile,p=max(cihi),na.rm=T)))))
   }
 
   plot(NA,xlim=c(0,length(allparms)+1), ylim=ylims, ylab="",xlab="",xaxt="n",...=...)
