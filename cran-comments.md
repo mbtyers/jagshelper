@@ -1,6 +1,6 @@
 ## Update notes
 * This is an existing package on CRAN.  
-* This version contains a minor bug fix and some minor improvements to functionality.
+* This version contains two new functions and some minor improvements to functionality.
 
 * I have read and agree to all CRAN policies.
 
@@ -9,10 +9,10 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
-*   installed size is 5.4Mb
+*   installed size is  5.5Mb
     sub-directories of 1Mb or more:
-      data  4.0Mb
-      doc    1.2Mb
+      data   3.9Mb
+      doc    1.3Mb
 
 ## Downstream dependencies
 This is a new package and there are no downstream dependencies.

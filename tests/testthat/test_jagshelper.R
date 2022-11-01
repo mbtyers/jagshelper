@@ -224,3 +224,14 @@ test_that("pairstrace_jags", {
   expect_error(pairstrace_jags(out_df),"Input must be an output object returned from jagsUI::jags().")
 })
 
+test_that("cor_jags", {
+  expect_equal(sum(cor_jags(asdf_jags_out)), 8.291098, tolerance=0.0001)
+  expect_equal(dim(cor_jags(asdf_jags_out)), c(8,8))
+  expect_equal(dim(cor_jags(asdf_jags_out, p=c("a","b"))), c(5,5))
+})
+
+test_that("plotcor_jags", {
+  expect_silent(plotcor_jags(asdf_jags_out))
+  expect_silent(plotcor_jags(asdf_jags_out, p=c("a","b")))
+  expect_silent(plotcor_jags(asdf_jags_out, legend=F, mincor=0.1, maxn=1))
+})

@@ -1,3 +1,7 @@
+## jagshelper 0.1.9
+
+Added `cor_jags()` and `plotcor_jags()` and associated documentation
+
 ## jagshelper 0.1.8
 
 Fixed a bug in `comparedens()` and added some minor functionality

@@ -106,6 +106,17 @@ surface shapes.  An example is shown below.
 pairstrace_jags(asdf_jags_out, p=c("a","sig_a"), points=TRUE, parmfrow=c(3,2))
 ```
 
+* The functions `cor_jags()` and `plotcor_jags()` respectively return and plot correlation
+matrices of all or a subset of parameters, which may be useful in directly assessing
+correlation between parameters.  In the case of multiple nodes per parameter (as
+in a vector or array of nodes), the full collection of nodes per parameter name is 
+given one axis tick.  This is intended to reduce graphical clutter as well as giving 
+greater visual weight to single parameters.  An example is given below.
+
+```{r, fig.width=7, fig.height=6}
+plotcor_jags(SS_out, p=c("trend","rate","sig"))
+```
+
 
 ## Extracting output as data.frame
 

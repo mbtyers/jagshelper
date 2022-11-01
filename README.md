@@ -47,6 +47,9 @@ plotted with respect to one another.  In addition to convergence, this may provi
 a graphical check for correlation between parameter nodes, or problematic posterior 
 surface shapes.
 
+* `cor_jags()` and `plotcor_jags()` respectively return and plot correlation matrices 
+for all or a subset of parameter nodes.
+
 ### Commonly-used functions: Extracting simplified model output
 
 * `jags_df()` extracts the MCMC iterations from a 'jagsUI' output object as a `data.frame`,

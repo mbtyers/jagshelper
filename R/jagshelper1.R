@@ -12,8 +12,8 @@
 #' @importFrom graphics axis lines par points polygon segments
 #' @importFrom stats density quantile
 #' @importFrom grDevices rgb
-#' @importFrom graphics abline legend
-#' @importFrom stats rbeta median
+#' @importFrom graphics abline legend rect text
+#' @importFrom stats rbeta median cor
 #' @examples
 #' skeleton("asdf")
 #' @export
@@ -1608,6 +1608,7 @@ cor_jags <- function(x, p=NULL, exact=FALSE) {
 plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, legend=TRUE, ...) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
   dfcor <- cor_jags(x=x, p=p, exact=exact)
+  if(all(dim(dfcor)==0)) stop("No parameters with matching names")
 
   dfnames <- dimnames(dfcor)[[1]] #names(df)
   dfwhich <- sapply(strsplit(dfnames,split="[",fixed=T),FUN="[",1)
