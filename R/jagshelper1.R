@@ -76,6 +76,9 @@ ncores <- 3
 #' be more straightforward, and posterior objects will be smaller files and can be
 #' written to an external table or .csv, etc.
 #' @param x Output object from `jagsUI::jags()`
+#' @param p Optional string to begin posterior names.  If `NULL` is used, all parameters will be returned.
+#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).
+#' Defaults to `FALSE.`
 #' @return A `data.frame` with a column associated with each parameter and a row
 #' associated with each MCMC iteration.
 #' @seealso \link{pull_post}
@@ -84,9 +87,11 @@ ncores <- 3
 #' @examples
 #' out_df <- jags_df(asdf_jags_out)
 #' @export
-jags_df <- function(x) {
+jags_df <- function(x, p=NULL, exact=FALSE) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
-  return(as.data.frame(as.matrix(x$samples)))
+  xdf <- as.data.frame(as.matrix(x$samples))
+  if(!is.null(p)) xdf <- pull_post(xdf, p=p, exact=exact)
+  return(xdf)
 }
 
 
@@ -96,7 +101,7 @@ jags_df <- function(x) {
 #' in creating smaller objects consisting of MCMC samples.
 #' @param x Posterior `data.frame`
 #' @param p String to begin posterior names.  If `NULL` is used, all parameters will be returned.
-#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).  Defaults to `FALSE`.
+#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).
 #' Defaults to `FALSE.`
 #' @return A `data.frame` with a column associated with each (subsetted) parameter and a row
 #' associated with each MCMC iteration.
@@ -1551,4 +1556,127 @@ pairstrace_jags <- function (x, p = NULL, points=FALSE, contour=FALSE, lwd = 1, 
 niggle <- function() print("He was the sort of painter who can paint leaves better than trees. ")
 
 
+#' Correlation matrix from a JAGS object
+#' @description Computes a correlation matrix of all MCMC samples from an object
+#' returned by 'jagsUI', or an optional subset of parameter nodes.
+#' @param x Output object returned from `jagsUI`
+#' @param p Optional string to begin posterior names.  If `NULL` is used, all parameters will be used
+#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).
+#' Defaults to `FALSE.`
+#' @return A 2-dimensional correlation matrix (n X n, where n is the number of parameter nodes)
+#' @seealso \link{plotcor_jags}
+#' @author Matt Tyers
+#' @examples
+#' cor_jags(asdf_jags_out)
+#' @export
+cor_jags <- function(x, p=NULL, exact=FALSE) {
+  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+  df <- jags_df(x, p=p, exact=exact)   ### make this jags_df
+  suppressWarnings(dfcor <- cor(df))
+  return(dfcor)
+}
+
+
+#' Plot a correlation matrix from a JAGS object
+#' @description Plots a correlation matrix of all MCMC samples from an object
+#' returned by 'jagsUI', or an optional subset of parameter nodes.  Correlation is
+#' plotted as shades of red (positive) or blue (negative).
+#'
+#' In the case of vectors or arrays of nodes for each parameter name, a single axis
+#' tick will be used for all nodes with a single name.  This has the effect of
+#' giving greater visual weight to single parameters, and reducing plot clutter.
+#'
+#' Values of correlation are overlayed for all parameters with few nodes, with
+#' character size scaled according to the absolute correlation.
+#' @param x Output object returned from `jagsUI`
+#' @param p Optional string to begin posterior names.  If `NULL` is used, all parameters will be used
+#' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).
+#' Defaults to `FALSE.`
+#' @param mincor Minimum (absolute) correlation to use for text labels.  Defaults to 0 (all will be plotted)
+#' @param maxn Maximum number of nodes per parameter name for text labels, to prevent plot clutter.  Defaults to 4.
+#' @param maxcex Maximum character expansion factor for text labels.  Defaults to 1.
+#' @param legend Whether to produce a plot legend.  Defaults to `TRUE`.
+#' @param ... Optional plotting arguments
+#' @return `NULL`
+#' @seealso \link{plotcor_jags}
+#' @author Matt Tyers
+#' @examples
+#' plotcor_jags(asdf_jags_out, maxcex=0.7)
+#'
+#' plotcor_jags(SS_out, p=c("trend","rate","sig"))
+#' @export
+plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, legend=TRUE, ...) {
+  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+  dfcor <- cor_jags(x=x, p=p, exact=exact)
+
+  dfnames <- dimnames(dfcor)[[1]] #names(df)
+  dfwhich <- sapply(strsplit(dfnames,split="[",fixed=T),FUN="[",1)
+  dfhowmany <- rep(NA,length(dfnames))
+  for(i in 1:length(dfnames)) dfhowmany[i] <- sum(dfwhich==dfwhich[i])
+  dfdim <- cumsum(1/dfhowmany)
+  dfdim1 <- c(0, dfdim[-length(dfdim)])
+
+  xmat <- matrix(dfdim, nrow=length(dfdim), ncol=length(dfdim))
+  ymat <- matrix(dfdim, nrow=length(dfdim), ncol=length(dfdim), byrow=T)
+  xmat1 <- matrix(dfdim1, nrow=length(dfdim), ncol=length(dfdim))
+  ymat1 <- matrix(dfdim1, nrow=length(dfdim), ncol=length(dfdim), byrow=T)
+
+  cols <- 0*xmat
+  for(i in 1:nrow(xmat)) {
+    for(j in 1:i) {
+      if(!is.na(dfcor[i,j])) {
+        if(dfcor[i,j] > 0) {
+          cols[i,j] <- cols[j,i] <- adjustcolor(2,alpha.f=dfcor[i,j])
+        }
+        if(dfcor[i,j] < 0) {
+          cols[i,j] <- cols[j,i] <- adjustcolor(4,alpha.f=-dfcor[i,j])
+        }
+      }
+      if(i==j) cols[i,j] <- 1
+    }
+  }
+
+  plot(NA, xlim=(1+.1*legend)*range(0,dfdim), ylim=rev(range(0,dfdim)),
+       yaxt="n", xaxt="n", ylab="", xlab="", bty='n',...=...)#,yaxs="i", xaxs="i"
+  dfwhichunique <- unique(dfwhich)
+  axis(side=1, at=1:length(dfwhichunique)-.5, labels=dfwhichunique, las=2)
+  axis(side=2, at=1:length(dfwhichunique)-.5, labels=dfwhichunique, las=2)
+
+  rect(xleft=xmat1, xright=xmat, ybottom=ymat1, ytop=ymat, border=cols, col=cols)
+  for(i in 1:nrow(xmat)) {
+    for(j in 1:i) {
+      if((dfhowmany[i]<=maxn) & (dfhowmany[j]<=maxn) & (abs(dfcor[i,j])>=mincor)) {
+        text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+        text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+      }
+    }
+  }
+  # abline(v=0:length(dfwhichunique))
+  segments(x0=rep(0, length(dfwhichunique)+1),
+           x1=rep(length(dfwhichunique), length(dfwhichunique)+1),
+           y0=0:length(dfwhichunique))
+  segments(y0=rep(0, length(dfwhichunique)+1),
+           y1=rep(length(dfwhichunique), length(dfwhichunique)+1),
+           x0=0:length(dfwhichunique))
+
+  if(legend) {
+    legendby <- .25
+    legendn <- 2/legendby+1
+
+    legendl <- rep(1.05*max(dfdim),legendn)
+    legendr <- rep(1.1*max(dfdim),legendn)
+    legendb <- seq(from=.5*max(dfdim), to=0, length.out=legendn+1)[-legendn-1]
+    legendt <- seq(from=.5*max(dfdim), to=0, length.out=legendn+1)[-1]
+
+    legendcols <- rep(0, legendn)
+    legendcors <- seq(-1,1,length.out=legendn)
+    for(i in 1:(1/legendby)) {
+      legendcols[i] <- adjustcolor(4, alpha.f=-legendcors[i])
+      legendcols[legendn+1-i] <- adjustcolor(2, alpha.f=-legendcors[i])
+    }
+
+    rect(xleft=legendl, xright=legendr, ytop=legendt, ybottom=legendb, col=legendcols, border=NA)
+    text(x=.5*(legendl+legendr), y=.5*(legendt+legendb), labels=legendcors, cex=.7)
+  }
+}
 

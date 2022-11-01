@@ -11,7 +11,7 @@ pull_post(x, p = NULL, exact = FALSE)
 
 \item{p}{String to begin posterior names.  If \code{NULL} is used, all parameters will be returned.}
 
-\item{exact}{Whether name must be an exact match (\code{TRUE}) or with initial sub-string matching only supplied characters (\code{FALSE}).  Defaults to \code{FALSE}.
+\item{exact}{Whether name must be an exact match (\code{TRUE}) or with initial sub-string matching only supplied characters (\code{FALSE}).
 Defaults to \code{FALSE.}}
 }
 \value{

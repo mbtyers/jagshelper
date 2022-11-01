@@ -4,10 +4,15 @@
 \alias{jags_df}
 \title{Extract data.frame}
 \usage{
-jags_df(x)
+jags_df(x, p = NULL, exact = FALSE)
 }
 \arguments{
 \item{x}{Output object from \code{jagsUI::jags()}}
+
+\item{p}{Optional string to begin posterior names.  If \code{NULL} is used, all parameters will be returned.}
+
+\item{exact}{Whether name must be an exact match (\code{TRUE}) or with initial sub-string matching only supplied characters (\code{FALSE}).
+Defaults to \code{FALSE.}}
 }
 \value{
 A \code{data.frame} with a column associated with each parameter and a row
