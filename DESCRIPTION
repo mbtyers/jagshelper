@@ -1,8 +1,8 @@
 Package: jagshelper
 Type: Package
 Title: Extracting and Visualizing Output from 'jagsUI'
-Version: 0.1.9
-Date: 2022-11-01
+Version: 0.1.10
+Date: 2022-11-02
 Author: Matt Tyers [aut, cre]
 Authors@R: person("Matt", "Tyers", email = "matttyersstat@gmail.com",
     role = c("aut", "cre"))

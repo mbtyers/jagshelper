@@ -1132,6 +1132,11 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
     rhats <- rhatlist[[i]]
     if(!is.null(dim(rhats))) {
       if(!is.null(margin)) {
+        domargin <- (max(margin)<=length(dim(rhats)))
+      } else {
+        domargin <- F
+      }
+      if(domargin) {
         if(max(margin)<=length(dim(rhats))) {
           if(!n.eff) maxes <- apply(rhats, MARGIN=margin, max, na.rm=T)
           if(n.eff) maxes <- apply(rhats, MARGIN=margin, min, na.rm=T)
@@ -1141,10 +1146,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
             whichone <- whichone1[which.max(whichone1[,2]==imax),]
             thenames <- c(thenames, paste0(pp,"[",paste(whichone,collapse=","),"]"))
           }
-        } else {
-          stop("invalid margin argument")    ##### add functionality of using margin when applicable??  SS_out doesn't work
         }
-
       } else {
         if(length(dim(rhats))>1) {  ##### this might not work as intended for >2d
           if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1,]
@@ -1160,7 +1162,64 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
     }
     tracedens_jags(x,p=thenames,...=...)
   }
-  # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
+
+  # if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+  #
+  # if(!is.null(parmfrow)) {
+  #   parmfrow1 <- par("mfrow")
+  #   par(mfrow=parmfrow)
+  #   on.exit(par(mfrow=parmfrow1))
+  # }
+  # if(!n.eff) {
+  #   if(is.null(p)) {
+  #     rhatlist <- x$Rhat
+  #     p <- names(rhatlist)
+  #   } else {
+  #     rhatlist <- x$Rhat[names(x$Rhat) %in% p]    # do the thing like plist, that allows sig??
+  #   }
+  # } else {
+  #   if(is.null(p)) {
+  #     rhatlist <- x$n.eff
+  #     p <- names(rhatlist)
+  #   } else {
+  #     rhatlist <- x$n.eff[names(x$n.eff) %in% p]    # do the thing like plist, that allows sig??
+  #   }
+  # }
+  # if(length(rhatlist)==0) stop("No parameters with matching names")
+  # for(i in 1:length(rhatlist)) {
+  #   pp <- p[i]
+  #   rhats <- rhatlist[[i]]
+  #   if(!is.null(dim(rhats))) {
+  #     if(!is.null(margin)) {
+  #       if(max(margin)<=length(dim(rhats))) {
+  #         if(!n.eff) maxes <- apply(rhats, MARGIN=margin, max, na.rm=T)
+  #         if(n.eff) maxes <- apply(rhats, MARGIN=margin, min, na.rm=T)
+  #         thenames <- NULL
+  #         for(imax in 1:length(maxes)) {
+  #           whichone1 <- which(rhats==maxes[imax], arr.ind=T)
+  #           whichone <- whichone1[which.max(whichone1[,2]==imax),]
+  #           thenames <- c(thenames, paste0(pp,"[",paste(whichone,collapse=","),"]"))
+  #         }
+  #       } else {
+  #         stop("invalid margin argument")    ##### add functionality of using margin when applicable??  SS_out doesn't work
+  #       }
+  #
+  #     } else {
+  #       if(length(dim(rhats))>1) {  ##### this might not work as intended for >2d
+  #         if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1,]
+  #         if(n.eff) whichones <- which(rhats==min(rhats,na.rm=T), arr.ind=T)[1,]
+  #       } else {
+  #         if(!n.eff) whichones <- which(rhats==max(rhats,na.rm=T), arr.ind=T)[1]
+  #         if(n.eff) whichones <- which(rhats==min(rhats,na.rm=T), arr.ind=T)[1]
+  #       }
+  #       thenames <- paste0(pp,"[",paste(whichones,collapse=","),"]")
+  #     }
+  #   } else {
+  #     thenames <- pp
+  #   }
+  #   tracedens_jags(x,p=thenames,...=...)
+  # }
+  # # if(!is.null(parmfrow)) par(mfrow=parmfrow1)
 }
 
 
