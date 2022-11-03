@@ -1530,14 +1530,17 @@ comparecat <- function(x,p=NULL,ci=c(0.5,0.95),ylim=NULL,...) {
   plot(NA,xlim=c(0,length(allparms)+1), ylim=ylims, ylab="",xlab="",xaxt="n",...=...)
   axis(1,at=1:length(allparms),labels=allparms,las=2)
   # abline(v=1:length(allparms),lty=3)
+
+  cols <- c(4,2,3,rcolors(100))[1:length(x)]
+
   for(i in 1:length(allparms)) {
     for(ii in 1:length(x)) {
       if(allparms[i] %in% names(parmx[[ii]])) {
         xplot <- i+(seq(-.3,.3,length.out=length(x)))[ii]
         vec <- parmx[[ii]][,which(names(parmx[[ii]])==allparms[i])]
         segments(x0=rep(xplot,2), y0=quantile(vec,p=cilo), y1=quantile(vec,p=cihi),
-                 lwd=lwds, lend=1, col=ii+1)
-        points(xplot,median(vec),pch=16,col=ii+1)
+                 lwd=lwds, lend=1, col=cols[ii])  #col=ii+1
+        points(xplot,median(vec),pch=16,col=cols[ii])  #col=ii+1
       }
     }
   }
