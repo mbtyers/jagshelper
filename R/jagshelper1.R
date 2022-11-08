@@ -1776,24 +1776,24 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
 #' @author Matt Tyers
 #' @examples
 #' ## jagsUI object with a single parameter
-#' jags_dens(asdf_jags_out, p="b1")
+#' plotdens_jags(asdf_jags_out, p="b1")
 #'
 #' ## jagsUI object with multiple nodes of a parameter
-#' jags_dens(asdf_jags_out, p="a")
+#' plotdens_jags(asdf_jags_out, p="a")
 #'
 #' ## jagsUI object with multiple parameter nodes
-#' jags_dens(asdf_jags_out, p=c("a[1]","a[2]","a[3]"))
+#' plotdens_jags(asdf_jags_out, p=c("a[1]","a[2]","a[3]"))
 #'
 #' ## data.frame with multiple columns
-#' jags_dens(jags_df(asdf_jags_out, p="a"))
+#' plotdens_jags(jags_df(asdf_jags_out, p="a"))
 #'
 #' ## list of jagsUI objects with a single parameter name
-#' jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
+#' plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
 #'
 #' ## list of jagsUI objects with a vector of parameter names
-#' jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
+#' plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
 #' @export
-jags_dens <- function(df, p=NULL, exact=FALSE, add=FALSE,
+plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
                       col=NULL, shade=TRUE, lwd=2, minCI=0.99,
                       legend=TRUE, legendpos="topleft", legendnames=NULL,
                       main=NULL, xlab="", ylab="Density",...) {  #...
@@ -1857,7 +1857,7 @@ jags_dens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 
   }
 
-  if(is.null(dflist)) stop("No allowable input detected.  See help(jags_dens) for details.")
+  if(is.null(dflist)) stop("No allowable input detected.  See help(plotdens_jags) for details.")
   # alldims <- sapply(dflist, dim)
   # for(i in 1:length(alldims)) {
   #   if(!is.null(alldims[[i]])) stop("Multiple columns detected for at least one list element")
@@ -1894,12 +1894,12 @@ jags_dens <- function(df, p=NULL, exact=FALSE, add=FALSE,
     legend(legendpos, lwd=lwd, col=col, legend=legendnames)
   }
 }
-# jags_dens(df=asdf_jags_out, p="b1")
-# jags_dens(asdf_jags_out, p="a")
-# jags_dens(jags_df(asdf_jags_out, p="a"))
-# jags_dens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a")
-# jags_dens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a[1]")
-# jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
+# plotdens_jags(df=asdf_jags_out, p="b1")
+# plotdens_jags(asdf_jags_out, p="a")
+# plotdens_jags(jags_df(asdf_jags_out, p="a"))
+# plotdens_jags(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a")
+# plotdens_jags(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a[1]")
+# plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
 
 
 
