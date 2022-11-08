@@ -48,7 +48,7 @@ This function is intended as a quick graphical check of which parameters have ad
 
 \code{Rhat} (Gelman-Rubin Convergence Diagnostic, or Potential Scale Reduction Factor)
 is calculated within 'JAGS', and is
-commonly used as a measure of convergence for a given paramter node.  Values close
+commonly used as a measure of convergence for a given parameter node.  Values close
 to 1 are seen as evidence of adequate convergence.  \code{n.eff} is also calculated within 'JAGS', and may be interpreted as a crude measure of
 effective sample size for a given parameter node.
 }
