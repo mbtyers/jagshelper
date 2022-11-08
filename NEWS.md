@@ -1,3 +1,7 @@
+## jagshelper 0.1.11
+
+Added `plotdens_jags` and associated documentation
+
 ## jagshelper 0.1.9 and 0.1.10
 
 Added `cor_jags()` and `plotcor_jags()` and associated documentation

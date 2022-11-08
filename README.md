@@ -81,6 +81,9 @@ allow comparison among multiple candidate models.
 and right-facing vertically-oriented kernel densities for TWO model output objects,
 with parameter nodes with the same names plotted facing one another.
 
+* `plotdens()` produces a kernel density plot of a single parameter node, or 
+overlays kernel densities for multiple parameter nodes.
+
 
 ### Installation
 

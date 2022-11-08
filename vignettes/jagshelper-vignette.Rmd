@@ -156,11 +156,16 @@ with a categorical variable, in which plotting order may or may not matter.
 By contrast, `envelope()` is intended for a matrix associated with a sequence of 
 parameter nodes, such as in a time series.
 
+For a simpler case, `plotdens()` produces a kernel density plot of a single parameter
+node, or overlays multiple parameter nodes from a list.  Alternately (shown below)
+it overlays kernel density plots of a vector of parameter nodes.
+
 ```{r,fig.width=5,fig.height=8}
 old_parmfrow <- par("mfrow")  # storing old graphics state
-par(mfrow=c(2,1))
+par(mfrow=c(3,1))
 caterpillar(asdf_jags_out, "a")
 envelope(SS_out, "trend", x=SS_data$x)
+plotdens(asdf_jags_out, "a")
 par(mfrow=old_parmfrow)  # resetting graphics state
 ```
 

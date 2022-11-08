@@ -235,3 +235,14 @@ test_that("plotcor_jags", {
   expect_silent(plotcor_jags(asdf_jags_out, p=c("a","b")))
   expect_silent(plotcor_jags(asdf_jags_out, legend=F, mincor=0.1, maxn=1))
 })
+
+test_that("plotdens", {
+  expect_silent(plotdens(asdf_jags_out, p="b1"))
+  expect_silent(plotdens(asdf_jags_out, p="b1", add=T, shade=F, lwd=F))
+  expect_silent(plotdens(asdf_jags_out, p="a", minCI=.95, col=2:4))
+  expect_silent(plotdens(asdf_jags_out, p=c("a[1]","a[2]","a[3]"), legend=F))
+  expect_silent(plotdens(jags_df(asdf_jags_out, p="a"),legendnames=c("albert","betty","chuck")))
+  expect_silent(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1"))
+  expect_error(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a"),"No parameter names are an exact match to p= argument.")
+  expect_silent(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]")))
+})

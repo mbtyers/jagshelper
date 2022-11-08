@@ -1776,24 +1776,24 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
 #' @author Matt Tyers
 #' @examples
 #' ## jagsUI object with a single parameter
-#' plotdens_jags(asdf_jags_out, p="b1")
+#' plotdens(asdf_jags_out, p="b1")
 #'
 #' ## jagsUI object with multiple nodes of a parameter
-#' plotdens_jags(asdf_jags_out, p="a")
+#' plotdens(asdf_jags_out, p="a")
 #'
 #' ## jagsUI object with multiple parameter nodes
-#' plotdens_jags(asdf_jags_out, p=c("a[1]","a[2]","a[3]"))
+#' plotdens(asdf_jags_out, p=c("a[1]","a[2]","a[3]"))
 #'
 #' ## data.frame with multiple columns
-#' plotdens_jags(jags_df(asdf_jags_out, p="a"))
+#' plotdens(jags_df(asdf_jags_out, p="a"))
 #'
 #' ## list of jagsUI objects with a single parameter name
-#' plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
+#' plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
 #'
 #' ## list of jagsUI objects with a vector of parameter names
-#' plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
+#' plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
 #' @export
-plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
+plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
                       col=NULL, shade=TRUE, lwd=2, minCI=0.99,
                       legend=TRUE, legendpos="topleft", legendnames=NULL,
                       main=NULL, xlab="", ylab="Density",...) {  #...
@@ -1840,7 +1840,7 @@ plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
       dflist <- list()
       for(i in 1:length(df)) {
         suppressWarnings(dflist[[i]] <- tryCatch(jags_df(x=df[[i]], p=p[i], exact=T)[,1], error=function(e) NA))
-        if(all(is.na(dflist[[i]]))) stop("stoppity stop")
+        if(all(is.na(dflist[[i]]))) stop("No parameter names are an exact match to p= argument.")
       }
     } else {
   # list of jags, one p
@@ -1848,7 +1848,7 @@ plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
         dflist <- list()
         for(i in 1:length(df)) {
           suppressWarnings(dflist[[i]] <- tryCatch(jags_df(x=df[[i]], p=p, exact=T)[,1], error=function(e) NA))
-          if(all(is.na(dflist[[i]]))) stop("stoppity stop")
+          if(all(is.na(dflist[[i]]))) stop("No parameter names are an exact match to p= argument.")
         }
       } else {
         stop("p= argument must be of length 1 or length equal to the length of jagsUI object list")
@@ -1857,7 +1857,7 @@ plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
 
   }
 
-  if(is.null(dflist)) stop("No allowable input detected.  See help(plotdens_jags) for details.")
+  if(is.null(dflist)) stop("No allowable input detected.  See help(plotdens) for details.")
   # alldims <- sapply(dflist, dim)
   # for(i in 1:length(alldims)) {
   #   if(!is.null(alldims[[i]])) stop("Multiple columns detected for at least one list element")
@@ -1894,12 +1894,12 @@ plotdens_jags <- function(df, p=NULL, exact=FALSE, add=FALSE,
     legend(legendpos, lwd=lwd, col=col, legend=legendnames)
   }
 }
-# plotdens_jags(df=asdf_jags_out, p="b1")
-# plotdens_jags(asdf_jags_out, p="a")
-# plotdens_jags(jags_df(asdf_jags_out, p="a"))
-# plotdens_jags(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a")
-# plotdens_jags(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a[1]")
-# plotdens_jags(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
+# plotdens(df=asdf_jags_out, p="b1")
+# plotdens(asdf_jags_out, p="a")
+# plotdens(jags_df(asdf_jags_out, p="a"))
+# plotdens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a")
+# plotdens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a[1]")
+# plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
 
 
 
