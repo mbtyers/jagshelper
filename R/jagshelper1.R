@@ -1743,3 +1743,168 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
   }
 }
 
+
+#' Plot kernel densities of single parameter nodes
+#' @description Produces a kernel density plot of a single or multiple parameter nodes (overlayed).
+#'
+#' Input can be of multiple possible formats: either a single or list of output objects
+#'  from `jagsUI` with an associated vector of parameter names, or a vector or `data.frame`
+#'  of posterior samples.
+#' @param df Input object for plotting.  See examples below.
+#' @param p Vector of parameter names, if `df` is given as a single or list of output objects
+#'  from `jagsUI`
+#' @param exact Whether the `p=` argument should match the parameter name exactly.  See
+#' \link{jags_df} for details.
+#' @param add Whether to add to an existing plot (`TRUE`) or produce a new plot.
+#' Defaults to `FALSE`.
+#' @param col Vector of colors for plotting.  If the default (`NULL`) is accepted,
+#' colors will be automatically selected.
+#' @param shade Whether to shade the regions below the kernel density curve(s).
+#' Defaults to `TRUE`.
+#' @param lwd Line width for kernel density curves.  Defaults to `2`.  Note: setting
+#' this to `0` (or `FALSE`) will suppress lines.
+#' @param minCI Minimum CI width to include for all density curves.  Defaults to 99%.
+#' @param legend Whether to plot a legend.  Defaults to `TRUE`.
+#' @param legendpos Position for automatic legend.  Defaults to `"topleft"`.
+#' @param legendnames Names for legend
+#' @param main Plot title.  Defaults to "".
+#' @param xlab X-axis label.  Defaults to "".
+#' @param ylab Y-axis label.  Defaults to "Density".
+#' @param ... Optional plotting arguments
+#' @return `NULL`
+#' @seealso \link{comparedens}, \link{comparecat}
+#' @author Matt Tyers
+#' @examples
+#' ## jagsUI object with a single parameter
+#' jags_dens(asdf_jags_out, p="b1")
+#'
+#' ## jagsUI object with multiple nodes of a parameter
+#' jags_dens(asdf_jags_out, p="a")
+#'
+#' ## jagsUI object with multiple parameter nodes
+#' jags_dens(asdf_jags_out, p=c("a[1]","a[2]","a[3]"))
+#'
+#' ## data.frame with multiple columns
+#' jags_dens(jags_df(asdf_jags_out, p="a"))
+#'
+#' ## list of jagsUI objects with a single parameter name
+#' jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
+#'
+#' ## list of jagsUI objects with a vector of parameter names
+#' jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
+#' @export
+jags_dens <- function(df, p=NULL, exact=FALSE, add=FALSE,
+                      col=NULL, shade=TRUE, lwd=2, minCI=0.99,
+                      legend=TRUE, legendpos="topleft", legendnames=NULL,
+                      main=NULL, xlab="", ylab="Density",...) {  #...
+  dflist <- NULL # initial instance to check later
+
+  ## - single density
+  # vector
+  # df <- jags_df(asdf_jags_out, p="b0")
+  # if(inherits(df, "data.frame")) {
+  #   if(ncol(df)==1) {
+  #     dflist <- list(df[,1])
+  #   }
+  # }
+  # df <- jags_df(asdf_jags_out, p="b0")[,1]
+  if(inherits(df,"numeric") & is.null(dim(df))) {
+    dflist <- list(df)
+  }
+
+  # df <- jags_df(asdf_jags_out, p="a")
+  if(inherits(df, "data.frame")) {
+    dflist <- as.list(df)
+  }
+
+  # df <- as.matrix(jags_df(asdf_jags_out, p="a"))
+  if(inherits(df, "matrix")) {
+    dflist <- as.list(as.data.frame(df))
+  }
+
+  # jags & p
+  # df <- asdf_jags_out
+  # p <- "a"
+  if(inherits(df, "jagsUI")) {
+    dflist1 <- jags_df(df, p=p, exact=exact)  # this can be multiple
+    dflist <- as.list(dflist1)
+  }
+
+  ## - multiple densities
+  # df <- list(asdf_jags_out, asdf_jags_out, asdf_jags_out)
+  # p <- c("a[1]","a[2]","a[3]")
+  # p <- "b1"
+  if(inherits(df,"list")) {
+  # list of jags, list of p (same length)
+    if(length(df)==length(p)) {
+      dflist <- list()
+      for(i in 1:length(df)) {
+        suppressWarnings(dflist[[i]] <- tryCatch(jags_df(x=df[[i]], p=p[i], exact=T)[,1], error=function(e) NA))
+        if(all(is.na(dflist[[i]]))) stop("stoppity stop")
+      }
+    } else {
+  # list of jags, one p
+      if(length(p)==1) {
+        dflist <- list()
+        for(i in 1:length(df)) {
+          suppressWarnings(dflist[[i]] <- tryCatch(jags_df(x=df[[i]], p=p, exact=T)[,1], error=function(e) NA))
+          if(all(is.na(dflist[[i]]))) stop("stoppity stop")
+        }
+      } else {
+        stop("p= argument must be of length 1 or length equal to the length of jagsUI object list")
+      }
+    }
+
+  }
+
+  if(is.null(dflist)) stop("No allowable input detected.  See help(jags_dens) for details.")
+  # alldims <- sapply(dflist, dim)
+  # for(i in 1:length(alldims)) {
+  #   if(!is.null(alldims[[i]])) stop("Multiple columns detected for at least one list element")
+  # }
+
+  # make xlims
+  los <- sapply(dflist, quantile, p=0.5*(1-minCI), na.rm=T)
+  his <- sapply(dflist, quantile, p=1-(0.5*(1-minCI)), na.rm=T)
+  xlims <- range(los, his, na.rm=T)
+
+  # make denses
+  denses <- lapply(dflist, density)
+  xs <- sapply(denses, function(x) x$x)
+  ys <- sapply(denses, function(x) x$y)
+
+  # plot denses
+  if(is.null(main) & length(p)==1) main <- p
+  if(is.null(col)) col <- c(4,2,3,rcolors(100))[1:length(dflist)]
+  if(!add) {
+    plot(NA, xlim=xlims, ylim=range(ys), xlab=xlab, ylab=ylab, main=main,...=...)
+  }
+  for(i in 1:length(dflist)) {
+    if(shade) {
+      polygon(x=c(xs[1,i], rev(xs[,i])),
+            y=c(ys[1,i], rev(ys[,i])),
+            border=NA, col=adjustcolor(col[i],alpha.f=.3))
+    }
+    lines(denses[[i]], col=col[i], lwd=lwd)
+  }
+
+  # legend
+  if(!is.null(names(dflist)) & is.null(legendnames)) legendnames <- names(dflist)
+  if(legend & !is.null(legendnames)) {
+    legend(legendpos, lwd=lwd, col=col, legend=legendnames)
+  }
+}
+# jags_dens(df=asdf_jags_out, p="b1")
+# jags_dens(asdf_jags_out, p="a")
+# jags_dens(jags_df(asdf_jags_out, p="a"))
+# jags_dens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a")
+# jags_dens(df=list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a[1]")
+# jags_dens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
+
+
+
+
+
+
+
+
