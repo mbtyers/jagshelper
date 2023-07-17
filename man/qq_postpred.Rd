@@ -7,7 +7,12 @@
 qq_postpred(ypp, y, p = NULL, ...)
 }
 \arguments{
-\item{ypp}{Either a matrix or \code{data.frame} of posterior samples, or a}
+\item{ypp}{Either a matrix or \code{data.frame} of posterior samples, or an
+output object returned from \code{jagsUI} and a supplied parameter name}
+
+\item{y}{The associated data vector}
+
+\item{p}{A character name, if a \code{jagsUI} object is passed to \code{ypp}}
 
 \item{...}{Optional plotting arguments}
 }
@@ -46,7 +51,7 @@ qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
 qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
 }
 \seealso{
-\link{comparedens}, \link{comparecat}
+\link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 }
 \author{
 Matt Tyers
