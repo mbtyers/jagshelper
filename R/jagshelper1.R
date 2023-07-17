@@ -363,7 +363,7 @@ nbyname <- function(x, justtotal=FALSE) {
 #' @param x Output object from `jagsUI::jags()`
 #' @param thresh Threshold value (defaults to 1.1)
 #' @return Numeric (named) giving the proportion of Rhat values below the given threshold.
-#' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}, \link{qq_postpred}
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 #' Using Multiple Sequences. *Statistical Science, 7*(4), 457–472. http://www.jstor.org/stable/2246093
@@ -1084,7 +1084,7 @@ caterpillar <- function(df,
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
 #' @return `NULL`
-#' @seealso \link{plotRhats}, \link{check_Rhat}
+#' @seealso \link{plotRhats}, \link{check_Rhat}, \link{qq_postpred}
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 #' Using Multiple Sequences. *Statistical Science, 7*(4), 457–472. http://www.jstor.org/stable/2246093
@@ -1902,7 +1902,56 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 # plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1",lwd=F)
 
 
-
+#' Quantile-quantile plot from posterior predictive distribution
+#' @description Produces a quantile-quantile plot, calculated from the quantiles of
+#' a vector of data with respect to the matrix of associated posterior
+#' predictive distributions.
+#'
+#' While not an omnibus posterior predictive check, this plot can be useful
+#' for detecting an overparameterized model, or else improper specification
+#' of observation error.  Like a traditional Q-Q plot, a well-specified model
+#' will have points that lie close to the x=y line.  In the case of this
+#' function, an overparametrized model will typically produce a plot with a
+#' much shallower slope, with associated posterior predictive quantiles close
+#' to 0.5.
+#'
+#' It should be noted that this function will only produce meaningful results
+#' with a vector of data, as opposed to a single value.
+#'
+#' The posterior predictive distribution can be specified in two possible ways:
+#' either a single output object from `jagsUI` with an associated parameter
+#' name, or as a matrix or `data.frame` of posterior samples.
+#' @param ypp Either a matrix or `data.frame` of posterior samples, or an
+#' output object returned from `jagsUI` and a supplied parameter name
+#' @param y The associated data vector
+#' @param p A character name, if a `jagsUI` object is passed to `ypp`
+#' @param ... Optional plotting arguments
+#' @return `NULL`
+#' @seealso \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @author Matt Tyers
+#' @examples
+#' # first, a quick look at the example data...
+#' str(SS_data)
+#' str(SS_out$sims.list$ypp)
+#'
+#' # using a jagsUI object as ypp input
+#' qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
+#'
+#' # using a matrix as ypp input
+#' qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
+#' @export
+qq_postpred <- function(ypp, y, p=NULL, ...) { # ypp is a matrix, y is a vector
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+  }
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  ymat <- matrix(y, nrow=nrow(ypp), ncol=ncol(ypp), byrow=T)
+  qpp <- sort(colMeans(ymat>=ypp))
+  qtheo <- (1:length(qpp))/length(qpp)
+  plot(qtheo, qpp, xlim=0:1, ylim=0:1, xlab="Theoretical quantile", ylab="Posterior Predictive quantile", ...=...)
+  abline(0,1, lty=2)
+}
 
 
 
