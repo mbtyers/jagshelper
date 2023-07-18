@@ -246,3 +246,9 @@ test_that("plotdens", {
   expect_error(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a"),"No parameter names are an exact match to p= argument.")
   expect_silent(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]")))
 })
+
+test_that("qq_postpred", {
+  expect_silent(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y))
+  expect_silent(qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y))
+  expect_silent(qq_postpred(ypp=jags_df(x=SS_out, p="ypp"), y=SS_data$y))
+})
