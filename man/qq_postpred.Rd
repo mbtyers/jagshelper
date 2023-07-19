@@ -4,7 +4,7 @@
 \alias{qq_postpred}
 \title{Quantile-quantile plot from posterior predictive distribution}
 \usage{
-qq_postpred(ypp, y, p = NULL, ...)
+qq_postpred(ypp, y, p = NULL, add = FALSE, ...)
 }
 \arguments{
 \item{ypp}{Either a matrix or \code{data.frame} of posterior samples, or an
@@ -13,6 +13,8 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 \item{y}{The associated data vector}
 
 \item{p}{A character name, if a \code{jagsUI} object is passed to \code{ypp}}
+
+\item{add}{Whether to add the plot to an existing plot.  Defaults to \code{FALSE}.}
 
 \item{...}{Optional plotting arguments}
 }

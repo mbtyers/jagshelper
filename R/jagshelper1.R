@@ -1925,6 +1925,7 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 #' output object returned from `jagsUI` and a supplied parameter name
 #' @param y The associated data vector
 #' @param p A character name, if a `jagsUI` object is passed to `ypp`
+#' @param add Whether to add the plot to an existing plot.  Defaults to `FALSE`.
 #' @param ... Optional plotting arguments
 #' @return `NULL`
 #' @seealso \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
@@ -1940,17 +1941,23 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 #' # using a matrix as ypp input
 #' qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
 #' @export
-qq_postpred <- function(ypp, y, p=NULL, ...) { # ypp is a matrix, y is a vector
+qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y is a vector
   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
   if(inherits(ypp, "jagsUI") & !is.null(p)) {
     ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
   }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
   ymat <- matrix(y, nrow=nrow(ypp), ncol=ncol(ypp), byrow=T)
   qpp <- sort(colMeans(ymat>=ypp))
   qtheo <- (1:length(qpp))/length(qpp)
-  plot(qtheo, qpp, xlim=0:1, ylim=0:1, xlab="Theoretical quantile", ylab="Posterior Predictive quantile", ...=...)
-  abline(0,1, lty=2)
+  if(!add) {
+    plot(qtheo, qpp, xlim=0:1, ylim=0:1, xlab="Theoretical quantile", ylab="Posterior Predictive quantile", ...=...)
+    abline(0,1, lty=2)
+  } else {
+    points(qtheo, qpp, ...=...)
+  }
 }
 
 
