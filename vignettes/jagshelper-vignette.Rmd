@@ -106,6 +106,22 @@ plotRhats(SS_out)  # plotting Rhat values
     by-chain kernel density plots are desired (rather than both), older
     versions `trace_jags()` and `chaindens_jags()` are preserved.
 
+-   The function `qq_postpred()` produces a quantile-quantile plot from
+    the posterior predictive distributions associated with a vector of
+    data. This can be visually interpreted in a similar manner to a
+    traditional Q-Q plot, with an appropriately-specified model
+    producing a plot that falls along the x=y line. While not intended
+    as an omnibus posterior predictive check, this plot might be useful
+    in detecting overparameterization, poor convergence, or a
+    mis-specified error model. It should be noted that this function
+    depends on the existence of a matrix of posterior predictive
+    samples, which is up to the user. This can be specified within JAGS,
+    or via appropriate simulation from the posterior samples.
+
+    ```{r, fig.width=5, fig.height=5}
+    qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
+    ```
+
 -   The function `pairstrace_jags()` gives methods for plotting
     two-dimensional trace plots, scatter plots, or contour plots, in
     which each possible pairing of parameter nodes are plotted with

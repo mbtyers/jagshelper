@@ -41,10 +41,21 @@ The posterior predictive distribution can be specified in two possible ways:
 either a single output object from \code{jagsUI} with an associated parameter
 name, or as a matrix or \code{data.frame} of posterior samples.
 }
+\note{
+This function assumes the existence of a matrix of posterior predictive
+samples corresponding to a data vector, the construction of which must be
+left to the user.  This can be accomplished within JAGS, or using appropriate
+simulation from the posterior samples.
+}
 \examples{
 # first, a quick look at the example data...
 str(SS_data)
 str(SS_out$sims.list$ypp)
+
+# plotting the example posterior predictive distribution with the data
+# points overlayed.  Note the overdispersion in the posterior predictive.
+caterpillar(SS_out, p="ypp")
+points(SS_data$y)
 
 # using a jagsUI object as ypp input
 qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
