@@ -22,12 +22,7 @@ chaindens_df(df, nline, parmfrow = NULL, ...)
 By-chain kernel density plot of each column of a posterior \code{data.frame}.
 }
 \examples{
-out_df <- jags_df(asdf_jags_out)
-
-b1 <- pull_post(out_df,"b1")
-a <- pull_post(out_df,"a")
-
-trace_df(a, nline=3, parmfrow=c(3,1))
+a <- jags_df(asdf_jags_out, p="a")
 
 chaindens_df(a, nline=3, parmfrow=c(3,1))
 }

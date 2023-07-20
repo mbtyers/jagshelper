@@ -71,8 +71,7 @@ median line.
 }
 \examples{
 ## usage with input data.frame
-SS_df <- jags_df(SS_out)
-trend <- pull_post(SS_df, "trend")
+trend <- jags_df(SS_out, p="trend")
 envelope(trend, x=SS_data$x)
 
 ## usage with jagsUI object

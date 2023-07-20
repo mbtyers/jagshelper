@@ -24,10 +24,7 @@ trace_line(x, nline, lwd = 1, main = "", ...)
 Trace plot of a single parameter node.
 }
 \examples{
-out_df <- jags_df(asdf_jags_out)
-
-b1 <- pull_post(out_df,"b1")
-a <- pull_post(out_df,"a")
+b1 <- jags_df(asdf_jags_out, p="b1")
 
 trace_line(b1, nline=3, main="b1")
 }

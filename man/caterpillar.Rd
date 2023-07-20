@@ -19,6 +19,7 @@ caterpillar(
   xlab = "",
   ylab = "",
   main = NULL,
+  ylim = NULL,
   xax = NA,
   medlwd = lwd,
   medwd = 1,
@@ -56,6 +57,8 @@ given by column and MCMC iteration is given by row.}
 
 \item{main}{Plot title.  If the default (\code{NULL}) is accepted and argument \code{p} is used, \code{p} will be used for the title.}
 
+\item{ylim}{Y-axis limits.  If the default (\code{NULL}) is accepted, the limits will be determined automatically.}
+
 \item{xax}{Vector of possible x-axis tick labels.  Defaults to the \code{data.frame} column names.}
 
 \item{medlwd}{Line width of median line}
@@ -76,11 +79,7 @@ with overlayed median markings, for each of a vector of parameter nodes.
 }
 \examples{
 ## usage with input data.frame
-data(asdf_jags_out)
-out_df <- jags_df(asdf_jags_out)
-
-b1 <- pull_post(out_df,"b1")
-a <- pull_post(out_df,"a")
+a <- jags_df(asdf_jags_out, p="a")
 
 caterpillar(a)
 caterpillar(a, ci=seq(.1,.9,by=.1))
