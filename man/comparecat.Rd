@@ -4,7 +4,7 @@
 \alias{comparecat}
 \title{Compare Caterpillar Plots}
 \usage{
-comparecat(x, p = NULL, ci = c(0.5, 0.95), ylim = NULL, ...)
+comparecat(x, p = NULL, ci = c(0.5, 0.95), ylim = NULL, col = NULL, ...)
 }
 \arguments{
 \item{x}{List of output objects returned from \code{jagsUI} or \code{data.frame}s}
@@ -14,7 +14,9 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 
 \item{ci}{Credible intervals widths to plot.  Defaults to 50\% and 95\%.}
 
-\item{ylim}{Y-axis limits for plotting}
+\item{ylim}{Y-axis limits for plotting.  If the default (\code{NULL}) is accepted, limits will be automatically determined.}
+
+\item{col}{Vector of colors for plotting.  If the default (\code{NULL}) is accepted, colors will be automatically drawn.}
 
 \item{...}{additional plotting arguments}
 }

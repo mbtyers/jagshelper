@@ -19,7 +19,7 @@ number (or array dimensions) per parameter name, respectively.  It can be
 useful to know how many parameter nodes have been saved before performing further
 model diagnostics.
 
-### Commonly-used functions: Assessing model convergence
+### Commonly-used functions: Assessing model convergence and appropriateness
 
 * `check_Rhat()` and `check_neff()` give the proportion of parameter nodes to 
 meet a given threshold of `Rhat` (Gelman-Rubin convergence diagnostic) or `n.eff` 
@@ -49,6 +49,16 @@ surface shapes.
 
 * `cor_jags()` and `plotcor_jags()` respectively return and plot correlation matrices 
 for all or a subset of parameter nodes.
+
+* `qq_postpred()` produces a quantile-quantile plot from the posterior predictive
+distributions associated with a vector of data.  This can be visually interpreted
+in a similar manner to a traditional Q-Q plot, with an appropriately-specified
+model producing a plot that falls along the x=y line.  While not intended as
+an omnibus posterior predictive check, this plot might be useful in detecting 
+overparameterization, poor convergence, or a mis-specified error model.  It should
+be noted that this function depends on the existence of a matrix of posterior 
+predictive samples, which is up to the user.  This can be specified within JAGS,
+or via appropriate simulation from the posterior samples.
 
 ### Commonly-used functions: Extracting simplified model output
 

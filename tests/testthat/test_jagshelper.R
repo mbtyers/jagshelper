@@ -120,6 +120,7 @@ test_that("chaindens_line", {
 test_that("trace_df", {
   out_df <- jags_df(asdf_jags_out)
   expect_silent(trace_df(out_df, nline=3))
+  expect_silent(trace_df(as.matrix(out_df), nline=3))
   expect_silent(trace_df(out_df, nline=3, parmfrow=c(2,2)))
   expect_error(trace_df(asdf_jags_out), "Input must be a data.frame")
 })
@@ -127,6 +128,7 @@ test_that("trace_df", {
 test_that("chaindens_df", {
   out_df <- jags_df(asdf_jags_out)
   expect_silent(chaindens_df(out_df, nline=3))
+  expect_silent(chaindens_df(as.matrix(out_df), nline=3))
   expect_silent(chaindens_df(out_df, nline=3, parmfrow=c(2,2)))
   expect_error(chaindens_df(asdf_jags_out), "Input must be a data.frame")
 })
@@ -164,6 +166,7 @@ test_that("caterpillar", {
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=.5))
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=c(.1,.5,.9)))
   expect_silent(caterpillar(SS_out, p="trend"))
+  expect_silent(caterpillar(SS_out, p="trend", ylim=c(-10, 10)))
   expect_silent(caterpillar(SS_out, p="cycle_s", column=1))
   expect_silent(caterpillar(SS_out, p="cycle_s", column=1, main="cycle_s"))
   expect_silent(caterpillar(SS_out, p="cycle_s", column=2, col=2, add=TRUE))
@@ -203,12 +206,15 @@ test_that("comparedens", {
   expect_silent(comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig")))
   out_df <- jags_df(asdf_jags_out)
   expect_silent(comparedens(x1=out_df, x2=asdf_jags_out, p=c("a","b","sig")))
+  expect_silent(comparedens(x1=out_df, x2=asdf_jags_out, p=c("a","b","sig"), ylim=c(-10,10)))
+  expect_silent(comparedens(x1=out_df, x2=asdf_jags_out, p=c("a","b","sig"), col=2:3))
   expect_silent(comparedens(x2=out_df, x1=asdf_jags_out, p=c("a","b","sig")))
   expect_error(comparedens(x2=1:10, x1=asdf_jags_out, p=c("a","b","sig")),"Inputs must be data.frames or output objects returned from jagsUI::jags().")
 })
 
 test_that("comparecat", {
   expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig")))
+  expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig"), col=1:3))
   expect_error(comparecat(x=list(1:10, asdf_jags_out, asdf_jags_out),p=c("a","b","sig")))
   expect_error(comparecat(x=asdf_jags_out))
 })
@@ -245,4 +251,14 @@ test_that("plotdens", {
   expect_silent(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1"))
   expect_error(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="a"),"No parameter names are an exact match to p= argument.")
   expect_silent(plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]")))
+})
+
+test_that("qq_postpred", {
+  expect_silent(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y))
+  expect_silent(qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y))
+  expect_silent(qq_postpred(ypp=jags_df(x=SS_out, p="ypp"), y=SS_data$y))
+  expect_silent(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y, add=T, pch="+", col=4))
+  expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1]))
+  expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1:2]), "Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  expect_error(qq_postpred(ypp=SS_out, y=SS_data$y), "Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
 })

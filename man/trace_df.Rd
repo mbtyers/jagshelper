@@ -22,12 +22,7 @@ trace_df(df, nline, parmfrow = NULL, ...)
 Trace plot of each column of a posterior 'data.frame'.
 }
 \examples{
-out_df <- jags_df(asdf_jags_out)
-
-b1 <- pull_post(out_df,"b1")
-a <- pull_post(out_df,"a")
-
-trace_df(a, nline=3, parmfrow=c(3,1))
+a <- jags_df(asdf_jags_out, p="a")
 
 trace_df(a, nline=3, parmfrow=c(3,1))
 }
