@@ -21,7 +21,8 @@ skeleton <- function(NAME="NAME") {
 cat("
 library(jagsUI)
 
-# specify model, which is written to an external file
+# specify model, which is written to a temporary file
+",NAME,"_jags <- tempfile()
 cat('model {
   for(i in 1:n) {
     y[i] ~ dnorm(mu[i], tau)
@@ -39,7 +40,7 @@ cat('model {
 
   tau_a <- pow(sig_a, -2)
   sig_a ~ dunif(0, 10)
-}', file=\"",NAME,"_jags\")
+}', file=",NAME,"_jags)
 
 
 # simulate data to go with the example model
@@ -58,11 +59,12 @@ y <- rnorm(n, mean=grp-x)
 # JAGS controls
 niter <- 10000
 ncores <- 3
+# ncores <- min(10, parallel::detectCores()-1)
 
 {
   tstart <- Sys.time()
   print(tstart)
-  ",NAME,"_jags_out <- jagsUI::jags(model.file=\"",NAME,"_jags\", data=",NAME,"_data,
+  ",NAME,"_jags_out <- jagsUI::jags(model.file=",NAME,"_jags, data=",NAME,"_data,
                              parameters.to.save=c(\"b0\",\"b1\",\"sig\",\"a\",\"sig_a\"),
                              n.chains=ncores, parallel=T, n.iter=niter,
                              n.burnin=niter/2, n.thin=niter/2000)
