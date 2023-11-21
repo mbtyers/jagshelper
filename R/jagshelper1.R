@@ -1095,6 +1095,13 @@ caterpillar <- function(df,
 #'
 "asdf_jags_out"
 
+#' Example data: asdf prior jags out
+#'
+#' A simple model, equivalent to that produced by the output produced by `\link{skeleton}`,
+#' with the addition of prior samples for all parameters.
+#'
+"asdf_prior_jags_out"
+
 #' Example data: SS JAGS out
 #'
 #' A time series model with multiple observations of a single time series, and with two stochastic cycle components.
@@ -2093,3 +2100,58 @@ ts_postpred <- function(ypp, y, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  
   if(lines) lines(x=x, y=y-meds)
 }
 
+
+#' Compare Priors
+#' @description Side-by-side kernel density plots for all parameters with parameter
+#' names ending in `"_prior"`, and corresponding parameters without.
+#'
+#' This function is a wrapper of \link{comparedens}.
+#'
+#' Kernel densities are plotted vertically, either left- or right-facing.  Parameters with the same name are
+#'  plotted facing one another.
+#' @param x Output object returned from jagsUI::jags()
+#' @param ... additional arguments to \link{comparedens}
+#' @return `NULL`
+#' @seealso \link{comparecat}
+#' @author Matt Tyers
+#' @examples
+#' ## This is the same output object twice, but shows functionality.
+#' comparepriors(asdf_prior_jags_out, parmfrow=c(2, 3))
+#' @export
+comparepriors <- function(x, parmfrow=NULL,...) {
+  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
+  }
+
+  # get names
+  thenames <- names(x$sims.list)
+
+  # find names ending in "_prior"
+  thepriors <- NULL
+  for(i in 1:length(thenames)) {
+    thesplit <- strsplit(thenames[i], split="_")[[1]]
+    if(thesplit[length(thesplit)] == "prior") thepriors <- c(thepriors, i)
+  }
+  if(is.null(thepriors)) warning('No parameter names ending in "_prior"')
+
+  for(i_prior in thepriors) {
+    # find a posterior with matching name
+    thepriorname <- thenames[i_prior]
+    thepostname <- NULL
+    for(i_post in 1:length(thenames)) {
+      if(thenames[i_post] == substr(thepriorname, 1, nchar(thepriorname)-6)) {
+        thepostname <- thenames[i_post]
+      }
+    }
+    if(!is.null(thepostname)) {
+      priordf <- as.data.frame(x$sims.list[thepriorname])
+      postdf <- as.data.frame(x$sims.list[thepostname])
+      names(priordf) <- names(postdf)
+      comparedens(x1=priordf, x2=postdf, main=thepostname, legendnames=c("prior","posterior"),...=...)
+    }
+  }
+}
