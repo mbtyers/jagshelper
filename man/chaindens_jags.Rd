@@ -4,12 +4,15 @@
 \alias{chaindens_jags}
 \title{By-chain kernel densities of \code{jagsUI} object}
 \usage{
-chaindens_jags(x, p = NULL, parmfrow = NULL, lwd = 1, ...)
+chaindens_jags(x, p = NULL, exact = FALSE, parmfrow = NULL, lwd = 1, ...)
 }
 \arguments{
 \item{x}{Posterior \code{jagsUI} object}
 
 \item{p}{Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.}
+
+\item{exact}{Whether \code{p} should be an exact match (\code{TRUE}) or just match the
+beginning of the string (\code{FALSE}).  Defaults to \code{FALSE}.}
 
 \item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
 

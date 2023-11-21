@@ -198,6 +198,8 @@ pull_post <- function(x, p=NULL, exact=FALSE) {
 #' each MCMC iteration.
 #' @param x `jagsUI` output object
 #' @param p String to subset parameter names, if a subset is desired
+#' @param exact Whether `p` should be an exact match (`TRUE`) or just match the
+#' beginning of the string (`FALSE`).  Defaults to `FALSE`.
 #' @return A `list` with an element associated with each parameter.  Each element
 #' will be a matrix with a column associated with each MCMC chain and a row for
 #' each MCMC iteration.
@@ -211,7 +213,7 @@ pull_post <- function(x, p=NULL, exact=FALSE) {
 #' a_plist <- jags_plist(asdf_jags_out, p=c("a","sig_a"))
 #' str(a_plist)
 #' @export
-jags_plist <- function(x, p=NULL) {
+jags_plist <- function(x, p=NULL, exact=FALSE) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
 
   x_dflist <- lapply(x$samples, as.data.frame)
@@ -221,7 +223,12 @@ jags_plist <- function(x, p=NULL) {
   these <- rep(F, length(x2))
   if (!is.null(p)) {
     for(i in 1:length(p)) {
-      these[substr(names(x2), 1, nchar(p[i])) == p[i]] <- T
+      if(!exact) {
+        these[substr(names(x2), 1, nchar(p[i])) == p[i]] <- T
+      } else {
+        these[names(x2) == p[i]] <- T
+      }
+      # these[sapply(strsplit(names(x2), split="\\["), FUN="[", 1)==p[i]] <- T   # this is a weird hack
     }
     x2 <- x2[these]
   }
@@ -233,6 +240,8 @@ jags_plist <- function(x, p=NULL) {
 #' @description Trace plot of a whole `jagsUI` object, or optional subset of parameter nodes.
 #' @param x Posterior `jagsUI` object
 #' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param exact Whether `p` should be an exact match (`TRUE`) or just match the
+#' beginning of the string (`FALSE`).  Defaults to `FALSE`.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
@@ -244,9 +253,9 @@ jags_plist <- function(x, p=NULL) {
 #' trace_jags(asdf_jags_out, parmfrow=c(4,2))
 #' trace_jags(asdf_jags_out, p="a", parmfrow=c(3,1))
 #' @export
-trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
+trace_jags <- function(x,p=NULL,exact=FALSE,parmfrow=NULL,lwd=1,...) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
-  suppressWarnings(x_plist <- jags_plist(x, p = p))
+  suppressWarnings(x_plist <- jags_plist(x, p = p, exact=exact))
   if(length(x_plist)==0) stop("No parameters with matching names")
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
@@ -269,6 +278,8 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' @description By-chain kernel densities of a whole `jagsUI` object, or optional subset of parameter nodes.
 #' @param x Posterior `jagsUI` object
 #' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param exact Whether `p` should be an exact match (`TRUE`) or just match the
+#' beginning of the string (`FALSE`).  Defaults to `FALSE`.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param ... additional plotting arguments
@@ -280,9 +291,9 @@ trace_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' chaindens_jags(asdf_jags_out, parmfrow=c(4,2))
 #' chaindens_jags(x=asdf_jags_out, p="a", parmfrow=c(3,1))
 #' @export
-chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
+chaindens_jags <- function(x,p=NULL,exact=FALSE,parmfrow=NULL,lwd=1,...) {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
-  suppressWarnings(x_plist <- jags_plist(x, p = p))
+  suppressWarnings(x_plist <- jags_plist(x, p = p, exact=exact))
   if(length(x_plist)==0) stop("No parameters with matching names")
   if(!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
@@ -309,6 +320,8 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' @description Combination of trace plots and by-chain kernel densities of a whole `jagsUI` object, or optional subset of parameter nodes.
 #' @param x Posterior `jagsUI` object
 #' @param p Parameter name for subsetting: if this is specified, only parameters with names beginning with this string will be plotted.
+#' @param exact Whether `p` should be an exact match (`TRUE`) or just match the
+#' beginning of the string (`FALSE`).  Defaults to `FALSE`.
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param lwd Line width for plotting.  Defaults to 1.
 #' @param shade Whether to add semi-transparent shading to by-chain kernel densities.  Defaults to `TRUE`.
@@ -321,10 +334,10 @@ chaindens_jags <- function(x,p=NULL,parmfrow=NULL,lwd=1,...) {
 #' tracedens_jags(asdf_jags_out, parmfrow=c(4,2))
 #' tracedens_jags(asdf_jags_out, p="a", parmfrow=c(3,1))
 #' @export
-tracedens_jags <- function (x, p = NULL, parmfrow = NULL, lwd = 1, shade=TRUE, ...)
+tracedens_jags <- function (x, p = NULL, exact=FALSE, parmfrow = NULL, lwd = 1, shade=TRUE, ...)
 {
   if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
-  suppressWarnings(x_plist <- jags_plist(x, p = p))
+  suppressWarnings(x_plist <- jags_plist(x, p = p, exact=exact))
   if(length(x_plist)==0) stop("No parameters with matching names")
   if (!is.null(parmfrow)) {
     parmfrow1 <- par("mfrow")
@@ -1164,6 +1177,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
   for(i in 1:length(rhatlist)) {
     pp <- p[i]
     rhats <- rhatlist[[i]]
+    if(all(is.na(rhats))) rhats[1] <- 1  # this is a weird hack to eliminate NA bug
     if(!is.null(dim(rhats))) {
       if(!is.null(margin)) {
         domargin <- (max(margin)<=length(dim(rhats)))
@@ -1194,7 +1208,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
     } else {
       thenames <- pp
     }
-    tracedens_jags(x,p=thenames,...=...)
+    tracedens_jags(x,p=thenames, exact=T)#,...=...)
   }
 
   # if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")

@@ -4,12 +4,15 @@
 \alias{jags_plist}
 \title{Plist}
 \usage{
-jags_plist(x, p = NULL)
+jags_plist(x, p = NULL, exact = FALSE)
 }
 \arguments{
 \item{x}{\code{jagsUI} output object}
 
 \item{p}{String to subset parameter names, if a subset is desired}
+
+\item{exact}{Whether \code{p} should be an exact match (\code{TRUE}) or just match the
+beginning of the string (\code{FALSE}).  Defaults to \code{FALSE}.}
 }
 \value{
 A \code{list} with an element associated with each parameter.  Each element
