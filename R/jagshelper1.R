@@ -2058,6 +2058,8 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' output object returned from `jagsUI` and a supplied parameter name
 #' @param y The associated data vector
 #' @param p A character name, if a `jagsUI` object is passed to `ypp`
+#' @param x The time measurements associated with time series `y`.  If the default
+#' `NULL` is accepted, equally-spaced integer values will be used.
 #' @param add Whether to add the plot to an existing plot.  Defaults to `FALSE`.
 #' @param lines Whether to add a line linking data time series points.  Defaults to `FALSE`.
 #' @param ... Optional plotting arguments
@@ -2084,7 +2086,7 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' # using a matrix as ypp input
 #' ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
 #' @export
-ts_postpred <- function(ypp, y, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
+ts_postpred <- function(ypp, y, p=NULL, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
   if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
   if(inherits(ypp, "jagsUI") & !is.null(p)) {
@@ -2110,6 +2112,7 @@ ts_postpred <- function(ypp, y, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  
 #' Kernel densities are plotted vertically, either left- or right-facing.  Parameters with the same name are
 #'  plotted facing one another.
 #' @param x Output object returned from jagsUI::jags()
+#' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional arguments to \link{comparedens}
 #' @return `NULL`
 #' @seealso \link{comparecat}

@@ -9,6 +9,8 @@ comparepriors(x, parmfrow = NULL, ...)
 \arguments{
 \item{x}{Output object returned from jagsUI::jags()}
 
+\item{parmfrow}{Optional call to \code{par(mfrow)} for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.}
+
 \item{...}{additional arguments to \link{comparedens}}
 }
 \value{
