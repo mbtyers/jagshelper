@@ -1991,7 +1991,7 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 #' samples corresponding to a data vector, the construction of which must be
 #' left to the user.  This can be accomplished within JAGS, or using appropriate
 #' simulation from the posterior samples.
-#' @seealso \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @seealso \link{ts_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
 #' # first, a quick look at the example data...
@@ -2029,6 +2029,67 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 }
 
 
-
-
+#' Time series plot of centered posterior predictive distribution
+#' @description Produces a plot of centered posterior predictive distribution,
+#' defined as the difference between posterior predictive and posterior predictive
+#' median.
+#'
+#' Also overlays the posterior predictive residuals, defined as the differences
+#' between time series observations and their respective posterior predictive medians.
+#'
+#' While not an omnibus posterior predictive check, this plot can be useful
+#' for detecting an overparameterized model, or else improper specification
+#' of observation error.
+#'
+#' It should be noted that this function will only produce meaningful results
+#' with a vector of data, as opposed to a single value.
+#'
+#' The posterior predictive distribution can be specified in two possible ways:
+#' either a single output object from `jagsUI` with an associated parameter
+#' name, or as a matrix or `data.frame` of posterior samples.
+#' @param ypp Either a matrix or `data.frame` of posterior samples, or an
+#' output object returned from `jagsUI` and a supplied parameter name
+#' @param y The associated data vector
+#' @param p A character name, if a `jagsUI` object is passed to `ypp`
+#' @param add Whether to add the plot to an existing plot.  Defaults to `FALSE`.
+#' @param lines Whether to add a line linking data time series points.  Defaults to `FALSE`.
+#' @param ... Optional plotting arguments
+#' @return `NULL`
+#' @note This function assumes the existence of a matrix of posterior predictive
+#' samples corresponding to a data vector, the construction of which must be
+#' left to the user.  This can be accomplished within JAGS, or using appropriate
+#' simulation from the posterior samples.
+#' @seealso \link{qq_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @author Matt Tyers
+#' @examples
+#' # first, a quick look at the example data...
+#' str(SS_data)
+#' str(SS_out$sims.list$ypp)
+#'
+#' # plotting the example posterior predictive distribution with the data
+#' # points overlayed.  Note the overdispersion in the posterior predictive.
+#' caterpillar(SS_out, p="ypp")
+#' points(SS_data$y)
+#'
+#' # using a jagsUI object as ypp input
+#' ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
+#'
+#' # using a matrix as ypp input
+#' ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
+#' @export
+ts_postpred <- function(ypp, y, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+  }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  meds <- apply(ypp, 2, median, na.rm=T)
+  ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  envelope(ypp_resid, x=x, ylab="Diff from post pred mean")#, ...=...)
+  if(is.null(x)) x <- seq_along(y)
+  points(x=x, y=y-meds)
+  if(lines) lines(x=x, y=y-meds)
+}
 
