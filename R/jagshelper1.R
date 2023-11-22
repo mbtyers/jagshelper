@@ -2060,7 +2060,6 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' @param p A character name, if a `jagsUI` object is passed to `ypp`
 #' @param x The time measurements associated with time series `y`.  If the default
 #' `NULL` is accepted, equally-spaced integer values will be used.
-#' @param add Whether to add the plot to an existing plot.  Defaults to `FALSE`.
 #' @param lines Whether to add a line linking data time series points.  Defaults to `FALSE`.
 #' @param ... Optional plotting arguments
 #' @return `NULL`
@@ -2086,7 +2085,7 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' # using a matrix as ypp input
 #' ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
 #' @export
-ts_postpred <- function(ypp, y, p=NULL, x=NULL, add=FALSE, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
+ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
   if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
   if(inherits(ypp, "jagsUI") & !is.null(p)) {
@@ -2096,7 +2095,7 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, add=FALSE, lines=FALSE, ...) { #
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
   meds <- apply(ypp, 2, median, na.rm=T)
   ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
-  envelope(ypp_resid, x=x, ylab="Diff from post pred mean")#, ...=...)
+  envelope(ypp_resid, x=x, ylab="Diff from post pred median", ...=...)
   if(is.null(x)) x <- seq_along(y)
   points(x=x, y=y-meds)
   if(lines) lines(x=x, y=y-meds)

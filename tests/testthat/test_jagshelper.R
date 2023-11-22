@@ -262,3 +262,21 @@ test_that("qq_postpred", {
   expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1:2]), "Posterior matrix ypp must have the same number of columns as length of data matrix y")
   expect_error(qq_postpred(ypp=SS_out, y=SS_data$y), "Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
 })
+
+test_that("ts_postpred", {
+  expect_silent(ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y))
+  expect_silent(ts_postpred(ypp=SS_out, x=SS_data$x, p="ypp", y=SS_data$y))
+  expect_silent(ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y))
+  expect_silent(ts_postpred(ypp=jags_df(x=SS_out, p="ypp"), y=SS_data$y))
+  expect_silent(ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, add=T, col=3))
+  expect_error(ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1]))
+  expect_error(ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1:2]), "Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  expect_error(ts_postpred(ypp=SS_out, y=SS_data$y), "Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+})
+
+test_that("comparepriors", {
+  expect_silent(comparepriors(x=asdf_prior_jags_out))
+  expect_silent(comparepriors(x=asdf_prior_jags_out, parmfrow=c(3,2)))
+  expect_silent(comparepriors(x=asdf_prior_jags_out, parmfrow=c(3,2), col=3:2, minCI=0.7, legendpos="bottomleft"))
+  expect_warning(comparepriors(x=asdf_jags_out), 'No parameter names ending in "_prior"')
+})

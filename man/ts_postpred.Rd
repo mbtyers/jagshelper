@@ -4,7 +4,7 @@
 \alias{ts_postpred}
 \title{Time series plot of centered posterior predictive distribution}
 \usage{
-ts_postpred(ypp, y, p = NULL, x = NULL, add = FALSE, lines = FALSE, ...)
+ts_postpred(ypp, y, p = NULL, x = NULL, lines = FALSE, ...)
 }
 \arguments{
 \item{ypp}{Either a matrix or \code{data.frame} of posterior samples, or an
@@ -16,8 +16,6 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 
 \item{x}{The time measurements associated with time series \code{y}.  If the default
 \code{NULL} is accepted, equally-spaced integer values will be used.}
-
-\item{add}{Whether to add the plot to an existing plot.  Defaults to \code{FALSE}.}
 
 \item{lines}{Whether to add a line linking data time series points.  Defaults to \code{FALSE}.}
 
