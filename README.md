@@ -60,6 +60,12 @@ be noted that this function depends on the existence of a matrix of posterior
 predictive samples, which is up to the user.  This can be specified within JAGS,
 or via appropriate simulation from the posterior samples.
 
+* `ts_postpred()` produces an envelope plot of the centered posterior predictive
+distribution associated with a vector of data (most likely a time series), which
+is defined as the difference between the posterior predictive distribution and 
+posterior predictive medians.  This may be used to explore possible temporal
+features not visible using `qq_postpred()`.
+
 ### Commonly-used functions: Extracting simplified model output
 
 * `jags_df()` extracts the MCMC iterations from a 'jagsUI' output object as a `data.frame`,
@@ -90,6 +96,10 @@ allow comparison among multiple candidate models.
 * `comparedens()` is similar in use to `comparecat()`, but instead plots left- 
 and right-facing vertically-oriented kernel densities for TWO model output objects,
 with parameter nodes with the same names plotted facing one another.
+
+* `comparepriors()` is a wrapper of `comparedens()`, but compares all distributions
+of parameters with names ending in `"_prior"` with the corresponding posterior
+distributions.
 
 * `plotdens()` produces a kernel density plot of a single parameter node, or 
 overlays kernel densities for multiple parameter nodes.
