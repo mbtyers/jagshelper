@@ -89,7 +89,7 @@ plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p="b1")
 plotdens(list(asdf_jags_out,asdf_jags_out,asdf_jags_out), p=c("a[1]","a[2]","a[3]"))
 }
 \seealso{
-\link{comparedens}, \link{comparecat}
+\link{comparedens}, \link{comparecat}, \link{comparepriors}
 }
 \author{
 Matt Tyers

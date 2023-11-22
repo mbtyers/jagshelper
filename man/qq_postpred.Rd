@@ -23,7 +23,7 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 }
 \description{
 Produces a quantile-quantile plot, calculated from the quantiles of
-a vector of data with respect to the matrix of associated posterior
+a vector of data (most likely a time series), with respect to the matrix of associated posterior
 predictive distributions.
 
 While not an omnibus posterior predictive check, this plot can be useful
@@ -31,7 +31,7 @@ for detecting an overparameterized model, or else improper specification
 of observation error.  Like a traditional Q-Q plot, a well-specified model
 will have points that lie close to the x=y line.  In the case of this
 function, an overparametrized model will typically produce a plot with a
-much shallower slope, with associated posterior predictive quantiles close
+much shallower slope, possibly with many associated posterior predictive quantiles close
 to 0.5.
 
 It should be noted that this function will only produce meaningful results

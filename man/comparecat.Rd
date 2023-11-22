@@ -36,7 +36,7 @@ comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
            p=c("a","b","sig"))
 }
 \seealso{
-\link{caterpillar}, \link{comparedens}
+\link{caterpillar}, \link{comparedens}, \link{comparepriors}
 }
 \author{
 Matt Tyers

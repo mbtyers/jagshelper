@@ -427,7 +427,7 @@ nbyname <- function(x, justtotal=FALSE) {
 #' @param x Output object from `jagsUI::jags()`
 #' @param thresh Threshold value (defaults to 1.1)
 #' @return Numeric (named) giving the proportion of Rhat values below the given threshold.
-#' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}, \link{qq_postpred}
+#' @seealso \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}, \link{qq_postpred}, \link{ts_postpred}
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 #' Using Multiple Sequences. *Statistical Science, 7*(4), 457–472. http://www.jstor.org/stable/2246093
@@ -448,7 +448,7 @@ check_Rhat <- function(x, thresh=1.1) {
 #' @param x Output object from `jagsUI::jags()`
 #' @param thresh Threshold value (defaults to 500)
 #' @return Numeric (named) giving the proportion of `n.eff` values above the given threshold.
-#' @seealso \link{check_Rhat}
+#' @seealso \link{check_Rhat}, \link{traceworstRhat}, \link{plotRhats}, \link{qq_postpred}, \link{ts_postpred}
 #' @author Matt Tyers
 #' @examples
 #' check_neff(SS_out)
@@ -1138,7 +1138,7 @@ caterpillar <- function(df,
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
 #' @return `NULL`
-#' @seealso \link{plotRhats}, \link{check_Rhat}, \link{qq_postpred}
+#' @seealso \link{plotRhats}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 #' Using Multiple Sequences. *Statistical Science, 7*(4), 457–472. http://www.jstor.org/stable/2246093
@@ -1326,7 +1326,7 @@ rcolors <- function(n) {
 #' `margin=2` will separate the array by column.  If the default (`NULL`) is accepted, the function will split by the smallest dimension,
 #' therefore splitting into the fewest groups.
 #' @return `NULL`
-#' @seealso \link{traceworstRhat}, \link{check_Rhat}
+#' @seealso \link{traceworstRhat}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}
 #' @param ... additional plotting arguments
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
@@ -1470,7 +1470,7 @@ plotRhats <- function(x,
 #' @param col Colors for kernel density plots.  Defaults to colors `4` and `2` (blue and red).
 #' @param ... additional plotting arguments
 #' @return `NULL`
-#' @seealso \link{comparecat}
+#' @seealso \link{comparecat}, \link{comparepriors}
 #' @author Matt Tyers
 #' @examples
 #' ## This is the same output object twice, but shows functionality.
@@ -1550,7 +1550,7 @@ comparedens <- function(x1,x2, p=NULL, minCI=0.99, ylim=NULL, legendnames=NULL, 
 #' @param col Vector of colors for plotting.  If the default (`NULL`) is accepted, colors will be automatically drawn.
 #' @param ... additional plotting arguments
 #' @return `NULL`
-#' @seealso \link{caterpillar}, \link{comparedens}
+#' @seealso \link{caterpillar}, \link{comparedens}, \link{comparepriors}
 #' @author Matt Tyers
 #' @examples
 #' ## This is the same output object three times, but shows functionality.
@@ -1838,7 +1838,7 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
 #' @param ylab Y-axis label.  Defaults to "Density".
 #' @param ... Optional plotting arguments
 #' @return `NULL`
-#' @seealso \link{comparedens}, \link{comparecat}
+#' @seealso \link{comparedens}, \link{comparecat}, \link{comparepriors}
 #' @author Matt Tyers
 #' @examples
 #' ## jagsUI object with a single parameter
@@ -1970,7 +1970,7 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 
 #' Quantile-quantile plot from posterior predictive distribution
 #' @description Produces a quantile-quantile plot, calculated from the quantiles of
-#' a vector of data with respect to the matrix of associated posterior
+#' a vector of data (most likely a time series), with respect to the matrix of associated posterior
 #' predictive distributions.
 #'
 #' While not an omnibus posterior predictive check, this plot can be useful
@@ -1978,7 +1978,7 @@ plotdens <- function(df, p=NULL, exact=FALSE, add=FALSE,
 #' of observation error.  Like a traditional Q-Q plot, a well-specified model
 #' will have points that lie close to the x=y line.  In the case of this
 #' function, an overparametrized model will typically produce a plot with a
-#' much shallower slope, with associated posterior predictive quantiles close
+#' much shallower slope, possibly with many associated posterior predictive quantiles close
 #' to 0.5.
 #'
 #' It should be noted that this function will only produce meaningful results
@@ -2037,12 +2037,13 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 
 
 #' Time series plot of centered posterior predictive distribution
-#' @description Produces a plot of centered posterior predictive distribution,
+#' @description Produces a plot of centered posterior predictive distributions
+#' associated with a vector of data (most likely a time series),
 #' defined as the difference between posterior predictive and posterior predictive
 #' median.
 #'
 #' Also overlays the posterior predictive residuals, defined as the differences
-#' between time series observations and their respective posterior predictive medians.
+#' between data values and their respective posterior predictive medians.
 #'
 #' While not an omnibus posterior predictive check, this plot can be useful
 #' for detecting an overparameterized model, or else improper specification
@@ -2061,7 +2062,7 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' @param x The time measurements associated with time series `y`.  If the default
 #' `NULL` is accepted, equally-spaced integer values will be used.
 #' @param lines Whether to add a line linking data time series points.  Defaults to `FALSE`.
-#' @param ... Optional plotting arguments
+#' @param ... Additional arguments to \link{envelope}
 #' @return `NULL`
 #' @note This function assumes the existence of a matrix of posterior predictive
 #' samples corresponding to a data vector, the construction of which must be
@@ -2104,7 +2105,9 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, ...) { #p=NULL  ?? 
 
 #' Compare Priors
 #' @description Side-by-side kernel density plots for all parameters with parameter
-#' names ending in `"_prior"`, and corresponding parameters without.
+#' names ending in `"_prior"`, and corresponding parameters without.  It should
+#' be noted that these parameters must be specified in JAGS as well as the
+#' corresponding parameters, and this is left to the user.
 #'
 #' This function is a wrapper of \link{comparedens}.
 #'
@@ -2114,10 +2117,13 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, ...) { #p=NULL  ?? 
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional arguments to \link{comparedens}
 #' @return `NULL`
-#' @seealso \link{comparecat}
+#' @seealso \link{comparecat}, \link{comparedens}, \link{plotdens}
 #' @author Matt Tyers
 #' @examples
-#' ## This is the same output object twice, but shows functionality.
+#' ## a look at what parameters exist in the input object
+#' nbyname(asdf_prior_jags_out)
+#'
+#' ## then, showing the function usage
 #' comparepriors(asdf_prior_jags_out, parmfrow=c(2, 3))
 #' @export
 comparepriors <- function(x, parmfrow=NULL,...) {
@@ -2153,7 +2159,7 @@ comparepriors <- function(x, parmfrow=NULL,...) {
       priordf <- as.data.frame(x$sims.list[thepriorname])
       postdf <- as.data.frame(x$sims.list[thepostname])
       names(priordf) <- names(postdf)
-      comparedens(x1=priordf, x2=postdf, main=thepostname, legendnames=c("prior","posterior"),...=...)
+      comparedens(x1=priordf, x2=postdf, main=thepostname, legendnames=c("prior","post"),...=...)
     }
   }
 }

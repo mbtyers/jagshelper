@@ -73,7 +73,7 @@ Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 Using Multiple Sequences. \emph{Statistical Science, 7}(4), 457–472. http://www.jstor.org/stable/2246093
 }
 \seealso{
-\link{traceworstRhat}, \link{check_Rhat}
+\link{traceworstRhat}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}
 }
 \author{
 Matt Tyers

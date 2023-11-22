@@ -18,7 +18,9 @@ comparepriors(x, parmfrow = NULL, ...)
 }
 \description{
 Side-by-side kernel density plots for all parameters with parameter
-names ending in \code{"_prior"}, and corresponding parameters without.
+names ending in \code{"_prior"}, and corresponding parameters without.  It should
+be noted that these parameters must be specified in JAGS as well as the
+corresponding parameters, and this is left to the user.
 
 This function is a wrapper of \link{comparedens}.
 
@@ -26,11 +28,14 @@ Kernel densities are plotted vertically, either left- or right-facing.  Paramete
 plotted facing one another.
 }
 \examples{
-## This is the same output object twice, but shows functionality.
+## a look at what parameters exist in the input object
+nbyname(asdf_prior_jags_out)
+
+## then, showing the function usage
 comparepriors(asdf_prior_jags_out, parmfrow=c(2, 3))
 }
 \seealso{
-\link{comparecat}
+\link{comparecat}, \link{comparedens}, \link{plotdens}
 }
 \author{
 Matt Tyers

@@ -53,7 +53,7 @@ comparedens(x1=asdf_jags_out, x2=asdf_jags_out, p=c("a","b","sig"),
             legendnames=c("Model 1", "Model 2"))
 }
 \seealso{
-\link{comparecat}
+\link{comparecat}, \link{comparepriors}
 }
 \author{
 Matt Tyers

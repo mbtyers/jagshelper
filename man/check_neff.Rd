@@ -24,7 +24,7 @@ effective sample size for a given parameter node.
 check_neff(SS_out)
 }
 \seealso{
-\link{check_Rhat}
+\link{check_Rhat}, \link{traceworstRhat}, \link{plotRhats}, \link{qq_postpred}, \link{ts_postpred}
 }
 \author{
 Matt Tyers

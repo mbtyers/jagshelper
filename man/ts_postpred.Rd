@@ -19,18 +19,19 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 
 \item{lines}{Whether to add a line linking data time series points.  Defaults to \code{FALSE}.}
 
-\item{...}{Optional plotting arguments}
+\item{...}{Additional arguments to \link{envelope}}
 }
 \value{
 \code{NULL}
 }
 \description{
-Produces a plot of centered posterior predictive distribution,
+Produces a plot of centered posterior predictive distributions
+associated with a vector of data (most likely a time series),
 defined as the difference between posterior predictive and posterior predictive
 median.
 
 Also overlays the posterior predictive residuals, defined as the differences
-between time series observations and their respective posterior predictive medians.
+between data values and their respective posterior predictive medians.
 
 While not an omnibus posterior predictive check, this plot can be useful
 for detecting an overparameterized model, or else improper specification
