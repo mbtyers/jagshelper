@@ -1,3 +1,7 @@
+## jagshelper 0.2.1 (Jan 2024)
+
+Patch to allow a single parameter in `caterpillar()`
+
 ## jagshelper 0.2.0 (Nov 2023)
 
 * Added `qq_postpred()`, `ts_postpred()`, and `comparepriors()`
