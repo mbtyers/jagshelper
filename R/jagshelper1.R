@@ -963,7 +963,8 @@ overlayenvelope <- function(df,
 #' with overlayed median markings, for each of a vector of parameter nodes.
 #' @param df Output object returned from `jagsUI::jags()`; or alternately,
 #' two-dimensional `data.frame` or matrix in which parameter node element is
-#' given by column and MCMC iteration is given by row.
+#' given by column and MCMC iteration is given by row.  A vector may also be used,
+#' that expresses MCMC iterations of a single parameter node.
 #' @param p Parameter name, if input to `df` is a `jagsUI` output object.
 #' @param x Vector of X-coordinates for plotting.
 #' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
@@ -1036,7 +1037,7 @@ caterpillar <- function(df,
   # if(mean) points(x,colMeans(df, na.rm=T), pch=16, col=col)
   # for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
 
-  if(!inherits(df,"jagsUI") & !inherits(df,c("matrix","data.frame"))) {  ## put matrix in here
+  if(!inherits(df,"jagsUI") & !inherits(df,c("matrix","data.frame","numeric","integer"))) {  ## put matrix in here
     stop("Input must be a data.frame or output from jagsUI::jags() plus parameter name")
   }
   if(inherits(df,"jagsUI") & length(p)!=1) stop("Need single parameter name in p= argument") ###
@@ -1063,6 +1064,7 @@ caterpillar <- function(df,
   }
   if(is.null(main)) main <- ""
 
+  df <- as.matrix(df)  ################
   ci <- rev(sort(ci))
   loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
@@ -1072,7 +1074,7 @@ caterpillar <- function(df,
   }
   med <- apply(df, 2, median, na.rm=T)
   if(all(is.na(x))) x <- 1:ncol(df)
-  d <- diff(x[1:2])
+  d <- ifelse(length(x)>1, diff(x[1:2]), 1)  #########
   nn <- ncol(df)
   if(all(is.na(xax))) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd

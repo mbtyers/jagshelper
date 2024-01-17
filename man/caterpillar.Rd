@@ -29,7 +29,8 @@ caterpillar(
 \arguments{
 \item{df}{Output object returned from \code{jagsUI::jags()}; or alternately,
 two-dimensional \code{data.frame} or matrix in which parameter node element is
-given by column and MCMC iteration is given by row.}
+given by column and MCMC iteration is given by row.  A vector may also be used,
+that expresses MCMC iterations of a single parameter node.}
 
 \item{p}{Parameter name, if input to \code{df} is a \code{jagsUI} output object.}
 
