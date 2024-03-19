@@ -4,7 +4,17 @@
 \alias{comparecat}
 \title{Compare Caterpillar Plots}
 \usage{
-comparecat(x, p = NULL, ci = c(0.5, 0.95), ylim = NULL, col = NULL, ...)
+comparecat(
+  x,
+  p = NULL,
+  ci = c(0.5, 0.95),
+  ylim = NULL,
+  col = NULL,
+  xlab = "",
+  ylab = "",
+  transform = c("none", "exp", "expit"),
+  ...
+)
 }
 \arguments{
 \item{x}{List of output objects returned from \code{jagsUI} or \code{data.frame}s}
@@ -17,6 +27,15 @@ string supplied will be returned.  If the default (\code{NULL}) is accepted, all
 \item{ylim}{Y-axis limits for plotting.  If the default (\code{NULL}) is accepted, limits will be automatically determined.}
 
 \item{col}{Vector of colors for plotting.  If the default (\code{NULL}) is accepted, colors will be automatically drawn.}
+
+\item{xlab}{X-axis label}
+
+\item{ylab}{Y-axis label}
+
+\item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
+indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
+\code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
+adding additional plotting argument \code{log="y"}.}
 
 \item{...}{additional plotting arguments}
 }
@@ -34,6 +53,12 @@ with overlayed median markings, for each of a vector of parameter nodes.
 ## This is the same output object three times, but shows functionality.
 comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
            p=c("a","b","sig"))
+
+## Transformed
+comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
+           p=c("sig"), transform="exp")
+comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
+           p=c("sig"), transform="exp", log="y")
 }
 \seealso{
 \link{caterpillar}, \link{comparedens}, \link{comparepriors}

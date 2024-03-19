@@ -174,6 +174,11 @@ test_that("caterpillar", {
   expect_error(caterpillar(SS_out, p=c("trend","rate")), "Need single parameter name in p= argument")
   expect_error(caterpillar(SS_out), "Need single parameter name in p= argument")
   expect_error(caterpillar(SS_out, p="steve"), "No parameters with matching names")
+
+  expect_silent(caterpillar(trend, x=SS_data$x, transform="exp", log="y"))
+  expect_silent(caterpillar(SS_out, p="trend", transform="exp"))
+  expect_silent(caterpillar(SS_out, p="trend", transform="expit"))
+  expect_error(caterpillar(SS_out, p="trend", transform="somethingelse"))
 })
 
 test_that("traceworstRhat", {
@@ -215,6 +220,9 @@ test_that("comparedens", {
 test_that("comparecat", {
   expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig")))
   expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig"), col=1:3))
+  expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig"), col=1:3, transform="exp"))
+  expect_silent(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig"), col=1:3, transform="expit"))
+  expect_error(comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),p=c("a","b","sig"), col=1:3, transform="badbadbad"))
   expect_error(comparecat(x=list(1:10, asdf_jags_out, asdf_jags_out),p=c("a","b","sig")))
   expect_error(comparecat(x=asdf_jags_out))
 })

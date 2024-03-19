@@ -21,6 +21,7 @@ caterpillar(
   main = NULL,
   ylim = NULL,
   xax = NA,
+  transform = c("none", "exp", "expit"),
   medlwd = lwd,
   medwd = 1,
   ...
@@ -62,6 +63,11 @@ that expresses MCMC iterations of a single parameter node.}
 
 \item{xax}{Vector of possible x-axis tick labels.  Defaults to the \code{data.frame} column names.}
 
+\item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
+indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
+\code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
+adding additional plotting argument \code{log="y"}.}
+
 \item{medlwd}{Line width of median line}
 
 \item{medwd}{Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?}
@@ -95,6 +101,11 @@ caterpillar(SS_out, p="rate")
 ## usage with a 2-d parameter matrix
 caterpillar(SS_out, p="cycle_s", column=1)
 caterpillar(SS_out, p="cycle_s", column=2)
+
+## usage with an exponential transformation
+caterpillar(SS_out, p="trend", transform="exp", ylab="exp transform")
+caterpillar(SS_out, p="trend", transform="exp", ylab="exp transform", log="y")
+caterpillar(SS_out, p="trend", transform="expit", ylab="expit (inv logit) transform")
 }
 \seealso{
 \link{envelope}
