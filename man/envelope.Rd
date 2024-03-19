@@ -20,6 +20,7 @@ envelope(
   ylab = "",
   main = NULL,
   ylim = NULL,
+  transform = c("none", "exp", "expit"),
   ...
 )
 }
@@ -56,6 +57,11 @@ given by column and MCMC iteration is given by row.}
 
 \item{ylim}{Y-axis limits for plotting.  If the default (\code{NULL}) is accepted, these will be determined automatically.}
 
+\item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
+indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
+\code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
+adding additional plotting argument \code{log="y"}.}
+
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
 \value{
@@ -80,6 +86,10 @@ envelope(SS_out, p="trend")
 ## usage with 2-d jagsUI object
 envelope(SS_out, p="cycle_s", column=1, main="cycle")
 envelope(SS_out, p="cycle_s", column=2, col=2, add=TRUE)  ## overlay
+
+## scale transformation
+envelope(SS_out, p="trend", transform="exp", ylab="exp transform")
+envelope(SS_out, p="trend", transform="exp", ylab="exp transform", log="y")
 }
 \seealso{
 \link{overlayenvelope}, \link{caterpillar}

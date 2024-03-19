@@ -23,6 +23,7 @@ overlayenvelope(
   legend = TRUE,
   legendnames = NULL,
   legendpos = "topleft",
+  transform = c("none", "exp", "expit"),
   ...
 )
 }
@@ -67,6 +68,11 @@ input to \code{df} is a single \code{jagsUI} output object.}
 
 \item{legendpos}{Position for optional legend.  Defaults to \code{"topleft"}.}
 
+\item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
+indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
+\code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
+adding additional plotting argument \code{log="y"}.}
+
 \item{...}{additional plotting arguments or arguments to \code{lines()}}
 }
 \value{
@@ -93,6 +99,12 @@ overlayenvelope(df=SS_out, p="cycle_s")
 
 ## usage with a single jagsUI output object and multiple parameters
 overlayenvelope(df=SS_out, p=c("trend","rate"))
+
+## exponential transformation
+overlayenvelope(df=SS_out, p="cycle_s", transform="exp",
+                ylab="exp transform")
+overlayenvelope(df=SS_out, p="cycle_s", transform="exp",
+                ylab="exp transform", log="y")
 }
 \seealso{
 \link{envelope}

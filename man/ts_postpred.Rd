@@ -4,7 +4,15 @@
 \alias{ts_postpred}
 \title{Time series plot of centered posterior predictive distribution}
 \usage{
-ts_postpred(ypp, y, p = NULL, x = NULL, lines = FALSE, ...)
+ts_postpred(
+  ypp,
+  y,
+  p = NULL,
+  x = NULL,
+  lines = FALSE,
+  transform = c("none", "exp", "expit"),
+  ...
+)
 }
 \arguments{
 \item{ypp}{Either a matrix or \code{data.frame} of posterior samples, or an
@@ -18,6 +26,11 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 \code{NULL} is accepted, equally-spaced integer values will be used.}
 
 \item{lines}{Whether to add a line linking data time series points.  Defaults to \code{FALSE}.}
+
+\item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
+indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
+\code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
+adding additional plotting argument \code{log="y"}.}
 
 \item{...}{Additional arguments to \link{envelope}}
 }
@@ -65,6 +78,10 @@ ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
 
 # using a matrix as ypp input
 ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
+
+# exp transformation
+ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp")
+ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp", log="y")
 }
 \seealso{
 \link{qq_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}

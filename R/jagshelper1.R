@@ -633,6 +633,10 @@ chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
 #' @param ylab Y-axis label
 #' @param main Plot title.  If the default (`NULL`) is accepted and argument p is used, p will be used for the title.
 #' @param ylim Y-axis limits for plotting.  If the default (`NULL`) is accepted, these will be determined automatically.
+#' @param transform Should the y-axis be (back)transformed?  Options are `"exp"`,
+#' indicating exponential, or `"expit"`, indicating inverse-logit. Defaults to
+#' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
+#' adding additional plotting argument `log="y"`.
 #' @param ... additional plotting arguments or arguments to `lines()`
 #' @return `NULL`
 #' @seealso \link{overlayenvelope}, \link{caterpillar}
@@ -648,6 +652,10 @@ chaindens_df <- function(df, nline, parmfrow=NULL, ...) {
 #' ## usage with 2-d jagsUI object
 #' envelope(SS_out, p="cycle_s", column=1, main="cycle")
 #' envelope(SS_out, p="cycle_s", column=2, col=2, add=TRUE)  ## overlay
+#'
+#' ## scale transformation
+#' envelope(SS_out, p="trend", transform="exp", ylab="exp transform")
+#' envelope(SS_out, p="trend", transform="exp", ylab="exp transform", log="y")
 #' @export
 envelope <- function(df,
                      p=NULL,
@@ -657,7 +665,8 @@ envelope <- function(df,
                      ci=c(0.5,0.95),
                      col=4, add=FALSE, dark=.3, outline=FALSE,
                      xlab="", ylab="", main=NULL,
-                     ylim=NULL, ...) {
+                     ylim=NULL,
+                     transform=c("none", "exp", "expit"), ...) {
 
 
   # if(!inherits(df,"jagsUI") & !(inherits(df,"data.frame") | inherits(df,"matrix"))) {
@@ -741,6 +750,10 @@ envelope <- function(df,
   }
   if(is.null(main)) main <- ""
 
+  transform <- match.arg(transform)
+  if(transform == "exp") df <- exp(df)
+  if(transform == "expit") df <- expit(df)
+
   ci <- sort(ci)
   loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
@@ -822,6 +835,10 @@ envelope <- function(df,
 #' @param legendnames Optional vector of names for a legend.
 #' @param legendpos Position for optional legend.  Defaults to `"topleft"`.
 #' @param ... additional plotting arguments or arguments to `lines()`
+#' @param transform Should the y-axis be (back)transformed?  Options are `"exp"`,
+#' indicating exponential, or `"expit"`, indicating inverse-logit. Defaults to
+#' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
+#' adding additional plotting argument `log="y"`.
 #' @return `NULL`
 #' @seealso \link{envelope}
 #' @author Matt Tyers
@@ -838,6 +855,12 @@ envelope <- function(df,
 #'
 #' ## usage with a single jagsUI output object and multiple parameters
 #' overlayenvelope(df=SS_out, p=c("trend","rate"))
+#'
+#' ## exponential transformation
+#' overlayenvelope(df=SS_out, p="cycle_s", transform="exp",
+#'                 ylab="exp transform")
+#' overlayenvelope(df=SS_out, p="cycle_s", transform="exp",
+#'                 ylab="exp transform", log="y")
 #' @export
 overlayenvelope <- function(df,
                             p=NULL,
@@ -848,7 +871,8 @@ overlayenvelope <- function(df,
                             col=NULL, add=FALSE, dark=.3, outline=FALSE,
                             xlab="", ylab="", main=NULL,
                             ylim=NULL,
-                            legend=TRUE, legendnames=NULL, legendpos="topleft",...) {
+                            legend=TRUE, legendnames=NULL, legendpos="topleft",
+                            transform=c("none", "exp", "expit"), ...) {
   conditionmet <- F
   ## list of dfs
   # do nothing
@@ -914,6 +938,10 @@ overlayenvelope <- function(df,
   bounds <- sapply(df, function(x) apply(x,2, quantile, p=cilim, na.rm=T))
   if(is.null(ylim)) ylim <- range(bounds)
 
+  transform <- match.arg(transform)
+  if(transform == "exp") ylim <- exp(ylim)
+  if(transform == "expit") ylim <- expit(ylim)
+
   if(length(col) != length(df)) {
     cols <- c(4,2,3,rcolors(100))[1:length(df)]  ## betterize this??
   } else {
@@ -928,10 +956,12 @@ overlayenvelope <- function(df,
     }
   }
   envelope(df[[1]], ci=ci, col=cols[1], add=add, ylim=ylim, main=main, x=x,
-           median=median, dark=dark, outline=outline,xlab=xlab,ylab=ylab, ...=...)
+           median=median, dark=dark, outline=outline,xlab=xlab,ylab=ylab,
+           transform=transform, ...=...)
   for(i in 2:length(df)) {
     envelope(df[[i]], ci=ci, col=cols[i], add=T, x=x, median=median, dark=dark,
-             outline=outline, ...=...)
+             outline=outline,
+             transform=transform)#, ...=...)
   }
 
   ## add legend??
@@ -2108,6 +2138,10 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' @param x The time measurements associated with time series `y`.  If the default
 #' `NULL` is accepted, equally-spaced integer values will be used.
 #' @param lines Whether to add a line linking data time series points.  Defaults to `FALSE`.
+#' @param transform Should the y-axis be (back)transformed?  Options are `"exp"`,
+#' indicating exponential, or `"expit"`, indicating inverse-logit. Defaults to
+#' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
+#' adding additional plotting argument `log="y"`.
 #' @param ... Additional arguments to \link{envelope}
 #' @return `NULL`
 #' @note This function assumes the existence of a matrix of posterior predictive
@@ -2131,8 +2165,13 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #'
 #' # using a matrix as ypp input
 #' ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y)
+#'
+#' # exp transformation
+#' ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp")
+#' ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp", log="y")
 #' @export
-ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, ...) { #p=NULL  ?? style it after qq_postpred
+ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                        transform=c("none", "exp", "expit"), ...) { #p=NULL  ?? style it after qq_postpred
   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
   if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
   if(inherits(ypp, "jagsUI") & !is.null(p)) {
@@ -2142,10 +2181,15 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, ...) { #p=NULL  ?? 
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
   meds <- apply(ypp, 2, median, na.rm=T)
   ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
-  envelope(ypp_resid, x=x, ylab="Diff from post pred median", ...=...)
+  transform <- match.arg(transform)
+  yplot <- y-meds
+  if(transform == "exp") yplot <- exp(yplot)
+  if(transform == "expit") yplot <- expit(yplot)
+  envelope(ypp_resid, x=x, ylab="Diff from post pred median",
+           transform=transform, ...=...)
   if(is.null(x)) x <- seq_along(y)
-  points(x=x, y=y-meds)
-  if(lines) lines(x=x, y=y-meds)
+  points(x=x, y=yplot)
+  if(lines) lines(x=x, y=yplot)
 }
 
 
