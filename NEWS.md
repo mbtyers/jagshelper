@@ -1,3 +1,8 @@
+## jagshelper 0.2.2 (Mar 2024)
+
+Added exponential and inverse-logit transformation to `caterpillar()`, 
+`envelope()`, and associated plots 
+
 ## jagshelper 0.2.1 (Jan 2024)
 
 Patch to allow a single parameter in `caterpillar()`
