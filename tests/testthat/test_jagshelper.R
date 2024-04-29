@@ -176,6 +176,8 @@ test_that("caterpillar", {
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=.5))
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=c(.1,.5,.9)))
   expect_silent(caterpillar(SS_out, p="trend"))
+  expect_silent(caterpillar(SS_out, p="trend", xax=c(letters, LETTERS)[1:41]))
+  expect_silent(caterpillar(SS_out, p="trend", xax=c(letters, LETTERS)[1:41], las=2))
   expect_silent(caterpillar(SS_out, p="trend", ylim=c(-10, 10)))
   expect_silent(caterpillar(SS_out, p="cycle_s", column=1))
   expect_silent(caterpillar(SS_out, p="cycle_s", column=1, main="cycle_s"))

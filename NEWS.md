@@ -1,3 +1,8 @@
+## jagshelper 0.2.3 (Apr 2024)
+
+Fixed some plotting bugs in `envelope()`, `caterpillar()`, and `ts_postpred()`,
+added a few more lines to `skeleton()`
+
 ## jagshelper 0.2.2 (Mar 2024)
 
 Added exponential and inverse-logit transformation to `caterpillar()`, 

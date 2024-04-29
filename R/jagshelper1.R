@@ -69,7 +69,11 @@ ncores <- 3
                              n.chains=ncores, parallel=T, n.iter=niter,
                              n.burnin=niter/2, n.thin=niter/2000)
   print(Sys.time() - tstart)
-}",sep="")
+}
+
+nbyname(",NAME,"_jags_out)
+plotRhats(",NAME,"_jags_out)
+traceworstRhat(",NAME,"_jags_out, parmfrow = c(3, 3))",sep="")
 }
 
 #' Extract data.frame
@@ -750,6 +754,10 @@ envelope <- function(df,
   }
   if(is.null(main)) main <- ""
 
+  if(all(is.na(x))) x <- 1:ncol(df)
+  df <- df[, order(x)]  # reordering for plotting if x is not in order
+  x <- x[order(x)]
+
   transform <- match.arg(transform)
   if(transform == "exp") df <- exp(df)
   if(transform == "expit") df <- expit(df)
@@ -762,7 +770,7 @@ envelope <- function(df,
     hiq <- t(as.matrix(hiq))
   }
   med <- apply(df, 2, median, na.rm=T)
-  if(all(is.na(x))) x <- 1:ncol(df)
+
   if(!add) {
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
     plot(NA, xlim=range(x),ylim=ylim, xlab=xlab, ylab=ylab, main=main, ...=...)
@@ -1126,7 +1134,7 @@ caterpillar <- function(df,
   if(!add) {
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
     plot(NA, type='l', xlim=range(x-(.2*d),x+(.2*d)), xlab=xlab, ylab=ylab, main=main, ylim=ylim, xaxt="n", ...=...)
-    axis(1,x,labels=xax)
+    axis(1,x,labels=xax, las=list(...)$las)
   }
   if(median) {
     segments(x0=x-.2*d*medwd,x1=x+.2*d*medwd,y0=med,y1=med,col=col,lwd=medlwd, lend=1)
@@ -2183,10 +2191,32 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
   ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
   transform <- match.arg(transform)
   yplot <- y-meds
-  if(transform == "exp") yplot <- exp(yplot)
-  if(transform == "expit") yplot <- expit(yplot)
+
+  ## finding y limits for plotting
+  dots <- list(...)
+  if(!is.null(dots$ci)) {
+    ci <- max(dots$ci)
+  } else {
+    ci <- 0.95
+  }
+  ylim1 <- apply(ypp_resid, 2, quantile, p=(1-ci)/2)
+  ylim2 <- apply(ypp_resid, 2, quantile, p=1-((1-ci)/2))
+
+  ## transforming if needed
+  if(transform == "exp") {
+    yplot <- exp(yplot)
+    ylim1 <- exp(ylim1)
+    ylim2 <- exp(ylim2)
+  }
+  if(transform == "expit") {
+    yplot <- expit(yplot)
+    ylim1 <- expit(ylim1)
+    ylim2 <- expit(ylim2)
+  }
+
   envelope(ypp_resid, x=x, ylab="Diff from post pred median",
-           transform=transform, ...=...)
+           transform=transform, ylim=range(ylim1, ylim2, yplot, na.rm=TRUE),
+           ...=...)
   if(is.null(x)) x <- seq_along(y)
   points(x=x, y=yplot)
   if(lines) lines(x=x, y=yplot)
