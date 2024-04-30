@@ -12,6 +12,6 @@ This is a new package and there are no downstream dependencies.
 
 ## Test environments
 * Windows 10 (local): R 4.3.2
-* Winbuilder: R 4.3.3
+* Winbuilder: R 4.4.0
 * Winbuilder: R-devel
-* Macbuilder (OS 13.3.1): R 4.3.0
+* Macbuilder (OS 13.3.1): R 4.4.0
