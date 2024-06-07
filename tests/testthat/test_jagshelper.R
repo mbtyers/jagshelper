@@ -279,7 +279,9 @@ test_that("qq_postpred", {
   expect_silent(qq_postpred(ypp=jags_df(x=SS_out, p="ypp"), y=SS_data$y))
   expect_silent(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y, add=T, pch="+", col=4))
   expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1]))
-  expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1:2]), "Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  expect_error(qq_postpred(ypp=SS_out, p="ypp", y=SS_data$y[1:2]), "Posterior matrix ypp has more columns than length of data matrix y")
+  expect_warning(qq_postpred(ypp=SS_out$sims.list$ypp[,1:2], y=SS_data$y), "Posterior matrix ypp has fewer columns than length of data matrix y")
+  expect_silent(qq_postpred(ypp=SS_out$sims.list$ypp[,1:2], y=SS_data$y[1:2]))
   expect_error(qq_postpred(ypp=SS_out, y=SS_data$y), "Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
 })
 

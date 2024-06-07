@@ -787,28 +787,51 @@ envelope <- function(df,
   }
 
   else {
-    whichnotna <- unname(apply(loq,2,function(x) !all(is.na(x))))
-    firsts <- lasts <- NA
-    ilist <- whichnotna[1]
-    if(whichnotna[1]) firsts[1] <- 1
-    for(ii in 2:(length(whichnotna)-1)) {
-      if(whichnotna[ii] & !whichnotna[ii-1]) {
-        ilist <- ilist+1
-        firsts[ilist] <- ii
-      }
-      if(whichnotna[ii] & !whichnotna[ii+1]) {
-        lasts[ilist] <- ii
-      }
-    }
-    if(whichnotna[length(whichnotna)]) lasts[ilist] <- length(whichnotna)
+    # whichnotna <- unname(apply(loq,2,function(x) !all(is.na(x))))
+    # firsts <- lasts <- NA
+    # ilist <- whichnotna[1]
+    # if(whichnotna[1]) firsts[1] <- 1
+    # for(ii in 2:(length(whichnotna)-1)) {
+    #   if(whichnotna[ii] & !whichnotna[ii-1]) {
+    #     ilist <- ilist+1
+    #     firsts[ilist] <- ii
+    #   }
+    #   if(whichnotna[ii] & !whichnotna[ii+1]) {
+    #     lasts[ilist] <- ii
+    #   }
+    # }
+    # if(whichnotna[length(whichnotna)]) lasts[ilist] <- length(whichnotna)
+    #
+    # for(ii in 1:length(firsts)) {
+    #   for(i in 1:length(ci)) {
+    #     polygon(c(x[firsts[ii]:lasts[ii]],rev(x[firsts[ii]:lasts[ii]])),
+    #             c(loq[i,firsts[ii]:lasts[ii]],rev(hiq[i,firsts[ii]:lasts[ii]])),
+    #             col=adjustcolor(col,alpha.f=dark), border=NA)
+    #   }
+    # }
 
-    for(ii in 1:length(firsts)) {
+    whichnotna <- which(unname(apply(loq,2,function(x) !all(is.na(x)))))
+    # firsts <- lasts <- NA
+    # ilist <- whichnotna[1]
+    # if(whichnotna[1]) firsts[1] <- 1
+    # for(ii in 2:(length(whichnotna)-1)) {
+    #   if(whichnotna[ii] & !whichnotna[ii-1]) {
+    #     ilist <- ilist+1
+    #     firsts[ilist] <- ii
+    #   }
+    #   if(whichnotna[ii] & !whichnotna[ii+1]) {
+    #     lasts[ilist] <- ii
+    #   }
+    # }
+    # if(whichnotna[length(whichnotna)]) lasts[ilist] <- length(whichnotna)
+
+    # for(ii in 1:length(firsts)) {
       for(i in 1:length(ci)) {
-        polygon(c(x[firsts[ii]:lasts[ii]],rev(x[firsts[ii]:lasts[ii]])),
-                c(loq[i,firsts[ii]:lasts[ii]],rev(hiq[i,firsts[ii]:lasts[ii]])),
+        polygon(c(x[whichnotna],rev(x[whichnotna])),
+                c(loq[i,whichnotna],rev(hiq[i,whichnotna])),
                 col=adjustcolor(col,alpha.f=dark), border=NA)
       }
-    }
+    # }
   }
 }
 
@@ -1629,12 +1652,16 @@ comparecat <- function(x, p=NULL, ci=c(0.5,0.95), ylim=NULL, col=NULL, xlab="", 
   if(!inherits(x,"list")) stop("Input must be a (single) list of outputs from jagsUI::jags() or data.frames.")
   xdf <- list()
   for(i in 1:length(x)) {
-    if(!inherits(x[[i]], "jagsUI") & !inherits(x[[i]], "data.frame")) {
+    if(!inherits(x[[i]], "jagsUI") & !inherits(x[[i]], "data.frame") & !inherits(x[[i]], "matrix")) {
       stop("Each input element must be an output from jagsUI::jags() or data.frame.")
     }
     if(inherits(x[[i]],"jagsUI")) {
       xdf[[i]] <- jags_df(x[[i]])
-    } else {
+    }
+    if(inherits(x[[i]],"matrix")) {
+      xdf[[i]] <- as.data.frame(x[[i]])
+    }
+    if(inherits(x[[i]],"data.frame")) {
       xdf[[i]] <- x[[i]]
     }
   }
@@ -1659,8 +1686,9 @@ comparecat <- function(x, p=NULL, ci=c(0.5,0.95), ylim=NULL, col=NULL, xlab="", 
     }
   }
 
-  # allparms <- sort(unique(unlist(lapply(parmx,names))))
-  allparms <- unique(unlist(lapply(parmx,names)))
+  # # allparms <- sort(unique(unlist(lapply(parmx,names))))
+  # allparms <- unique(unlist(lapply(parmx,names)))
+  allparms <- unique(unlist(lapply(parmx, colnames)))
 
   cilo <- sort(1-ci)/2
   cihi <- 1-cilo
@@ -2107,8 +2135,21 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
     ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
   }
   if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
-  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
-  ymat <- matrix(y, nrow=nrow(ypp), ncol=ncol(ypp), byrow=T)
+  if(ncol(ypp) > length(y)) {
+    stop("Posterior matrix ypp has more columns than length of data matrix y")
+  }
+  if(ncol(ypp) < length(y)) {
+    warning("Posterior matrix ypp has fewer columns than length of data matrix y")
+    # define ymat somehow differently
+    # ymat <- matrix(NA, nrow=nrow(ypp), ncol=ncol(ypp))
+    ymat <- matrix(y, nrow=nrow(ypp), ncol=length(y), byrow=T)   # actually this should work for both
+    ypp1 <- matrix(NA, nrow=nrow(ypp), ncol=length(y))
+    ypp1[,1:ncol(ypp)] <- ypp
+    ypp <- ypp1
+  }
+  if(ncol(ypp) == length(y)){
+    ymat <- matrix(y, nrow=nrow(ypp), ncol=ncol(ypp), byrow=T)
+  }
   qpp <- sort(colMeans(ymat>=ypp))
   qtheo <- (1:length(qpp))/length(qpp)
   if(!add) {
@@ -2222,6 +2263,53 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
   if(lines) lines(x=x, y=yplot)
 }
 
+
+#' @export
+plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                          transform=c("none", "exp", "expit"), ...) {   # include a parmfrow
+
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+  }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+
+  # plot 1
+  qq_postpred(ypp=ypp, y=y)
+
+  # plot 2
+  if(is.null(x)) x <- seq_along(y)
+  ts_postpred(ypp=ypp, y=y, x=x, lines=lines, transform=transform)
+
+  # plot 3
+  ymeds <- apply(ypp, 2, median, na.rm=TRUE)
+  ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
+
+  # plot 4
+  thecat <- cut(ymeds, breaks=floor(sqrt(length(ymeds))))  ## this is a throwaway breaks=, make it smarter please
+
+  # nperbin <- 5
+
+  xplot <- tapply(y, thecat, mean, na.rm=TRUE)
+  thesd <- tapply(y, thecat, sd, na.rm=TRUE)
+
+  # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
+  ylims <- range(thesd, na.rm=TRUE)
+
+  plot(xplot, thesd, type="b",
+       xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
+       xlab="Post pred median", ylab="PP residual SD (binned)")
+
+  # points(x=ymeds, y=0*ymeds+ylims[1]) # jitter this somehow
+
+  # segments(x0=ymeds,
+  #          y0=rep(0, length(ymeds)), y1=rep(ylims[1], length(ymeds)),
+  #          col=as.numeric(as.factor(thecat))+1)
+}
+# par(mfrow=c(2,2))
+# plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x)
 
 #' Compare Priors
 #' @description Side-by-side kernel density plots for all parameters with parameter
