@@ -16,7 +16,7 @@ plotcor_jags(
 )
 }
 \arguments{
-\item{x}{Output object returned from \code{jagsUI}}
+\item{x}{Output object returned from \code{jagsUI}, or a data.frame with MCMC output}
 
 \item{p}{Optional string to begin posterior names.  If \code{NULL} is used, all parameters will be used}
 
@@ -54,7 +54,7 @@ plotcor_jags(asdf_jags_out, maxcex=0.7)
 plotcor_jags(SS_out, p=c("trend","rate","sig"))
 }
 \seealso{
-\link{plotcor_jags}
+\link{cor_jags}
 }
 \author{
 Matt Tyers

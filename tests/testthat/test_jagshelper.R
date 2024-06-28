@@ -258,6 +258,8 @@ test_that("cor_jags", {
 
 test_that("plotcor_jags", {
   expect_silent(plotcor_jags(asdf_jags_out))
+  expect_silent(plotcor_jags(jags_df(asdf_jags_out)))
+  expect_silent(asdf_jags_out$sims.list$a)
   expect_silent(plotcor_jags(asdf_jags_out, p=c("a","b")))
   expect_silent(plotcor_jags(asdf_jags_out, legend=F, mincor=0.1, maxn=1))
 })

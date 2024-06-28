@@ -1,3 +1,9 @@
+## jagshelper 0.2.4 (June 2024)
+
+* Bug fixes in `envelope()`, `comparecat()`, and `qq_postpred()`.
+
+* Extended allowable inputs to `plotcor_jags()`.
+
 ## jagshelper 0.2.3 (Apr 2024)
 
 Fixed some plotting bugs in `envelope()`, `caterpillar()`, and `ts_postpred()`,

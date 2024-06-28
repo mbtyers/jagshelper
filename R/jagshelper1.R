@@ -1828,7 +1828,7 @@ cor_jags <- function(x, p=NULL, exact=FALSE) {
 #'
 #' Values of correlation are overlayed for all parameters with few nodes, with
 #' character size scaled according to the absolute correlation.
-#' @param x Output object returned from `jagsUI`
+#' @param x Output object returned from `jagsUI`, or a data.frame with MCMC output
 #' @param p Optional string to begin posterior names.  If `NULL` is used, all parameters will be used
 #' @param exact Whether name must be an exact match (`TRUE`) or with initial sub-string matching only supplied characters (`FALSE`).
 #' Defaults to `FALSE.`
@@ -1846,9 +1846,17 @@ cor_jags <- function(x, p=NULL, exact=FALSE) {
 #' plotcor_jags(SS_out, p=c("trend","rate","sig"))
 #' @export
 plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, legend=TRUE, ...) {
-  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
-  dfcor <- cor_jags(x=x, p=p, exact=exact)
-  if(all(dim(dfcor)==0)) stop("No parameters with matching names")
+  if(!inherits(x, c("data.frame","matrix","jagsUI"))) {
+    stop("Input must be an output object returned from jagsUI::jags(), or data.frame with MCMC output.")
+  }
+
+  if(inherits(x,"jagsUI")) {
+    dfcor <- cor_jags(x=x, p=p, exact=exact)
+    if(all(dim(dfcor)==0)) stop("No parameters with matching names")
+  }
+  if(inherits(x, c("data.frame","matrix"))) {
+    dfcor <- cor(x=as.data.frame(x))
+  }
 
   dfnames <- dimnames(dfcor)[[1]] #names(df)
   dfwhich <- sapply(strsplit(dfnames,split="[",fixed=T),FUN="[",1)
@@ -1883,15 +1891,35 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
   axis(side=1, at=1:length(dfwhichunique)-.5, labels=dfwhichunique, las=2)
   axis(side=2, at=1:length(dfwhichunique)-.5, labels=dfwhichunique, las=2)
 
+  # rect(xleft=xmat1, xright=xmat, ybottom=ymat1, ytop=ymat, border=cols, col=cols)
+  # for(i in 1:nrow(xmat)) {
+  #   for(j in 1:i) {
+  #     if((dfhowmany[i]<=maxn) & (dfhowmany[j]<=maxn) & (abs(dfcor[i,j])>=mincor)) {
+  #       text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+  #       text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+  #     }
+  #   }
+  # }
+
   rect(xleft=xmat1, xright=xmat, ybottom=ymat1, ytop=ymat, border=cols, col=cols)
+  dfcor4cex <- dfcor
+  dfcor4cex[is.na(dfcor4cex)] <- 0.5
   for(i in 1:nrow(xmat)) {
     for(j in 1:i) {
-      if((dfhowmany[i]<=maxn) & (dfhowmany[j]<=maxn) & (abs(dfcor[i,j])>=mincor)) {
-        text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
-        text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+      # if((dfhowmany[i]<=maxn) & (dfhowmany[j]<=maxn) & (abs(dfcor[i,j])>=mincor)) {
+      if((dfhowmany[i]<=maxn) & (dfhowmany[j]<=maxn) & (abs(dfcor4cex[i,j])>=mincor)) {
+        # text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+        # text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor[i,j])^.3)
+        text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor4cex[i,j])^.3)
+        text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels=round(dfcor[i,j],2), cex=maxcex*abs(dfcor4cex[i,j])^.3)
+        if(is.na(dfcor[i,j])) {
+          text(x=dfdim1[i]+0.5/dfhowmany[i], y=dfdim1[j]+0.5/dfhowmany[j], labels="NA", cex=maxcex*abs(dfcor4cex[i,j])^.3)
+          text(x=dfdim1[j]+0.5/dfhowmany[j], y=dfdim1[i]+0.5/dfhowmany[i], labels="NA", cex=maxcex*abs(dfcor4cex[i,j])^.3)
+        }
       }
     }
   }
+
   # abline(v=0:length(dfwhichunique))
   segments(x0=rep(0, length(dfwhichunique)+1),
            x1=rep(length(dfwhichunique), length(dfwhichunique)+1),
