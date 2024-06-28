@@ -1838,7 +1838,7 @@ cor_jags <- function(x, p=NULL, exact=FALSE) {
 #' @param legend Whether to produce a plot legend.  Defaults to `TRUE`.
 #' @param ... Optional plotting arguments
 #' @return `NULL`
-#' @seealso \link{plotcor_jags}
+#' @seealso \link{cor_jags}
 #' @author Matt Tyers
 #' @examples
 #' plotcor_jags(asdf_jags_out, maxcex=0.7)
@@ -2264,52 +2264,9 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 }
 
 
-#' @export
-plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
-                          transform=c("none", "exp", "expit"), ...) {   # include a parmfrow
 
-  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
-  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
-  if(inherits(ypp, "jagsUI") & !is.null(p)) {
-    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
-  }
-  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
-  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
 
-  # plot 1
-  qq_postpred(ypp=ypp, y=y)
 
-  # plot 2
-  if(is.null(x)) x <- seq_along(y)
-  ts_postpred(ypp=ypp, y=y, x=x, lines=lines, transform=transform)
-
-  # plot 3
-  ymeds <- apply(ypp, 2, median, na.rm=TRUE)
-  ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
-
-  # plot 4
-  thecat <- cut(ymeds, breaks=floor(sqrt(length(ymeds))))  ## this is a throwaway breaks=, make it smarter please
-
-  # nperbin <- 5
-
-  xplot <- tapply(y, thecat, mean, na.rm=TRUE)
-  thesd <- tapply(y, thecat, sd, na.rm=TRUE)
-
-  # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
-  ylims <- range(thesd, na.rm=TRUE)
-
-  plot(xplot, thesd, type="b",
-       xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
-       xlab="Post pred median", ylab="PP residual SD (binned)")
-
-  # points(x=ymeds, y=0*ymeds+ylims[1]) # jitter this somehow
-
-  # segments(x0=ymeds,
-  #          y0=rep(0, length(ymeds)), y1=rep(ylims[1], length(ymeds)),
-  #          col=as.numeric(as.factor(thecat))+1)
-}
-# par(mfrow=c(2,2))
-# plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x)
 
 #' Compare Priors
 #' @description Side-by-side kernel density plots for all parameters with parameter
