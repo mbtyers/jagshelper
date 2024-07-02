@@ -441,6 +441,75 @@ plotcor_jags <- function(x, p=NULL, exact=FALSE, mincor=0, maxn=4, maxcex=1, leg
 }
 
 
+
+
+
+
+#' Compare Priors
+#' @description Side-by-side kernel density plots for all parameters with parameter
+#' names ending in `"_prior"`, and corresponding parameters without.  It should
+#' be noted that these parameters must be specified in JAGS as well as the
+#' corresponding parameters, and this is left to the user.
+#'
+#' This function is a wrapper of \link{comparedens}.
+#'
+#' Kernel densities are plotted vertically, either left- or right-facing.  Parameters with the same name are
+#'  plotted facing one another.
+#' @param x Output object returned from jagsUI::jags()
+#' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
+#' @param ... additional arguments to \link{comparedens}
+#' @return `NULL`
+#' @seealso \link{comparecat}, \link{comparedens}, \link{plotdens}
+#' @author Matt Tyers
+#' @examples
+#' ## a look at what parameters exist in the input object
+#' nbyname(asdf_prior_jags_out)
+#'
+#' ## then, showing the function usage
+#' comparepriors(asdf_prior_jags_out, parmfrow=c(2, 3))
+#' @export
+comparepriors <- function(x, parmfrow=NULL,...) {
+  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+
+  if(!is.null(parmfrow)) {
+    parmfrow1 <- par("mfrow")
+    par(mfrow=parmfrow)
+    on.exit(par(mfrow=parmfrow1))
+  }
+
+  # get names
+  thenames <- names(x$sims.list)
+
+  # find names ending in "_prior"
+  thepriors <- NULL
+  for(i in 1:length(thenames)) {
+    thesplit <- strsplit(thenames[i], split="_")[[1]]
+    if(thesplit[length(thesplit)] == "prior") thepriors <- c(thepriors, i)
+  }
+  if(is.null(thepriors)) warning('No parameter names ending in "_prior"')
+
+  for(i_prior in thepriors) {
+    # find a posterior with matching name
+    thepriorname <- thenames[i_prior]
+    thepostname <- NULL
+    for(i_post in 1:length(thenames)) {
+      if(thenames[i_post] == substr(thepriorname, 1, nchar(thepriorname)-6)) {
+        thepostname <- thenames[i_post]
+      }
+    }
+    if(!is.null(thepostname)) {
+      priordf <- as.data.frame(x$sims.list[thepriorname])
+      postdf <- as.data.frame(x$sims.list[thepostname])
+      names(priordf) <- names(postdf)
+      comparedens(x1=priordf, x2=postdf, main=thepostname, legendnames=c("prior","post"),...=...)
+    }
+  }
+}
+
+
+
+
+
 #' Quantile-quantile plot from posterior predictive distribution
 #' @description Produces a quantile-quantile plot, calculated from the quantiles of
 #' a vector of data (most likely a time series), with respect to the matrix of associated posterior
@@ -626,66 +695,67 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 
 
 
-
-
-
-#' Compare Priors
-#' @description Side-by-side kernel density plots for all parameters with parameter
-#' names ending in `"_prior"`, and corresponding parameters without.  It should
-#' be noted that these parameters must be specified in JAGS as well as the
-#' corresponding parameters, and this is left to the user.
-#'
-#' This function is a wrapper of \link{comparedens}.
-#'
-#' Kernel densities are plotted vertically, either left- or right-facing.  Parameters with the same name are
-#'  plotted facing one another.
-#' @param x Output object returned from jagsUI::jags()
-#' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
-#' @param ... additional arguments to \link{comparedens}
-#' @return `NULL`
-#' @seealso \link{comparecat}, \link{comparedens}, \link{plotdens}
-#' @author Matt Tyers
-#' @examples
-#' ## a look at what parameters exist in the input object
-#' nbyname(asdf_prior_jags_out)
-#'
-#' ## then, showing the function usage
-#' comparepriors(asdf_prior_jags_out, parmfrow=c(2, 3))
 #' @export
-comparepriors <- function(x, parmfrow=NULL,...) {
-  if(!inherits(x,"jagsUI")) stop("Input must be an output object returned from jagsUI::jags().")
+plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                          transform=c("none", "exp", "expit"), ...) {   # include a parmfrow
 
-  if(!is.null(parmfrow)) {
-    parmfrow1 <- par("mfrow")
-    par(mfrow=parmfrow)
-    on.exit(par(mfrow=parmfrow1))
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
   }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
 
-  # get names
-  thenames <- names(x$sims.list)
+  # plot 1
+  qq_postpred(ypp=ypp, y=y)
 
-  # find names ending in "_prior"
-  thepriors <- NULL
-  for(i in 1:length(thenames)) {
-    thesplit <- strsplit(thenames[i], split="_")[[1]]
-    if(thesplit[length(thesplit)] == "prior") thepriors <- c(thepriors, i)
-  }
-  if(is.null(thepriors)) warning('No parameter names ending in "_prior"')
+  # plot 2
+  if(is.null(x)) x <- seq_along(y)
+  ts_postpred(ypp=ypp, y=y, x=x, lines=lines, transform=transform)
 
-  for(i_prior in thepriors) {
-    # find a posterior with matching name
-    thepriorname <- thenames[i_prior]
-    thepostname <- NULL
-    for(i_post in 1:length(thenames)) {
-      if(thenames[i_post] == substr(thepriorname, 1, nchar(thepriorname)-6)) {
-        thepostname <- thenames[i_post]
-      }
-    }
-    if(!is.null(thepostname)) {
-      priordf <- as.data.frame(x$sims.list[thepriorname])
-      postdf <- as.data.frame(x$sims.list[thepostname])
-      names(priordf) <- names(postdf)
-      comparedens(x1=priordf, x2=postdf, main=thepostname, legendnames=c("prior","post"),...=...)
-    }
-  }
+  # plot 3
+  ymeds <- apply(ypp, 2, median, na.rm=TRUE)
+  ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
+
+  # plot 4
+  # thecat <- cut(ymeds, breaks=floor(sqrt(length(ymeds))))  ## this is a throwaway breaks=, make it smarter please
+  thecat <- cut(rank(ymeds),
+                breaks=seq(from=1, to=length(ymeds),
+                           length.out=floor(sqrt(length(ymeds)))),
+                include.lowest = TRUE)
+
+  # nperbin <- 5
+
+  xplot <- tapply(y, thecat, mean, na.rm=TRUE)
+  thesd <- tapply(y, thecat, sd, na.rm=TRUE)
+
+  # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
+  ylims <- range(c(0, thesd), na.rm=TRUE)
+
+  plot(xplot, thesd, type="b",
+       xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
+       xlab="Post pred median", ylab="PP residual SD (binned)")
+
+  # points(x=ymeds, y=0*ymeds+ylims[1]) # jitter this somehow
+
+  # segments(x0=ymeds,
+  #          y0=rep(0, length(ymeds)), y1=rep(ylims[1], length(ymeds)),
+  #          col=as.numeric(as.factor(thecat))+1)
 }
+# par(mfrow=c(2,2))
+# plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x)
+
+# to do:
+# - xlab for plot 2
+# - rug or SOMETHING for plot 4
+# - maybe overlay rolling / binned SD on plots 2 & 3?
+# - decide if these are even the plots!
+# - add parmfrow=c(2,2)?? maybe don't supply default actually
+# - get inspiration from plot.lm
+# - visually differentiate plots 2 and 3?  maybe just add titles
+# - test drive this with another project: maybe lake trout stuff
+# -- see if I can find the bottleneck!!
+# - jags_df??  also for qq_ and ts_
+# - add documentation / tests / NEWS of course
+# - maybe this is worthy of adding to README and Vignette
