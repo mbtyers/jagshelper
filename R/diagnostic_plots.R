@@ -719,17 +719,19 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
   ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
 
   # plot 4
-  # thecat <- cut(ymeds, breaks=floor(sqrt(length(ymeds))))  ## this is a throwaway breaks=, make it smarter please
-  ymeds <- ymeds[!is.na(ymeds)]
-  thecat <- cut(rank(ymeds),
-                breaks=seq(from=1, to=length(ymeds),
-                           length.out=floor(sqrt(length(ymeds)))),
-                include.lowest = TRUE)
-
-  # nperbin <- 5
-
-  xplot <- tapply(ymeds, thecat, mean, na.rm=TRUE)
-  thesd <- tapply(ymeds, thecat, sd, na.rm=TRUE)
+  # ymeds <- ymeds[!is.na(ymeds)]
+  # thecat <- cut(rank(ymeds),
+  #               breaks=seq(from=1, to=length(ymeds),
+  #                          length.out=floor(sqrt(length(ymeds)))),
+  #               include.lowest = TRUE)
+  #
+  # # nperbin <- 5
+  #
+  # xplot <- tapply(ymeds, thecat, mean, na.rm=TRUE)
+  # thesd <- tapply(ymeds, thecat, sd, na.rm=TRUE)
+  resid <- y - ymeds
+  xplot <- ymeds[order(ymeds)]
+  thesd <- rollingSD(resid[order(ymeds)], n = min(10, floor(sqrt(length(ymeds)))))
 
   # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
   ylims <- range(c(0, thesd), na.rm=TRUE)
@@ -780,7 +782,14 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 # - sdthing x=ymed
 # - sdthing x=y??
 
-# rollingSD <- function(x, window=10) {
-#   xmat <-
-# }
 
+
+rollingSD <- function(x, n=5) { # will just define as n on either side!
+  x1 <- c(rep(NA, n), x, rep(NA, n))
+  thesd <- NA*x
+  for(i in 1:length(x)) thesd[i] <- sd(x1[(i):(i+(2*n))], na.rm=TRUE)
+  return(thesd)
+}
+
+par(mfrow=c(2,2))
+plot_postpred(SS_out, p="ypp", y=SS_data$y, x=SS_data$x)
