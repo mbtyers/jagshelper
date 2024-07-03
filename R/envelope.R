@@ -140,6 +140,12 @@ envelope <- function(df,
   if(is.null(main)) main <- ""
 
   if(all(is.na(x))) x <- 1:ncol(df)
+
+  ###
+  df <- df[, !is.na(x)] # taking out NA in x (not sure what it would do)
+  x <- x[!is.na(x)]
+  ###
+
   df <- df[, order(x)]  # reordering for plotting if x is not in order
   x <- x[order(x)]
 

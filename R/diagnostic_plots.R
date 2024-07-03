@@ -779,3 +779,8 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 # - sdthing x=x if there is an x
 # - sdthing x=ymed
 # - sdthing x=y??
+
+# rollingSD <- function(x, window=10) {
+#   xmat <-
+# }
+
