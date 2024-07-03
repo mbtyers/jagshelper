@@ -670,8 +670,8 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
   } else {
     ci <- 0.95
   }
-  ylim1 <- apply(ypp_resid, 2, quantile, p=(1-ci)/2)
-  ylim2 <- apply(ypp_resid, 2, quantile, p=1-((1-ci)/2))
+  ylim1 <- apply(ypp_resid, 2, quantile, p=(1-ci)/2, na.rm=TRUE)
+  ylim2 <- apply(ypp_resid, 2, quantile, p=1-((1-ci)/2), na.rm=TRUE)
 
   ## transforming if needed
   if(transform == "exp") {
@@ -720,6 +720,7 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 
   # plot 4
   # thecat <- cut(ymeds, breaks=floor(sqrt(length(ymeds))))  ## this is a throwaway breaks=, make it smarter please
+  ymeds <- ymeds[!is.na(ymeds)]
   thecat <- cut(rank(ymeds),
                 breaks=seq(from=1, to=length(ymeds),
                            length.out=floor(sqrt(length(ymeds)))),
@@ -727,13 +728,13 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 
   # nperbin <- 5
 
-  xplot <- tapply(y, thecat, mean, na.rm=TRUE)
-  thesd <- tapply(y, thecat, sd, na.rm=TRUE)
+  xplot <- tapply(ymeds, thecat, mean, na.rm=TRUE)
+  thesd <- tapply(ymeds, thecat, sd, na.rm=TRUE)
 
   # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
   ylims <- range(c(0, thesd), na.rm=TRUE)
 
-  plot(xplot, thesd, type="b",
+  plot(xplot, thesd,# type="b",
        xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
        xlab="Post pred median", ylab="PP residual SD (binned)")
 
@@ -759,3 +760,22 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 # - jags_df??  also for qq_ and ts_
 # - add documentation / tests / NEWS of course
 # - maybe this is worthy of adding to README and Vignette
+# - FIXED - bug in envelope with NA values in x
+
+# plots:
+# - qq_
+#
+# - just envelope x=sequence
+# - just envelope x=x if there is an x
+# - just envelope x=ymed
+# - just envelope x=y??
+#
+# - ts_ x=sequence
+# - ts_ x=x if there is an x
+# - ts_ x=ymed
+# - ts_ x=y??
+#  COULD OVERLAY WITH
+# - sdthing x=sequence
+# - sdthing x=x if there is an x
+# - sdthing x=ymed
+# - sdthing x=y??
