@@ -694,11 +694,9 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 }
 
 
-
-#' @export
-plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
-                          transform=c("none", "exp", "expit"), ...) {   # include a parmfrow
-
+sd_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                        transform=c("none", "exp", "expit"), ...) {
+  # is transform necessary here?? don't think so
   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
   if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
   if(inherits(ypp, "jagsUI") & !is.null(p)) {
@@ -706,46 +704,176 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
   }
   if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  meds <- apply(ypp, 2, median, na.rm=T)
+  ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  transform <- match.arg(transform)
 
-  # plot 1
-  qq_postpred(ypp=ypp, y=y)
+  resid <- y - meds
 
-  # plot 2
-  if(is.null(x)) x <- seq_along(y)
-  ts_postpred(ypp=ypp, y=y, x=x, lines=lines, transform=transform)
+  resid <- resid[!is.na(x)]
+  x <- x[!is.na(x)]
 
-  # plot 3
-  ymeds <- apply(ypp, 2, median, na.rm=TRUE)
-  ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
-
-  # plot 4
-  # ymeds <- ymeds[!is.na(ymeds)]
-  # thecat <- cut(rank(ymeds),
-  #               breaks=seq(from=1, to=length(ymeds),
-  #                          length.out=floor(sqrt(length(ymeds)))),
-  #               include.lowest = TRUE)
-  #
-  # # nperbin <- 5
-  #
-  # xplot <- tapply(ymeds, thecat, mean, na.rm=TRUE)
-  # thesd <- tapply(ymeds, thecat, sd, na.rm=TRUE)
-  resid <- y - ymeds
-  xplot <- ymeds[order(ymeds)]
-  thesd <- rollingSD(resid[order(ymeds)], n = min(10, floor(sqrt(length(ymeds)))))
+  xplot <- x[order(x)]
+  thesd <- rollingSD(resid[order(x)], n = min(10, floor(sqrt(length(x)))))
 
   # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
   ylims <- range(c(0, thesd), na.rm=TRUE)
 
   plot(xplot, thesd,# type="b",
-       xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
-       xlab="Post pred median", ylab="PP residual SD (binned)")
-
-  # points(x=ymeds, y=0*ymeds+ylims[1]) # jitter this somehow
-
-  # segments(x0=ymeds,
-  #          y0=rep(0, length(ymeds)), y1=rep(ylims[1], length(ymeds)),
-  #          col=as.numeric(as.factor(thecat))+1)
+       xlim=range(x, na.rm=TRUE), ylim=ylims,
+       ylab="Residual SD (binned)", ...=...)
 }
+
+
+sd_postpred2 <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                        transform=c("none", "exp", "expit"), ...) {
+  # is transform necessary here?? don't think so
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+  }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  meds <- apply(ypp, 2, median, na.rm=T)
+  ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  transform <- match.arg(transform)
+
+  ts_postpred(ypp=ypp, y=y, x=x, lines=lines,
+              transform=transform, ...=...)
+
+  resid <- y - meds
+
+  resid <- resid[!is.na(x)]
+  x <- x[!is.na(x)]
+
+  xplot <- x[order(x)]
+  thesd <- rollingSD(resid[order(x)], n = min(10, floor(sqrt(length(x)))))
+
+  # # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
+  # ylims <- range(c(0, thesd), na.rm=TRUE)
+  #
+  # plot(xplot, thesd,# type="b",
+  #      xlim=range(x, na.rm=TRUE), ylim=ylims,
+  #      ylab="Residual SD (binned)", ...=...)
+
+  lines(x=xplot, y=qnorm(.25)*thesd)
+  lines(x=xplot, y=qnorm(.75)*thesd)
+  lines(x=xplot, y=qnorm(.025)*thesd)
+  lines(x=xplot, y=qnorm(.975)*thesd)
+}
+
+
+
+
+plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+                          whichplots = c(1, 2, 4),
+                          transform=c("none", "exp", "expit"), ...) {
+  if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+  if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+  if(inherits(ypp, "jagsUI") & !is.null(p)) {
+    ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+  }
+  if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+  if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+  yppmeds <- apply(ypp, 2, median, na.rm=T)
+  ypp_resid <- ypp - matrix(yppmeds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  transform <- match.arg(transform)
+
+  for(thisplot in whichplots) {
+    if(thisplot==1) {
+      # sequence
+      xplot <- seq_along(y)
+      xlab <- "Data Sequence"
+    }
+    if(thisplot==2) {
+      # x
+      xplot <- x
+      xlab <- "Data x"
+    }
+    if(thisplot==3) {
+      # y
+      xplot <- y
+      xlab <- "Data y"
+    }
+    if(thisplot==4) {
+      # fitted values
+      xplot <- yppmeds
+      xlab <- "Fitted Values"
+    }
+
+    # # panel 1 qq
+    # qq_postpred(ypp=ypp, y=y,
+    #             main="Posterior Predictive QQ")
+
+    # panel 2 envelope
+    envelope(df=ypp, x=xplot,
+             xlab=xlab, ylab="Posterior Predictive Y")    # add xlab, main
+    points(x=xplot[!is.na(yppmeds)], y=y[!is.na(yppmeds)])
+
+    # panel 3 residuals
+    ts_postpred(ypp=ypp, y=y, x=xplot,
+                xlab=xlab,
+                main="Residuals & PP Residual")  # optional args??  add xlab, main
+
+    # panel 4 sd residuals
+    sd_postpred(ypp=ypp, y=y, x=xplot,
+                xlab=xlab,
+                main="Residual SD")  # add xlab, main
+  }
+}
+
+
+# plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
+#                           transform=c("none", "exp", "expit"), ...) {   # include a parmfrow
+#
+#   if(!inherits(ypp, c("matrix","data.frame")) & !inherits(ypp, "jagsUI")) stop("Argument ypp must be a posterior matrix or jagsUI object.")
+#   if(inherits(ypp, "jagsUI") & is.null(p)) stop("Parameter name must be supplied to p= argument if jagsUI object is used in argument ypp")
+#   if(inherits(ypp, "jagsUI") & !is.null(p)) {
+#     ypp <- ypp$sims.list[names(ypp$sims.list)==p][[1]]   # rework this with jags_df?
+#   }
+#   if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
+#   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+#
+#   # plot 1
+#   qq_postpred(ypp=ypp, y=y)
+#
+#   # plot 2
+#   if(is.null(x)) x <- seq_along(y)
+#   ts_postpred(ypp=ypp, y=y, x=x, lines=lines, transform=transform)
+#
+#   # plot 3
+#   ymeds <- apply(ypp, 2, median, na.rm=TRUE)
+#   ts_postpred(ypp=ypp, y=y, x=ymeds, lines=lines, transform=transform, xlab="Post pred median")
+#
+#   # plot 4
+#   # ymeds <- ymeds[!is.na(ymeds)]
+#   # thecat <- cut(rank(ymeds),
+#   #               breaks=seq(from=1, to=length(ymeds),
+#   #                          length.out=floor(sqrt(length(ymeds)))),
+#   #               include.lowest = TRUE)
+#   #
+#   # # nperbin <- 5
+#   #
+#   # xplot <- tapply(ymeds, thecat, mean, na.rm=TRUE)
+#   # thesd <- tapply(ymeds, thecat, sd, na.rm=TRUE)
+#   resid <- y - ymeds
+#   xplot <- ymeds[order(ymeds)]
+#   thesd <- rollingSD(resid[order(ymeds)], n = min(10, floor(sqrt(length(ymeds)))))
+#
+#   # ylims <- c(min(thesd, na.rm=TRUE)-0.5*diff(range(thesd, na.rm=TRUE)), max(thesd, na.rm=TRUE))
+#   ylims <- range(c(0, thesd), na.rm=TRUE)
+#
+#   plot(xplot, thesd,# type="b",
+#        xlim=range(ymeds, na.rm=TRUE), ylim=ylims,
+#        xlab="Post pred median", ylab="PP residual SD (binned)")
+#
+#   # points(x=ymeds, y=0*ymeds+ylims[1]) # jitter this somehow
+#
+#   # segments(x0=ymeds,
+#   #          y0=rep(0, length(ymeds)), y1=rep(ylims[1], length(ymeds)),
+#   #          col=as.numeric(as.factor(thecat))+1)
+# }
 # par(mfrow=c(2,2))
 # plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x)
 
@@ -783,6 +911,28 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE,
 # - sdthing x=y??
 
 
+# data sequence
+# YES - qq
+# YES - envelope
+# YES - residuals
+# YES - residual SD
+# data x
+# - qq
+# YES - envelope
+# YES - residuals
+# YES - residual SD
+# data y
+# - qq
+# - envelope
+# - residuals
+# - residual SD
+# fitted
+# - qq
+# MAYBE - envelope
+# YES - residuals
+# YES - residual SD
+
+
 
 rollingSD <- function(x, n=5) { # will just define as n on either side!
   x1 <- c(rep(NA, n), x, rep(NA, n))
@@ -791,5 +941,7 @@ rollingSD <- function(x, n=5) { # will just define as n on either side!
   return(thesd)
 }
 
-par(mfrow=c(2,2))
-plot_postpred(SS_out, p="ypp", y=SS_data$y, x=SS_data$x)
+# par(mfrow=c(3,3))
+# plot_postpred(SS_out, p="ypp", y=SS_data$y, x=SS_data$x)
+# plot_postpred(LA_jags_out, p="ypp", y=LA_data$y, x=LA_data$x)
+# sd_postpred2(LA_jags_out, p="ypp", y=LA_data$y, x=LA_jags_out$q50$ypp)

@@ -50,7 +50,7 @@ pairstrace_jags(asdf_jags_out, parmfrow=c(3,3), points=TRUE)
 pairstrace_jags(asdf_jags_out, parmfrow=c(3,3), contour=TRUE)
 }
 \seealso{
-\link{tracedens_jags}
+\link{tracedens_jags}, \link{crossplot}
 }
 \author{
 Matt Tyers

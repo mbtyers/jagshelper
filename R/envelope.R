@@ -164,7 +164,8 @@ envelope <- function(df,
 
   if(!add) {
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
-    plot(NA, xlim=range(x, na.rm=TRUE),ylim=ylim, xlab=xlab, ylab=ylab, main=main, ...=...)
+    ### vvv this is new
+    plot(NA, xlim=range(x[!is.na(med)], na.rm=TRUE),ylim=ylim, xlab=xlab, ylab=ylab, main=main, ...=...)
     if(median) lines(x, med, col=col)
   }
   else

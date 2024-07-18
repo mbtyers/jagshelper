@@ -165,7 +165,7 @@ trace_df <- function(df, nline, parmfrow=NULL, ...) {
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
 #' @return `NULL`
-#' @seealso \link{tracedens_jags}
+#' @seealso \link{tracedens_jags}, \link{crossplot}
 #' @author Matt Tyers
 #' @examples
 #' pairstrace_jags(SS_out, p="sig", parmfrow=c(2,3), lwd=2)

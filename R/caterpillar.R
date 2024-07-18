@@ -132,7 +132,11 @@ caterpillar <- function(df,
   }
   med <- apply(df, 2, median, na.rm=T)
   if(all(is.na(x))) x <- 1:ncol(df)
-  d <- ifelse(length(x)>1, diff(x[1:2]), 1)  #########
+
+  ### this was smarterized, make sure it doesn't break other code!!!
+  # d <- ifelse(length(x)>1, diff(x[1:2]), 1)  #########
+  d <- ifelse(length(x)>1, diff(range(x, na.rm=TRUE))/length(x), 1)  #########
+
   nn <- ncol(df)
   if(all(is.na(xax))) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd
@@ -259,3 +263,5 @@ comparecat <- function(x, p=NULL, ci=c(0.5,0.95), ylim=NULL, col=NULL, xlab="", 
     }
   }
 }
+
+
