@@ -14,6 +14,7 @@ crossplot(
   drawblob = FALSE,
   blobres = NULL,
   blobsmooth = NULL,
+  outline = FALSE,
   ci = c(0.5, 0.95),
   lwd = 1,
   mean = FALSE,
@@ -76,6 +77,8 @@ corresponds to half the number of polygon vertices used for local smoothing.
 If the default \code{NULL} is accepted,
 the function will supply a value based on the number of MCMC samples and the
 number of vertices.}
+
+\item{outline}{Whether to draw quantile polygons as lines rather than filled regions.  Defaults to \code{FALSE}.}
 
 \item{ci}{Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.}
 
@@ -149,29 +152,41 @@ approximately \verb{ci=} x100\% of the associated MCMC samples.
 All methods can overlay multiple bars or polygons, depending on the length of \verb{ci=}.
 }
 \examples{
+## basic functionality with cross geometry
 crossplot(SS_out, p=c("trend","rate"))
-crossplot(SS_out, p=c("trend","rate"), col="random")
+
+## default labels
 crossplot(SS_out, p=c("trend","cycle"), labels=TRUE)
+
+## showing:
+## - link lines
+## - blob geometry (smoothed confidence polygons)
+## - random colors with col="random"
 crossplot(SS_out, p=c("trend","cycle"),
-          labels=SS_data$x, labelpos=1, link=TRUE, drawblob=TRUE)
+          labels=SS_data$x, labelpos=1, link=TRUE, drawblob=TRUE,
+          col="random")
+
+## adding x geometry and showing usage with a single vector element (41)
 crossplot(SS_out, p=c("trend","cycle"),
           whichx=41, whichy=41,
           drawblob=TRUE, drawx=TRUE)
 
-plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-     col=adjustcolor(1, alpha.f=.1), pch=16)
-crossplot(SS_out, p=c("trend","cycle"),
-          whichx=41, whichy=41, add=TRUE, col=1)
-plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-     col=adjustcolor(1, alpha.f=.1), pch=16)
-crossplot(SS_out, p=c("trend","cycle"),
-          whichx=41, whichy=41, add=TRUE, col=1,
+## single vectors (or data.frames or 2d matrices) can also be used
+xx <- SS_out$sims.list$trend[,41]
+yy <- SS_out$sims.list$cycle[,41]
+
+par(mfrow = c(2, 2))
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="cross geometry")
+crossplot(xx, yy, add=TRUE, col=1)
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="x geometry")
+crossplot(xx, yy, add=TRUE, col=1,
           drawcross=FALSE, drawx=TRUE)
-plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-     col=adjustcolor(1, alpha.f=.1), pch=16)
-crossplot(SS_out, p=c("trend","cycle"),
-          whichx=41, whichy=41, add=TRUE, col=1,
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="blob geometry")
+crossplot(xx, yy, add=TRUE, col=1,
           drawcross=FALSE, drawblob=TRUE)
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="blob outlines")
+crossplot(xx, yy, add=TRUE, col=1,
+          drawcross=FALSE, drawblob=TRUE, outline=TRUE)
 }
 \seealso{
 \link{caterpillar}, \link{pairstrace_jags}

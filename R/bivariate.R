@@ -42,6 +42,7 @@
 #' If the default `NULL` is accepted,
 #' the function will supply a value based on the number of MCMC samples and the
 #' number of vertices.
+#' @param outline Whether to draw quantile polygons as lines rather than filled regions.  Defaults to `FALSE`.
 #' @param ci Vector of intervals to overlay.  Defaults to 50 percent and 95 percent.
 #' @param lwd Base line width for plotting.  Defaults to 1.
 #' @param mean Whether to include points for means.  Defaults to `FALSE`.
@@ -76,29 +77,41 @@
 #' @author Matt Tyers
 #' @importFrom stats princomp qnorm sd
 #' @examples
+#' ## basic functionality with cross geometry
 #' crossplot(SS_out, p=c("trend","rate"))
-#' crossplot(SS_out, p=c("trend","rate"), col="random")
+#'
+#' ## default labels
 #' crossplot(SS_out, p=c("trend","cycle"), labels=TRUE)
+#'
+#' ## showing:
+#' ## - link lines
+#' ## - blob geometry (smoothed confidence polygons)
+#' ## - random colors with col="random"
 #' crossplot(SS_out, p=c("trend","cycle"),
-#'           labels=SS_data$x, labelpos=1, link=TRUE, drawblob=TRUE)
+#'           labels=SS_data$x, labelpos=1, link=TRUE, drawblob=TRUE,
+#'           col="random")
+#'
+#' ## adding x geometry and showing usage with a single vector element (41)
 #' crossplot(SS_out, p=c("trend","cycle"),
 #'           whichx=41, whichy=41,
 #'           drawblob=TRUE, drawx=TRUE)
 #'
-#' plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-#'      col=adjustcolor(1, alpha.f=.1), pch=16)
-#' crossplot(SS_out, p=c("trend","cycle"),
-#'           whichx=41, whichy=41, add=TRUE, col=1)
-#' plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-#'      col=adjustcolor(1, alpha.f=.1), pch=16)
-#' crossplot(SS_out, p=c("trend","cycle"),
-#'           whichx=41, whichy=41, add=TRUE, col=1,
+#' ## single vectors (or data.frames or 2d matrices) can also be used
+#' xx <- SS_out$sims.list$trend[,41]
+#' yy <- SS_out$sims.list$cycle[,41]
+#'
+#' par(mfrow = c(2, 2))
+#' plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="cross geometry")
+#' crossplot(xx, yy, add=TRUE, col=1)
+#' plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="x geometry")
+#' crossplot(xx, yy, add=TRUE, col=1,
 #'           drawcross=FALSE, drawx=TRUE)
-#' plot(SS_out$sims.list$trend[,41], SS_out$sims.list$cycle[,41],
-#'      col=adjustcolor(1, alpha.f=.1), pch=16)
-#' crossplot(SS_out, p=c("trend","cycle"),
-#'           whichx=41, whichy=41, add=TRUE, col=1,
+#' plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="blob geometry")
+#' crossplot(xx, yy, add=TRUE, col=1,
 #'           drawcross=FALSE, drawblob=TRUE)
+#' plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="blob outlines")
+#' crossplot(xx, yy, add=TRUE, col=1,
+#'           drawcross=FALSE, drawblob=TRUE, outline=TRUE)
 #' @export
 crossplot <- function(dfx,
                       dfy=NULL,
@@ -108,6 +121,7 @@ crossplot <- function(dfx,
 
                       drawcross=TRUE, drawx=FALSE, drawblob=FALSE,
                       blobres=NULL, blobsmooth=NULL,
+                      outline=FALSE,
 
                       ci=c(0.5,0.95),
                       lwd=1,
@@ -116,7 +130,7 @@ crossplot <- function(dfx,
                       link=FALSE, linklwd=1,
                       labels=FALSE, labelpos=NULL, labelcex=0.7,
 
-                      whichx=NULL, rowx=NULL, columnx=NULL,   ### include which inhelp
+                      whichx=NULL, rowx=NULL, columnx=NULL,
                       whichy=NULL, rowy=NULL, columny=NULL,
 
                       xlab=NULL, ylab=NULL, main=NULL, xlim=NULL, ylim=NULL,
@@ -298,8 +312,18 @@ crossplot <- function(dfx,
     # for(i_data in which(!is.na(colSums(dfx, na.rm=T)) & !is.na(colSums(dfy, na.rm=T)))) {
       for(i_ci in seq_along(ci)) {
         # confidenceblob2(x=dfx[,i_data], y=dfy[,i_data], ci=ci[i_ci], lwd=lwds[i_ci], col=cols[i_data])#
+        if(outline) {
+          fillcol <- NA
+          linecol <- adjustcolor(cols[i_data],
+                                 alpha.f=seq(to=1, length.out=length(ci), by=1/length(ci))[i_ci])
+        } else {
+          fillcol <- adjustcolor(cols[i_data], alpha.f=.3)
+          linecol <- NA
+        }
+        # polygon(blob_coordlist[[i_blob]]$x, blob_coordlist[[i_blob]]$y,
+        #         col=adjustcolor(cols[i_data], alpha.f=.3), border=NA)
         polygon(blob_coordlist[[i_blob]]$x, blob_coordlist[[i_blob]]$y,
-                col=adjustcolor(cols[i_data], alpha.f=.3), border=NA)
+                col=fillcol, border=linecol, lwd=lwd)
         i_blob <- i_blob + 1
       }
     }

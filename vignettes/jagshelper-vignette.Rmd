@@ -270,6 +270,44 @@ overlayenvelope(df=SS_out, p="cycle_s")
 overlayenvelope(df=SS_out, p=c("trend","rate"))
 ```
 
+Function `crossplot()` plots corresponding pairs of parameter densities on the X-
+and Y-axes.  Three plotting methods are provided, that may be overlayed if desired:
+
+- If drawcross == TRUE, caterpillar-like plots will be produced, with quantile intervals in the x- and y- directions.
+
+- If drawx == TRUE, caterpillar-like plots will be produced, but rotated along the standardized principal component axes. This may be useful to draw if correlation is present.
+
+- If drawblob == TRUE, smoothed polygons will be produced, each containing approximately ⁠ci=⁠ x100% of the associated MCMC samples.
+
+This function may be used with vectors or matrices of MCMC samples, or with a `jagsUI`
+object and a vector of parameter names.
+
+```{r}
+## Usage with single vectors (or data.frames or 2d matrices) 
+xx <- SS_out$sims.list$trend[,41]
+yy <- SS_out$sims.list$cycle[,41]
+
+## Showing possible geometries
+par(mfrow = c(2, 2))
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="Cross Geometry")
+crossplot(xx, yy, add=TRUE, col=1)
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="G Geometry")
+crossplot(xx, yy, add=TRUE, col=1,
+          drawcross=FALSE, drawx=TRUE)
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="Blob Geometry")
+crossplot(xx, yy, add=TRUE, col=1,
+          drawcross=FALSE, drawblob=TRUE)
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="Blob Outlines")
+crossplot(xx, yy, add=TRUE, col=1,
+          drawcross=FALSE, drawblob=TRUE, outline=TRUE)
+
+## Usage with jagsUI object and parameter names, plus addl functionality
+par(mfrow = c(1, 1))
+crossplot(SS_out, p=c("trend","cycle"),
+          labels=SS_data$x, labelpos=1, link=TRUE, drawblob=TRUE,
+          col="random")
+```
+
 ### Comparison between priors and posteriors
 
 Function `comparepriors()` is a wrapper for `comparedens()`, and plots side-by-side

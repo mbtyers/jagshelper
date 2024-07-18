@@ -308,3 +308,49 @@ test_that("comparepriors", {
   expect_silent(comparepriors(x=asdf_prior_jags_out, parmfrow=c(3,2), col=3:2, minCI=0.7, legendpos="bottomleft"))
   expect_warning(comparepriors(x=asdf_jags_out), 'No parameter names ending in "_prior"')
 })
+
+trend1 <- trend2 <- SS_out$sims.list$trend
+rate1 <- rate2 <- SS_out$sims.list$rate
+trend1[, 2:3] <- rate1[, 2:3] <- NA
+trend2[, 2:3] <- rate2[, 2:3] <- 42
+test_that("crossplot", {
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend[,1], dfy=SS_out$sims.list$rate[,1]))
+  expect_silent(crossplot(dfx=as.data.frame(SS_out$sims.list$trend),
+                          dfy=as.data.frame(SS_out$sims.list$rate)))
+  expect_silent(crossplot(dfx=log(20+SS_out$sims.list$trend),
+                          dfy=log(20+SS_out$sims.list$rate),
+                          transformx="exp", transformy="exp"))
+  expect_silent(crossplot(dfx=suppressWarnings(log(SS_out$sims.list$trend)),
+                          dfy=suppressWarnings(log(SS_out$sims.list$rate))))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=FALSE))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=FALSE, drawx=TRUE, drawblob=FALSE))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=FALSE, drawx=FALSE, drawblob=TRUE))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=FALSE, drawx=FALSE, drawblob=TRUE,
+                          outline=TRUE, lwd=2))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=TRUE, drawx=TRUE, drawblob=TRUE,
+                          lwd=1, link=TRUE, col=2, linklwd=3, labels=TRUE))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=TRUE, drawx=TRUE, drawblob=TRUE,
+                          lwd=1, link=TRUE, col="random", linklwd=3, labels=TRUE))
+  expect_silent(crossplot(dfx=SS_out$sims.list$trend, dfy=SS_out$sims.list$rate,
+                          drawcross=TRUE, drawx=TRUE, drawblob=TRUE,
+                          labels=SS_data$x, labelpos=1, labelcex=1.2))
+  expect_silent(crossplot(dfx=trend1, dfy=rate1, drawblob=TRUE, drawx=TRUE))
+  expect_silent(crossplot(dfx=trend2, dfy=rate2, drawblob=TRUE, drawx=TRUE))
+  expect_silent(crossplot(dfx=SS_out, p=c("trend","rate")))
+  expect_silent(crossplot(dfx=SS_out, p=c("trend","rate"), whichx=7, whichy=7))
+  expect_silent(crossplot(dfx=SS_out, p=c("trend","sig_eps"), whichx=7))
+  expect_silent(crossplot(dfx=SS_out, p=rev(c("trend","sig_eps")), whichy=7))
+  expect_error(crossplot(dfx=SS_out, p=c("trend","sig_eps")),
+               "Dimension or length mismatch between X and Y")
+  expect_error(crossplot(dfx=SS_out, p=c("trend","cycle_s")),
+               "Dimension or length mismatch between X and Y")
+  expect_silent(crossplot(dfx=SS_out, p=rev(c("trend","cycle_s")), columnx = 1))
+  expect_silent(crossplot(dfx=SS_out, p=c("trend","cycle_s"), columny = 1))
+})
