@@ -10,6 +10,8 @@ ts_postpred(
   p = NULL,
   x = NULL,
   lines = FALSE,
+  pch = 1,
+  pointcol = 1,
   transform = c("none", "exp", "expit"),
   ...
 )
@@ -26,6 +28,11 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 \code{NULL} is accepted, equally-spaced integer values will be used.}
 
 \item{lines}{Whether to add a line linking data time series points.  Defaults to \code{FALSE}.}
+
+\item{pch}{Plotting character for points, which will accept a vector input.
+See \link[graphics]{points}.  Defaults to \code{1}.}
+
+\item{pointcol}{Plotting color for points.  Defaults to \code{1}.}
 
 \item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
 indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
