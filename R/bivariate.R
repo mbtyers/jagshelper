@@ -166,7 +166,13 @@ crossplot <- function(dfx,
       if(is.null(rowx) & is.null(columnx) & is.null(whichx)) {
         xlab <- p[1]
       } else {
-        if(!is.null(whichx)) xlab <- paste0(p[1],"[",whichx,"]")
+        if(!is.null(whichx)) {
+          if(length(whichx)==1) {
+            xlab <- paste0(p[1],"[",whichx,"]")
+          } else {
+            xlab <- p[1]
+          }
+        }
         if(!is.null(rowx)) xlab <- paste0(p[1],"[",rowx,",]")
         if(!is.null(columnx)) xlab <- paste0(p[1],"[,",columnx,"]")
       }
@@ -185,7 +191,13 @@ crossplot <- function(dfx,
       if(is.null(rowy) & is.null(columny) & is.null(whichy)) {
         ylab <- p[2]
       } else {
-        if(!is.null(whichy)) ylab <- paste0(p[2],"[",whichy,"]")
+        if(!is.null(whichy)) {
+          if(length(whichy)==1) {
+            ylab <- paste0(p[2],"[",whichy,"]")
+          } else {
+            ylab <- p[2]
+          }
+        }
         if(!is.null(rowy)) ylab <- paste0(p[2],"[",rowy,",]")
         if(!is.null(columny)) ylab <- paste0(p[2],"[,",columny,"]")
       }
@@ -440,7 +452,8 @@ confidenceblob <- function(x, y,
                            ci=0.95, lwd=1, col=1, lty=1, return_coords = FALSE) {
 
   if(is.null(blobres)) blobres <- round(length(x)/50)
-  if(is.null(blobsmooth)) blobsmooth <- round(100*blobres/length(x))
+  # if(is.null(blobsmooth)) blobsmooth <- round(100*blobres/length(x))
+  if(is.null(blobsmooth)) blobsmooth <- round(blobres^0.25)
 
   xmed <- median(x, na.rm=TRUE)
   ymed <- median(y, na.rm=TRUE)

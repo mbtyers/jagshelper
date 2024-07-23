@@ -345,6 +345,7 @@ test_that("crossplot", {
   expect_silent(crossplot(dfx=trend2, dfy=rate2, drawblob=TRUE, drawx=TRUE))
   expect_silent(crossplot(dfx=SS_out, p=c("trend","rate")))
   expect_silent(crossplot(dfx=SS_out, p=c("trend","rate"), whichx=7, whichy=7))
+  expect_silent(crossplot(dfx=SS_out, p=c("trend","rate"), whichx=7:10, whichy=7:10))
   expect_silent(crossplot(dfx=SS_out, p=c("trend","sig_eps"), whichx=7))
   expect_silent(crossplot(dfx=SS_out, p=rev(c("trend","sig_eps")), whichy=7))
   expect_error(crossplot(dfx=SS_out, p=c("trend","sig_eps")),
