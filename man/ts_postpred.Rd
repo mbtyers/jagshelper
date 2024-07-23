@@ -91,7 +91,7 @@ ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp")
 ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y, transform="exp", log="y")
 }
 \seealso{
-\link{qq_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+\link{qq_postpred}, \link{plot_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 }
 \author{
 Matt Tyers

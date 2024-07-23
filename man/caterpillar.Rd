@@ -108,7 +108,7 @@ caterpillar(SS_out, p="trend", transform="exp", ylab="exp transform", log="y")
 caterpillar(SS_out, p="trend", transform="expit", ylab="expit (inv logit) transform")
 }
 \seealso{
-\link{envelope}
+\link{envelope}, \link{crossplot}
 }
 \author{
 Matt Tyers

@@ -30,6 +30,10 @@ output object returned from \code{jagsUI} and a supplied parameter name}
 \item{x}{The time measurements associated with time series \code{y}.  If the default
 \code{NULL} is accepted, associated plots will be suppressed.}
 
+\item{whichplots}{A vector of which sets of plots to produce (that is, with
+respect to which variables on the x-axis).  See above for details.  Defaults
+to \code{c(1, 2, 4)}.}
+
 \item{plot_data}{Whether to produce plots associated with the data (\verb{y=})
 time series and untransformed posterior predictive distribution.
 Defaults to \code{TRUE}.}

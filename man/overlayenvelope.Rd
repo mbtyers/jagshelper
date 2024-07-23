@@ -107,7 +107,7 @@ overlayenvelope(df=SS_out, p="cycle_s", transform="exp",
                 ylab="exp transform", log="y")
 }
 \seealso{
-\link{envelope}
+\link{envelope}, \link{crossplot}
 }
 \author{
 Matt Tyers

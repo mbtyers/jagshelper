@@ -61,7 +61,7 @@ comparecat(x=list(asdf_jags_out, asdf_jags_out, asdf_jags_out),
            p=c("sig"), transform="exp", log="y")
 }
 \seealso{
-\link{caterpillar}, \link{comparedens}, \link{comparepriors}
+\link{caterpillar}, \link{crossplot}, \link{comparedens}, \link{comparepriors}
 }
 \author{
 Matt Tyers

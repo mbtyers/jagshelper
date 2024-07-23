@@ -263,7 +263,7 @@ envelope <- function(df,
 #' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
 #' adding additional plotting argument `log="y"`.
 #' @return `NULL`
-#' @seealso \link{envelope}
+#' @seealso \link{envelope}, \link{crossplot}
 #' @author Matt Tyers
 #' @examples
 #' ## usage with list of input data.frames

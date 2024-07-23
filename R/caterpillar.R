@@ -31,7 +31,7 @@
 #' @param medwd Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?
 #' @param ... additional plotting arguments
 #' @return `NULL`
-#' @seealso \link{envelope}
+#' @seealso \link{envelope}, \link{crossplot}
 #' @author Matt Tyers
 #' @examples
 #' ## usage with input data.frame
@@ -174,7 +174,7 @@ caterpillar <- function(df,
 #' adding additional plotting argument `log="y"`.
 #' @param ... additional plotting arguments
 #' @return `NULL`
-#' @seealso \link{caterpillar}, \link{comparedens}, \link{comparepriors}
+#' @seealso \link{caterpillar}, \link{crossplot}, \link{comparedens}, \link{comparepriors}
 #' @author Matt Tyers
 #' @examples
 #' ## This is the same output object three times, but shows functionality.
