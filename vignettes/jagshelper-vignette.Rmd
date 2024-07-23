@@ -134,6 +134,13 @@ plotRhats(SS_out)  # plotting Rhat values
     ts_postpred(ypp=SS_out, p="ypp", y=SS_data$y)
     par(mfrow=old_parmfrow)        # restoring previous graphics state
     ```
+    
+-   The function `plot_postpred()` is a wrapper that produces a sequence of 
+plots: first, an `envelope()` plot of the posterior predictive distribution overlayed
+with raw data values, then a call to `ts_postpred()` giving a time series of the
+posterior predictive residual distribution overlayed with the data residuals, then
+a plot of the residual standard deviation calculated over a moving window.  By 
+default, these three plots are given with respect to the data sequence, then with respect to the data supplied for x, then with respect to fitted values.
 
 -   The function `pairstrace_jags()` gives methods for plotting
     two-dimensional trace plots, scatter plots, or contour plots, in

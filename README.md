@@ -66,6 +66,10 @@ is defined as the difference between the posterior predictive distribution and
 posterior predictive medians.  This may be used to explore possible temporal
 features not visible using `qq_postpred()`.
 
+* `plot_postpred()` is a wrapper that combines several calls of `envelope()`
+and `ts_postpred()` for a sequence of different variables expressed on the x-axis, 
+potentially highlighting different features of the dataset or model structure. 
+
 ### Commonly-used functions: Extracting simplified model output
 
 * `jags_df()` extracts the MCMC iterations from a 'jagsUI' output object as a `data.frame`,
@@ -87,6 +91,11 @@ plots to be overlayed.
 and 95%) and median markings, for a set of parameter nodes side-by-side.  This 
 function is intended for plotting the posterior densities of a vector of parameter
 nodes in which order may not matter, such as a set of random effects.
+
+* `crossplot()` provides methods for bivariate plotting of a single pair of parameters
+or paired vectors of parameter nodes.  Options are given to add credible intervals
+in the x- and y- directions, credible intervals along the principal component 
+axes, or approximate smoothed credible polygons.
 
 * `comparecat()` produces an interleaved caterpillar plot for multiple 'jagsUI' 
 output objects or `data.frame`s, in which parameter nodes with the same name across

@@ -354,3 +354,28 @@ test_that("crossplot", {
   expect_silent(crossplot(dfx=SS_out, p=rev(c("trend","cycle_s")), columnx = 1))
   expect_silent(crossplot(dfx=SS_out, p=c("trend","cycle_s"), columny = 1))
 })
+
+test_that("plot_postpred", {
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              lines=TRUE))
+  expect_silent(plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              plot_residuals=FALSE))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              plot_data=FALSE))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              plot_sd=FALSE))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              whichplots=1))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              whichplots=2))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              whichplots=3))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              whichplots=4))
+  expect_silent(plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x,
+                              whichplots=1:4,
+                              pointcol=2+(SS_data$y>2),
+                              pch=2+(SS_data$x>2018)))
+})

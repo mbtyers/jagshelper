@@ -1,3 +1,10 @@
+## jagshelper 0.3.0 (July 2024)
+
+* Added new functions `crossplot()` for bivariate plotting and `plot_postpred()`
+for model diagnostics
+
+* Reorganized /R folder structure
+
 ## jagshelper 0.2.4 (June 2024)
 
 * Bug fixes in `envelope()`, `comparecat()`, and `qq_postpred()`.
