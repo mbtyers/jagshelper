@@ -1,3 +1,9 @@
+## jagshelper 0.3.1 (July 2024)
+
+* Made `plot_postpred()` more efficient
+
+* Misc bug fixes
+
 ## jagshelper 0.3.0 (July 2024)
 
 * Added new functions `crossplot()` for bivariate plotting and `plot_postpred()`
