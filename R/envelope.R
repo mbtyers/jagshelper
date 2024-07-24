@@ -166,10 +166,10 @@ envelope <- function(df,
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
     ### vvv this is new
     plot(NA, xlim=range(x[!is.na(med)], na.rm=TRUE),ylim=ylim, xlab=xlab, ylab=ylab, main=main, ...=...)
-    if(median) lines(x, med, col=col)
+    if(median) lines(x[!is.na(x) & !is.na(med)], med[!is.na(x) & !is.na(med)], col=col)
   }
   else
-    if(median) lines(x, med, type='l', col=col, ...=...)
+    if(median) lines(x[!is.na(x) & !is.na(med)], med[!is.na(x) & !is.na(med)], col=col, ...=...)
   if(outline) {
     darks <- rev(1-((1-dark)^(1:length(ci))))
     for(i in 1:length(ci)) {
@@ -358,8 +358,10 @@ overlayenvelope <- function(df,
 
   #### do stuff
   cilim <- c((1-max(ci))/2, 1-(1-max(ci))/2)
-  bounds <- sapply(df, function(x) apply(x,2, quantile, p=cilim, na.rm=T))
-  if(is.null(ylim)) ylim <- range(bounds)
+  if(is.null(ylim)) {
+    bounds <- sapply(df, function(x) apply(x,2, quantile, p=cilim, na.rm=T))
+    ylim <- range(bounds)
+  }
 
   transform <- match.arg(transform)
   if(transform == "exp") ylim <- exp(ylim)

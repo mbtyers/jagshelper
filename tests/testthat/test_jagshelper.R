@@ -380,3 +380,32 @@ test_that("plot_postpred", {
                               pointcol=2+(SS_data$y>2),
                               pch=2+(SS_data$x>2018)))
 })
+
+x_withNA <- SS_data$x
+y_withNA <- SS_data$y
+ypp_withNA <- SS_out$sims.list$ypp
+x_withNA[sample(1:41, 2)] <- NA
+y_withNA[sample(1:41, 2)] <- NA
+ypp_withNA[,sample(1:41, 2)] <- NA
+test_that("NA cases in _postpred", {
+  expect_silent(qq_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y))
+  expect_silent(qq_postpred(ypp=ypp_withNA, y=SS_data$y))
+  expect_silent(qq_postpred(ypp=SS_out$sims.list$ypp, y=y_withNA))
+  expect_silent(qq_postpred(ypp=ypp_withNA, y=y_withNA))
+
+  expect_silent(ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x))
+  expect_silent(ts_postpred(ypp=ypp_withNA, y=SS_data$y, x=SS_data$x))
+  expect_silent(ts_postpred(ypp=SS_out$sims.list$ypp, y=y_withNA, x=SS_data$x))
+  expect_silent(ts_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=x_withNA))
+  expect_silent(ts_postpred(ypp=ypp_withNA, y=y_withNA, x=x_withNA))
+
+  expect_silent(envelope(df=SS_out$sims.list$ypp, x=SS_data$x))
+  expect_silent(envelope(df=ypp_withNA, x=SS_data$x))
+  expect_silent(envelope(df=ypp_withNA, x=x_withNA))
+
+  expect_silent(plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=SS_data$x))
+  expect_silent(plot_postpred(ypp=ypp_withNA, y=SS_data$y, x=SS_data$x))
+  expect_silent(plot_postpred(ypp=SS_out$sims.list$ypp, y=y_withNA, x=SS_data$x))
+  expect_silent(plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=x_withNA))
+  expect_silent(plot_postpred(ypp=ypp_withNA, y=y_withNA, x=x_withNA))
+})

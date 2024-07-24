@@ -673,23 +673,24 @@ ts_postpred <- function(ypp, y, p=NULL, x=NULL, lines=FALSE, pch=1, pointcol=1,
   } else {
     ci <- 0.95
   }
-  ylim1 <- apply(ypp_resid, 2, quantile, p=(1-ci)/2, na.rm=TRUE)
-  ylim2 <- apply(ypp_resid, 2, quantile, p=1-((1-ci)/2), na.rm=TRUE)
+  # ylim1 <- apply(ypp_resid, 2, quantile, p=(1-ci)/2, na.rm=TRUE)
+  # ylim2 <- apply(ypp_resid, 2, quantile, p=1-((1-ci)/2), na.rm=TRUE)
+  ylim1 <- apply(ypp_resid, 2, quantile, p=c((1-ci)/2, 1-((1-ci)/2)), na.rm=TRUE)
 
   ## transforming if needed
   if(transform == "exp") {
     yplot <- exp(yplot)
     ylim1 <- exp(ylim1)
-    ylim2 <- exp(ylim2)
+    # ylim2 <- exp(ylim2)
   }
   if(transform == "expit") {
     yplot <- expit(yplot)
     ylim1 <- expit(ylim1)
-    ylim2 <- expit(ylim2)
+    # ylim2 <- expit(ylim2)
   }
 
   envelope(ypp_resid, x=x, ylab="Diff from Post Pred Median",
-           transform=transform, ylim=range(ylim1, ylim2, yplot, na.rm=TRUE),
+           transform=transform, ylim=range(ylim1, yplot, na.rm=TRUE),
            ...=...)
   if(is.null(x)) x <- seq_along(y)
   points(x=x, y=yplot, pch=pch, col=pointcol)
@@ -707,7 +708,7 @@ sd_postpred <- function(ypp, y, p=NULL, x=NULL, ...) {
   if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
   meds <- apply(ypp, 2, median, na.rm=T)
-  ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  # ypp_resid <- ypp - matrix(meds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
   # transform <- match.arg(transform)
 
   resid <- y - meds
@@ -817,8 +818,29 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL,
   }
   if(length(y)<=1) stop("Data (argument y) must be a vector for meaningful diagnostics")
   if(ncol(ypp)!=length(y)) stop("Posterior matrix ypp must have the same number of columns as length of data matrix y")
+
+  # pre-calculating all values for plots
   yppmeds <- apply(ypp, 2, median, na.rm=T)
   ypp_resid <- ypp - matrix(yppmeds, byrow=TRUE, nrow=nrow(ypp), ncol=ncol(ypp))
+  y_resid <- y - yppmeds
+
+  # pre-calculating ylims for plots
+  dots <- list(...)
+  if(!is.null(dots$ci)) {
+    cilim <- max(dots$ci)
+  } else {
+    cilim <- 0.95
+  }
+  if(plot_data) {
+    ylim_data <- range(y, apply(ypp[,!is.na(yppmeds)], 2, quantile,
+                                p=c((1-cilim)/2, 1-((1-cilim)/2)), na.rm=TRUE), na.rm=TRUE)
+  }
+  if(plot_residuals) {
+    ylim_residuals <- range(y_resid, apply(ypp_resid[,!is.na(yppmeds)], 2, quantile,
+                                p=c((1-cilim)/2, 1-((1-cilim)/2)), na.rm=TRUE), na.rm=TRUE)
+  }
+
+
   # transform <- match.arg(transform)
 
   if(is.null(x)) {
@@ -855,24 +877,40 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL,
       envelope(df=ypp, x=xplot,
                xlab=xlab, ylab="Data y and Post Pred y",
                main=c("Data y & Post Pred y", paste("vs.", xlab)),
-               ...=...)
+               ylim=ylim_data, ...=...)
       points(x=xplot[!is.na(yppmeds)], y=y[!is.na(yppmeds)], pch=pch, col=pointcol)
       if(lines) lines(x=xplot[!is.na(yppmeds)], y=y[!is.na(yppmeds)])
     }
 
     # panel 3 residuals
     if(plot_residuals) {
-      ts_postpred(ypp=ypp, y=y, x=xplot,
-                xlab=xlab, pch=pch, pointcol=pointcol,
-                main=c("Residuals & PP Residual", paste("vs.", xlab)),
-                lines=lines, ...=...)
+      # ts_postpred(ypp=ypp, y=y, x=xplot,
+      #           xlab=xlab, pch=pch, pointcol=pointcol,
+      #           main=c("Residuals & PP Residual", paste("vs.", xlab)),
+      #           lines=lines, ...=...)
+      envelope(df=ypp_resid, x=xplot,
+               xlab=xlab, ylab="Diff from Post Pred Median",
+               main=c("Residuals & PP Residual", paste("vs.", xlab)),
+               ylim=ylim_residuals, ...=...)
+      points(x=xplot[!is.na(yppmeds)], y=y_resid[!is.na(yppmeds)], pch=pch, col=pointcol)
+      if(lines) lines(x=xplot[!is.na(yppmeds)], y=y[!is.na(yppmeds)])
     }
 
     # panel 4 sd residuals
     if(plot_sd) {
-      sd_postpred(ypp=ypp, y=y, x=xplot,
-                xlab=xlab,
-                main=c("Residual SD", paste("vs.", xlab)))
+      # sd_postpred(ypp=ypp, y=y, x=xplot,
+      #           xlab=xlab,
+      #           main=c("Residual SD", paste("vs.", xlab)))
+      y_resid_4sd <- y_resid[!is.na(xplot)]
+      x_4sd <- xplot[!is.na(xplot)]
+
+      xplot_4sd <- x_4sd[order(x_4sd)]
+      thesd <- rollingSD(y_resid_4sd[order(x_4sd)], n = min(10, floor(sqrt(length(x_4sd)))))
+      ylims_4sd <- range(c(0, thesd), na.rm=TRUE)
+
+      plot(x=xplot_4sd, y=thesd,# type="b",
+           xlim=range(x_4sd, na.rm=TRUE), ylim=ylims_4sd,
+           ylab="Residual SD (binned)", ...=...)
     }
   }
 }
