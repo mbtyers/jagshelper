@@ -910,6 +910,7 @@ plot_postpred <- function(ypp, y, p=NULL, x=NULL,
 
       plot(x=xplot_4sd, y=thesd,# type="b",
            xlim=range(x_4sd, na.rm=TRUE), ylim=ylims_4sd,
+           xlab=xlab,
            ylab="Residual SD (binned)", ...=...)
     }
   }
