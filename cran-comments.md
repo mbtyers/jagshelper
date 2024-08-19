@@ -1,6 +1,6 @@
 ## Update notes
 * This is an existing package on CRAN.  
-* This version contains bug fixes to three new functions and some minor improvements to functionality.
+* This version contains a patch to fix a minor bug in the previous release.
 
 * I have read and agree to all CRAN policies.
 

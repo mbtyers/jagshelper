@@ -1,3 +1,7 @@
+## jagshelper 0.3.2 (Aug 2024)
+
+* Minor bug fix
+
 ## jagshelper 0.3.1 (July 2024)
 
 * Made `plot_postpred()` more efficient
