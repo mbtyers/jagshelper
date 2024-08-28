@@ -142,7 +142,9 @@ caterpillar <- function(df,
   lwds <- (1+2*(1:length(ci)-1))*lwd
   if(!add) {
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
-    plot(NA, type='l', xlim=range(x-(.2*d),x+(.2*d)), xlab=xlab, ylab=ylab, main=main, ylim=ylim, xaxt="n", ...=...)
+    # xlims <- range(x-(.2*d),x+(.2*d))
+    xlims <- range(x-(.5*d*(1+(length(x)==1))),x+(.5*d*(1+(length(x)==1))))
+    plot(NA, type='l', xlim=xlims, xlab=xlab, ylab=ylab, main=main, ylim=ylim, xaxt="n", ...=...)
     axis(1,x,labels=xax, las=list(...)$las)
   }
   if(median) {
