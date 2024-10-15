@@ -150,7 +150,9 @@ for(j in seq_along(kk)) {
     print(c(j,i))
   }
 }
+par(mfrow=c(1,1))
 boxplot(rmsemat)
+nrep <- 25
 for(j in seq_along(kk)) {
   for(i in 1:nrep) {
     rmsemat[i,j] <- kfold(k=kk[j],
