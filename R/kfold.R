@@ -1,5 +1,4 @@
 library(jagshelper)
-skeleton("asdf")
 library(jagsUI)
 
 # specify model, which is written to a temporary file
@@ -59,6 +58,72 @@ traceworstRhat(asdf_jags_out, parmfrow = c(3, 3))
 
 
 
+
+#### test case where y is a matrix
+
+asdf_jags <- tempfile()
+cat('model {
+  for(i in 1:n) {
+    for(j in 1:ngrp) {
+      y[i,j] ~ dnorm(mu[i,j], tau)
+      mu[i,j] <- b0 + b1*x[i,j] + a[j]
+    }
+
+  }
+
+  for(j in 1:ngrp) {
+    a[j] ~ dnorm(0, tau_a)
+  }
+
+  tau <- pow(sig, -2)
+  sig ~ dunif(0, 10)
+  b0 ~ dnorm(0, 0.001)
+  b1 ~ dnorm(0, 0.001)
+
+  tau_a <- pow(sig_a, -2)
+  sig_a ~ dunif(0, 10)
+}', file=asdf_jags)
+
+
+# simulate data to go with the example model
+n <- 60
+x <- matrix(rnorm(n, sd=3),
+            nrow=20, ncol=3)
+# grp <- sample(1:3, n, replace=T)
+y <- matrix(rnorm(n, mean=rep(1:3, each=20)-x),
+            nrow=20, ncol=3)
+
+# bundle data to pass into JAGS
+asdf_data <- list(x=x,
+                  y=y,
+                  n=nrow(x),
+                  # grp=as.numeric(as.factor(grp)),
+                  ngrp=ncol(x))
+
+# JAGS controls
+niter <- 10000
+# ncores <- 3
+ncores <- min(10, parallel::detectCores()-1)
+
+{
+  tstart <- Sys.time()
+  print(tstart)
+  asdf_jags_out <- jagsUI::jags(model.file=asdf_jags, data=asdf_data,
+                                parameters.to.save=c("b0","b1","sig","a","sig_a","mu"),
+                                n.chains=ncores, parallel=T, n.iter=niter,
+                                n.burnin=niter/2, n.thin=niter/2000)
+  print(Sys.time() - tstart)
+}
+
+nbyname(asdf_jags_out)
+plotRhats(asdf_jags_out)
+traceworstRhat(asdf_jags_out, parmfrow = c(3, 3))
+
+
+
+
+
+
 ### actually starting on the function!
 # define which data objects to withold data (char)
 # define which model output params will correspond (char - will be ypp i think, or maybe y)
@@ -96,8 +161,8 @@ allocate <- function(n, k) {
 
 
 ## to do:
-# + structure output object with $rms_pred, $ma_pred, $ypp_q50
-#   - also $ypp if post=TRUE ?
+# + structure output object with $rms_pred, $ma_pred, $pred
+#   - also $postpred if post=TRUE ?
 #   - posteriors for addl parameters if !is.null(addl_p)??? - dims will be weird
 # + figure out how to handle when data_y is a matrix
 #   - add optional fold_byrow and fold_bycolumn
@@ -106,61 +171,84 @@ allocate <- function(n, k) {
 #   - need a test case where data is matrix
 
 kfold <- function(model.file, data,
-                  pdata, pmodel,
+                  p, addl_p=NULL, save_postpred=FALSE,
                   k=5,
+                  fold_byrow=FALSE, fold_bycolumn=FALSE,
                   ...) {
-  data_y <- data[[pdata]]     ### figure out if there will be a case for multiple vectors or matrices or something
+  data_y <- data[[p]]     ### figure out if there will be a case for multiple vectors or matrices or something
   # fold <- sample(x=seq(k), size=length(data_y), replace=TRUE)  ## figure out a more robust way to do this!!
-  fold <- allocate(n=length(data_y), k=k)
-  pred_y <- rep(NA, length(data_y))
+
+  if((!fold_byrow & !fold_bycolumn) | is.null(dim(data_y)) | min(dim(data_y)==1)) {
+    fold <- allocate(n=length(data_y), k=k)
+  } else {
+    if(fold_byrow) {
+      fold <- allocate(n=nrow(data_y), k=k)
+    }
+    if(fold_bycolumn) {   # should make sure they can't both be true
+      fold <- allocate(n=ncol(data_y), k=k)
+    }
+  }    ## maybe more elegant to create similar fold matrix
+
+  pred_y <- NA*data_y #rep(NA, length(data_y))
 
   if(interactive()) pb <- txtProgressBar(style=3)
 
   for(i_fold in seq(k)) {
     data_fold <- data
-    data_fold[[pdata]][fold==i_fold] <- NA
+    data_fold[[p]][fold==i_fold] <- NA
 
     out_fold <- jagsUI::jags(model.file=model.file,
                              data=data_fold,
-                             parameters.to.save=pmodel,
-                             verbose=FALSE,     # maybe do a progress bar here
+                             parameters.to.save=c(p,addl_p),
+                             verbose=FALSE,
                              ...=...)
-    pred_fold <- out_fold$q50[[pmodel]]
+    pred_fold <- out_fold$q50[[p]]
 
     pred_y[fold==i_fold] <- pred_fold[fold==i_fold]
     if(interactive()) setTxtProgressBar(pb=pb, value=i_fold/k)
   }
-  return(rmse(x1=data_y, x2=pred_y))
+  out <- list(pred_y=pred_y, data_y=data_y)
+  if(save_postpred) {
+    # out$postpred <- y_postpred
+  }
+  out$rmse_pred <- rmse(x1=data_y, x2=pred_y)
+  out$mae_pred <- mae(x1=data_y, x2=pred_y)
+  return(out)
 }
-kfold(pdata="y", pmodel="ypp", #try y here too
+aa <- kfold(p="y",
   model.file=asdf_jags, data=asdf_data,
       n.chains=ncores, parallel=T, n.iter=niter,
       n.burnin=niter/2, n.thin=niter/2000)   # might be able to get this stuff from mcmc.info
+str(aa)
 
-kk <- c(3,5,10,30,60)
-nrep <- 50
-rmsemat <- matrix(nrow=nrep, ncol=length(kk))
-for(j in seq_along(kk)) {
-  for(i in 1:nrep) {
-    rmsemat[i,j] <- kfold(k=kk[j],
-                          pdata="y", pmodel="y", #try y here too
-                          model.file=asdf_jags, data=asdf_data,
-                          n.chains=ncores, parallel=T, n.iter=niter,
-                          n.burnin=niter/2, n.thin=niter/2000)
-    print(c(j,i))
-  }
-}
-par(mfrow=c(1,1))
-boxplot(rmsemat)
-nrep <- 25
-for(j in seq_along(kk)) {
-  for(i in 1:nrep) {
-    rmsemat[i,j] <- kfold(k=kk[j],
-                          pdata="y", pmodel="ypp", #try y here too
-                          model.file=asdf_jags, data=asdf_data,
-                          n.chains=ncores, parallel=T, n.iter=niter,
-                          n.burnin=niter/2, n.thin=niter/2000)
-    print(c(j,i))
-  }
-}
-boxplot(rmsemat)
+
+
+
+
+# kk <- c(3,5,10,30,60)
+# nrep <- 50
+# rmsemat <- matrix(nrow=nrep, ncol=length(kk))
+# for(j in seq_along(kk)) {
+#   for(i in 1:nrep) {
+#     rmsemat[i,j] <- kfold(k=kk[j],
+#                           pdata="y", pmodel="y", #try y here too
+#                           model.file=asdf_jags, data=asdf_data,
+#                           n.chains=ncores, parallel=T, n.iter=niter,
+#                           n.burnin=niter/2, n.thin=niter/2000)
+#     print(c(j,i))
+#   }
+# }
+# par(mfrow=c(1,1))
+# boxplot(rmsemat)
+# nrep <- 25
+# for(j in seq_along(kk)) {
+#   for(i in 1:nrep) {
+#     rmsemat[i,j] <- kfold(k=kk[j],
+#                           pdata="y", pmodel="ypp", #try y here too
+#                           model.file=asdf_jags, data=asdf_data,
+#                           n.chains=ncores, parallel=T, n.iter=niter,
+#                           n.burnin=niter/2, n.thin=niter/2000)
+#     print(c(j,i))
+#   }
+# }
+# boxplot(rmsemat)
