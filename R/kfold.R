@@ -66,6 +66,7 @@ traceworstRhat(asdf_jags_out, parmfrow = c(3, 3))
 # model file
 
 rmse <- function(x1, x2) sqrt(mean((x1-x2)^2, na.rm=TRUE))
+mae <- function(x1, x2) mean(abs(x1-x2), na.rm=TRUE)
 
 allocate <- function(n, k) {
   grp <- rep(NA, n)
@@ -78,6 +79,31 @@ allocate <- function(n, k) {
   }
   return(grp)
 }
+
+# return what:  ---> i think all of these!!
+# - just RMSE, just MAE
+# - prediction vector (from medians)
+# - MCMC matrix? maybe this is more fair
+# - also, MCMC of specified parameters, for the purpose of lppd
+
+# think if there will be a use case for multiple data vectors  ---> I think just one
+
+# what if there is a data matrix (not vector)?
+
+# document etc
+
+# any difference between y and ypp? assuming there won't be
+
+
+## to do:
+# + structure output object with $rms_pred, $ma_pred, $ypp_q50
+#   - also $ypp if post=TRUE ?
+#   - posteriors for addl parameters if !is.null(addl_p)??? - dims will be weird
+# + figure out how to handle when data_y is a matrix
+#   - add optional fold_byrow and fold_bycolumn
+#   - fold & allocate should work ok as-is when allocation is random
+
+#   - need a test case where data is matrix
 
 kfold <- function(model.file, data,
                   pdata, pmodel,
