@@ -167,13 +167,14 @@ allocate <- function(n, k) {
 # + figure out how to handle when data_y is a matrix
 #   - add optional fold_byrow and fold_bycolumn
 #   - fold & allocate should work ok as-is when allocation is random
+#   ====> I feel like i should be able to generalize to an array
 
 #   - need a test case where data is matrix
 
 kfold <- function(model.file, data,
                   p, addl_p=NULL, save_postpred=FALSE,
                   k=5,
-                  fold_byrow=FALSE, fold_bycolumn=FALSE,
+                  fold_byrow=FALSE, fold_bycolumn=FALSE,    ### or fold_by = c(NA,"row","column")
                   ...) {
   data_y <- data[[p]]     ### figure out if there will be a case for multiple vectors or matrices or something
   # fold <- sample(x=seq(k), size=length(data_y), replace=TRUE)  ## figure out a more robust way to do this!!
@@ -182,12 +183,15 @@ kfold <- function(model.file, data,
     fold <- allocate(n=length(data_y), k=k)
   } else {
     if(fold_byrow) {
-      fold <- allocate(n=nrow(data_y), k=k)
+      fold <- matrix(allocate(n=nrow(data_y), k=k),
+                     nrow=nrow(data_y), ncol=ncol(data_y))
     }
     if(fold_bycolumn) {   # should make sure they can't both be true
-      fold <- allocate(n=ncol(data_y), k=k)
+      fold <- matrix(allocate(n=ncol(data_y), k=k),
+                     nrow=nrow(data_y), ncol=ncol(data_y),
+                     byrow=TRUE)
     }
-  }    ## maybe more elegant to create similar fold matrix
+  }
 
   pred_y <- NA*data_y #rep(NA, length(data_y))
 
@@ -201,10 +205,23 @@ kfold <- function(model.file, data,
                              data=data_fold,
                              parameters.to.save=c(p,addl_p),
                              verbose=FALSE,
-                             ...=...)
+                                                       n.chains=ncores, parallel=T, n.iter=niter,
+                                                       n.burnin=niter/2, n.thin=niter/2000,
+                             # ...=...
+                             )
     pred_fold <- out_fold$q50[[p]]
-
     pred_y[fold==i_fold] <- pred_fold[fold==i_fold]
+
+    if(save_postpred) {
+      if(i_fold==1) {   # initialize with the same dims as post pred
+        postpred_y <- NA*out_fold$sims.list[[p]]
+      }
+      for(irep in 1:dim(postpred_y)[1]) {  # this is a hack
+        # actually this only works for 2d y
+        postpred_y[irep,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,][fold==i_fold]
+      }
+    }
+
     if(interactive()) setTxtProgressBar(pb=pb, value=i_fold/k)
   }
   out <- list(pred_y=pred_y, data_y=data_y)
