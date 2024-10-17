@@ -134,13 +134,17 @@ rmse <- function(x1, x2) sqrt(mean((x1-x2)^2, na.rm=TRUE))
 mae <- function(x1, x2) mean(abs(x1-x2), na.rm=TRUE)
 
 allocate <- function(n, k) {
-  grp <- rep(NA, n)
-  i <- 1
-  resample <- function(x, ...) x[sample.int(length(x), ...)]  # stolen from ?sample
-  while(!all(!is.na(grp))) {
-    grp[resample(which(is.na(grp)), 1)] <- i
-    i <- i+1
-    if(i>k) i <- 1
+  if(k < n) {
+    grp <- rep(NA, n)
+    i <- 1
+    resample <- function(x, ...) x[sample.int(length(x), ...)]  # stolen from ?sample
+    while(!all(!is.na(grp))) {
+      grp[resample(which(is.na(grp)), 1)] <- i
+      i <- i+1
+      if(i>k) i <- 1
+    }
+  } else {
+    grp <- seq(n)
   }
   return(grp)
 }
@@ -171,17 +175,27 @@ allocate <- function(n, k) {
 
 #   - need a test case where data is matrix
 
+
+# trying a generalization thingy
+data_y <- array(dim=c(2,3,4))
+fold_dims <- c(1,3)
+free_dims <- (1:length(dim(data_y)))[-fold_dims]
+nfold <- prod(dim(data_y)[fold_dims])
+
 kfold <- function(model.file, data,
                   p, addl_p=NULL, save_postpred=FALSE,
                   k=5,
                   fold_byrow=FALSE, fold_bycolumn=FALSE,    ### or fold_by = c(NA,"row","column")
                   ...) {
-  data_y <- data[[p]]     ### figure out if there will be a case for multiple vectors or matrices or something
-  # fold <- sample(x=seq(k), size=length(data_y), replace=TRUE)  ## figure out a more robust way to do this!!
+  data_y <- data[[p]]
 
+  ## generalize fold_dim?
   if((!fold_byrow & !fold_bycolumn) | is.null(dim(data_y)) | min(dim(data_y)==1)) {
     fold <- allocate(n=length(data_y), k=k)
-  } else {
+    if(length(dim(data_y))==2) {
+      fold <- matrix(fold, nrow=nrow(data_y), ncol=ncol(data_y))
+    }
+  } else {    ## see if i can generalize to array in this section
     if(fold_byrow) {
       fold <- matrix(allocate(n=nrow(data_y), k=k),
                      nrow=nrow(data_y), ncol=ncol(data_y))
@@ -193,7 +207,11 @@ kfold <- function(model.file, data,
     }
   }
 
-  pred_y <- NA*data_y #rep(NA, length(data_y))
+  pred_y <- NA*data_y
+
+  if(!is.null(addl_p)) {
+    addl_p_post <- list()
+  }
 
   if(interactive()) pb <- txtProgressBar(style=3)
 
@@ -203,7 +221,7 @@ kfold <- function(model.file, data,
 
     out_fold <- jagsUI::jags(model.file=model.file,
                              data=data_fold,
-                             parameters.to.save=c(p,addl_p),
+                             parameters.to.save=c(p, addl_p),
                              verbose=FALSE,
                                                        n.chains=ncores, parallel=T, n.iter=niter,
                                                        n.burnin=niter/2, n.thin=niter/2000,
@@ -217,22 +235,37 @@ kfold <- function(model.file, data,
         postpred_y <- NA*out_fold$sims.list[[p]]
       }
       for(irep in 1:dim(postpred_y)[1]) {  # this is a hack
-        # actually this only works for 2d y
-        postpred_y[irep,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,][fold==i_fold]
+        # this is hilarious!!  can go as many commas as I want, but would be better to generalize
+        if(length(dim(postpred_y))==2) {
+          postpred_y[irep,][fold==i_fold] <- out_fold$sims.list[[p]][irep,][fold==i_fold]
+        }
+        if(length(dim(postpred_y))==3) {
+          postpred_y[irep,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,][fold==i_fold]
+        }
       }
+    }
+
+    if(!is.null(addl_p)) {
+      addl_p_post[[i_fold]] <- out_fold$sims.list[addl_p]
     }
 
     if(interactive()) setTxtProgressBar(pb=pb, value=i_fold/k)
   }
   out <- list(pred_y=pred_y, data_y=data_y)
   if(save_postpred) {
-    # out$postpred <- y_postpred
+    out$postpred_y <- postpred_y
   }
   out$rmse_pred <- rmse(x1=data_y, x2=pred_y)
   out$mae_pred <- mae(x1=data_y, x2=pred_y)
+  if(!is.null(addl_p)) {
+    out$addl_p <- addl_p_post
+  }
+  out$fold <- fold
   return(out)
 }
 aa <- kfold(p="y",
+            save_postpred = TRUE,
+            addl_p = c("a","sig_a"),
   model.file=asdf_jags, data=asdf_data,
       n.chains=ncores, parallel=T, n.iter=niter,
       n.burnin=niter/2, n.thin=niter/2000)   # might be able to get this stuff from mcmc.info
