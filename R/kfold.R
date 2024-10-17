@@ -176,34 +176,124 @@ allocate <- function(n, k) {
 #   - need a test case where data is matrix
 
 
-# trying a generalization thingy
-data_y <- array(dim=c(2,3,4))
-fold_dims <- c(1,3)
-free_dims <- (1:length(dim(data_y)))[-fold_dims]
-nfold <- prod(dim(data_y)[fold_dims])
+# # trying a generalization thingy
+# data_y <- array(dim=c(2,3,4))
+# fold_dims <- 2:1
+# rpt_dims <- (1:length(dim(data_y)))[-fold_dims]
+# # rpt_bydim <- dim(data_y)
+# # rpt_bydim[fold_dims] <- 1
+# nfold <- prod(dim(data_y)[fold_dims])
+# fold <- aperm(a = array(1:nfold,
+#                         dim=c(dim(data_y)[fold_dims], dim(data_y)[rpt_dims])),
+#               perm = order(c(fold_dims, rpt_dims)))
+# fold
 
+
+#' Automated K-fold or Leave One Out Cross Validation
+#' @description Runs k-fold or Leave One Out Cross Validation for a specified
+#' component of a JAGS data object, for a specified JAGS model.
+#'
+#' JAGS is run internally `k` times (or alternately, the size of the dataset),
+#' withholding each of `k` "folds" of the input data and drawing posterior predictive
+#' samples corresponding to the withheld data, which can then be compared to the
+#' input data to assess model predictive power.
+#'
+#' Global measures of predictive power are provided in output: Root Mean Square
+#' (Prediction) Error and Mean Absolute (Prediction) Error.  However, it is likely
+#' that these measures will not be meaningful by themselves; rather, as a metric
+#' for scoring a set of candidate models.
+#' @param df Output object returned from `jagsUI::jags()`; or alternately,
+#' two-dimensional `data.frame` or matrix in which parameter node element is
+#' given by column and MCMC iteration is given by row.
+#' @param model.file Path to file containing the model written in BUGS code,
+#' passed directly to \link[jagsUI]{jags}.
+#' @param data The named list of data objects,
+#' passed directly to \link[jagsUI]{jags}.
+#' @param p The name of the data object to use for K-fold or LOO CV.
+#' @param addl_p Names of additional parameters to save from JAGS output,
+#' if a metric such as Log Pointwise Predictive Density is to be calculated from
+#' cross-validation results.  Defaults to `NULL`, indicating no additional parameters.
+#' @param save_postpred Whether to save all posterior predictive samples,
+#' in addition to posterior medians.  Defaults to `FALSE`.
+#' @param k How many folds to use for cross-validation.  Defaults to `10`.
+#' If this is set to a number equal to (or greater than) the sample size, LOOCV
+#' behavior will result.
+#' @param loocv Whether to perform Leave One Out (rather than k-fold) Cross
+#' Validation.  Setting this to `TRUE` will override the input to `k=`.  Defaults
+#' to `FALSE`.
+#' @param fold_dims A vector of margins to use for selecting folds, if the data
+#' object used for cross validation is a matrix or array.  For example, if the
+#' data consists of a two-dimensional matrix, setting `fold_dims=1` will result
+#' in whole rows being selected in each fold, or setting `fold_dims=2` will result
+#' in whole columns.  However, this is generalized to accept vectors of
+#' multiple `fold_dims` and higher-dimensional arrays of data.
+#' @param ... additional arguments to \link[jagsUI]{jags}.  These may (or must)
+#' include `n.chains`, `n.iter`, `n.burnin`, `n.thin`, `parallel`, etc.
+#' @return A named list, which may consist of the following:
+#' * `$pred_y`: Point estimates of predicted values corresponding to each data
+#' element, calculated as the posterior predictive median value
+#' * `$data_y`: Original data used for cross validation
+#' * `$postpred_y`: All posterior predictive samples corresponding to each data
+#' element, if `save_postpred=TRUE`
+#' * `$rmse_pred`: Root Mean Square (Prediction) Error
+#' * `$mae_pred`: Mean Absolute (Prediction) Error
+#' * `$addl_p`: A list with length equal to `k` (or the number of folds), with
+#' each list element containing all posterior samples for additional parameters,
+#' if these are supplied in argument `addl_p=`.
+#' * `$fold`: A vector, matrix, or array corresponding to the original data,
+#' giving the numerical values of the corresponding fold used
+#' @seealso \link{overlayenvelope}, \link{caterpillar}
+#' @author Matt Tyers
+#' @examples
+#' ## I need examples
+#' @export
 kfold <- function(model.file, data,
                   p, addl_p=NULL, save_postpred=FALSE,
-                  k=5,
-                  fold_byrow=FALSE, fold_bycolumn=FALSE,    ### or fold_by = c(NA,"row","column")
+                  k=10, loocv=FALSE,
+                  fold_dims=NULL,
+                  # fold_byrow=FALSE, fold_bycolumn=FALSE,    ### or fold_by = c(NA,"row","column")
                   ...) {
+  if(length(p) > 1) stop("Only one data object or parameter may be used at once.")
+
   data_y <- data[[p]]
 
+  if(is.na(k) | loocv) {
+    k <- length(data_y)
+  }
+  fold_dims <- fold_dims[fold_dims <= length(dim(data_y))]
+
   ## generalize fold_dim?
-  if((!fold_byrow & !fold_bycolumn) | is.null(dim(data_y)) | min(dim(data_y)==1)) {
+  # if((!fold_byrow & !fold_bycolumn) | is.null(dim(data_y)) | min(dim(data_y)==1)) {
+  #   fold <- allocate(n=length(data_y), k=k)
+  #   if(length(dim(data_y))==2) {
+  #     fold <- matrix(fold, nrow=nrow(data_y), ncol=ncol(data_y))
+  #   }
+  # } else {    ## see if i can generalize to array in this section
+  #   if(fold_byrow) {
+  #     fold <- matrix(allocate(n=nrow(data_y), k=k),
+  #                    nrow=nrow(data_y), ncol=ncol(data_y))
+  #   }
+  #   if(fold_bycolumn) {   # should make sure they can't both be true
+  #     fold <- matrix(allocate(n=ncol(data_y), k=k),
+  #                    nrow=nrow(data_y), ncol=ncol(data_y),
+  #                    byrow=TRUE)
+  #   }
+  # }
+  if(is.null(dim(data_y)) | min(dim(data_y)==1)) {
+    # if data_y is a vector
+
     fold <- allocate(n=length(data_y), k=k)
-    if(length(dim(data_y))==2) {
-      fold <- matrix(fold, nrow=nrow(data_y), ncol=ncol(data_y))
-    }
-  } else {    ## see if i can generalize to array in this section
-    if(fold_byrow) {
-      fold <- matrix(allocate(n=nrow(data_y), k=k),
-                     nrow=nrow(data_y), ncol=ncol(data_y))
-    }
-    if(fold_bycolumn) {   # should make sure they can't both be true
-      fold <- matrix(allocate(n=ncol(data_y), k=k),
-                     nrow=nrow(data_y), ncol=ncol(data_y),
-                     byrow=TRUE)
+  } else {
+
+    # if data_y is a matrix or array
+    if(is.null(fold_dims)) {
+      fold <- array(allocate(n=length(data_y), k=k), dim=dim(data_y))
+    } else {
+      rpt_dims <- (1:length(dim(data_y)))[-fold_dims]   # dims where fold is repeated
+      nfold <- prod(dim(data_y)[fold_dims])
+      fold <- aperm(a = array(allocate(n=nfold, k=k),
+                              dim=c(dim(data_y)[fold_dims], dim(data_y)[rpt_dims])),
+                    perm = order(c(fold_dims, rpt_dims)))
     }
   }
 
@@ -223,9 +313,10 @@ kfold <- function(model.file, data,
                              data=data_fold,
                              parameters.to.save=c(p, addl_p),
                              verbose=FALSE,
-                                                       n.chains=ncores, parallel=T, n.iter=niter,
-                                                       n.burnin=niter/2, n.thin=niter/2000,
-                             # ...=...
+                                                       # n.chains=ncores, parallel=T, n.iter=niter,
+                                                       # n.burnin=niter/2, n.thin=niter/2000,
+                             codaOnly = FALSE, bugs.format = FALSE,
+                             ...=...
                              )
     pred_fold <- out_fold$q50[[p]]
     pred_y[fold==i_fold] <- pred_fold[fold==i_fold]
@@ -241,6 +332,15 @@ kfold <- function(model.file, data,
         }
         if(length(dim(postpred_y))==3) {
           postpred_y[irep,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,][fold==i_fold]
+        }
+        if(length(dim(postpred_y))==4) {
+          postpred_y[irep,,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,,][fold==i_fold]
+        }
+        if(length(dim(postpred_y))==5) {
+          postpred_y[irep,,,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,,,][fold==i_fold]
+        }
+        if(length(dim(postpred_y))==6) {
+          postpred_y[irep,,,,,][fold==i_fold] <- out_fold$sims.list[[p]][irep,,,,,][fold==i_fold]
         }
       }
     }
@@ -268,7 +368,7 @@ aa <- kfold(p="y",
             addl_p = c("a","sig_a"),
   model.file=asdf_jags, data=asdf_data,
       n.chains=ncores, parallel=T, n.iter=niter,
-      n.burnin=niter/2, n.thin=niter/2000)   # might be able to get this stuff from mcmc.info
+      n.burnin=niter/2, n.thin=niter/2000)
 str(aa)
 
 
