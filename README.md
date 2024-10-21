@@ -70,6 +70,11 @@ features not visible using `qq_postpred()`.
 and `ts_postpred()` for a sequence of different variables expressed on the x-axis, 
 potentially highlighting different features of the dataset or model structure. 
 
+* `kfold()` provides automated k-fold or leave-one-out cross validation for a 
+specified component of a JAGS data object, for a specified JAGS model.  The intended 
+utility of this function is comparison of predictive power between a set of candidate models, rather than
+the fit or appropriateness of a single model.
+
 ### Commonly-used functions: Extracting simplified model output
 
 * `jags_df()` extracts the MCMC iterations from a 'jagsUI' output object as a `data.frame`,

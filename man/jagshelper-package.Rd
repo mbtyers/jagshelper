@@ -16,15 +16,15 @@ Functions are provided to help run Bayesian analyses in JAGS using
 \tabular{ll}{
 Package: \tab jagshelper\cr
 Type: \tab Package\cr
-Version: \tab 0.3.2\cr
-Date: \tab 2024-08-19\cr
+Version: \tab 0.4.0\cr
+Date: \tab 2024-10-21\cr
 License: \tab GPL-2\cr
 }
 The jagshelper package is intended to extend and streamline Bayesian analysis using the `jagsUI` package.
 
 The \link{skeleton} function prints a template JAGS model with associated R code to the console, which can easily be copied & pasted to an R script and modified as needed.
 
-Functions are also provided for visually assessing model convergence.  In particular, \link{tracedens_jags} gives a relatively simple syntax for trace plots of a collection or subset of parameter nodes, and overlays by-chain kernel densities for visual assessment of marginal posterior shapes as well as overlap between MCMC chains.  Another function that could be particularly useful to users is \link{plotRhats}, which gives a visual representation of the values of the Gelman-Rubin convergence diagnostic \code{Rhat} (or alternately effective sample size \code{n.eff}) for all saved parameters.  This may be particularly useful in the case where a model has many saved parameters.  Additionally, function \link{traceworstRhat} is a wrapper for \link{tracedens_jags}, but only produces trace plots for the parameter nodes with the worst (largest) values of \code{Rhat} or \code{n.eff}.  Functions \link{qq_postpred}, \link{ts_postpred}, and \link{plot_postpred} provide some posterior predictive checks of a vector of data and corresponding vector (matrix, in output form) of posterior predictive samples.
+Functions are also provided for visually assessing model convergence.  In particular, \link{tracedens_jags} gives a relatively simple syntax for trace plots of a collection or subset of parameter nodes, and overlays by-chain kernel densities for visual assessment of marginal posterior shapes as well as overlap between MCMC chains.  Another function that could be particularly useful to users is \link{plotRhats}, which gives a visual representation of the values of the Gelman-Rubin convergence diagnostic \code{Rhat} (or alternately effective sample size \code{n.eff}) for all saved parameters.  This may be particularly useful in the case where a model has many saved parameters.  Additionally, function \link{traceworstRhat} is a wrapper for \link{tracedens_jags}, but only produces trace plots for the parameter nodes with the worst (largest) values of \code{Rhat} or \code{n.eff}.  Functions \link{qq_postpred}, \link{ts_postpred}, and \link{plot_postpred} provide some posterior predictive checks of a vector of data and corresponding vector (matrix, in output form) of posterior predictive samples.  Function \link{kfold} provides automated k-fold or leave-one-out cross validation, giving a quick means of comparison of predictive power between candidate models.
 
 Functions are also provided for visualizing posterior densities; in particular, the case of a vector of parameter nodes (one-dimensional in the JAGS model, giving a two-dimensional matrix of MCMC iterations).  Notably, the \link{envelope} function is intended for a sequence of nodes (as in a time series), and the \link{caterpillar} function is intended for cases in which order may not matter (as in a collection of random effects).  The \link{crossplot} function provides methods for bivariate plotting of two parameters, or for overlaying paired nodes of two parameter vectors.
 

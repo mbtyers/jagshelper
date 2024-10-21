@@ -1,3 +1,7 @@
+## jagshelper 0.4.0 (Oct 2024)
+
+* Added new function `kfold()` for automated k-fold or leave-one-out cross validation
+
 ## jagshelper 0.3.2 (Aug 2024)
 
 * Minor bug fix

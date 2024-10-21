@@ -409,3 +409,94 @@ test_that("NA cases in _postpred", {
   expect_silent(plot_postpred(ypp=SS_out$sims.list$ypp, y=SS_data$y, x=x_withNA))
   expect_silent(plot_postpred(ypp=ypp_withNA, y=y_withNA, x=x_withNA))
 })
+
+# y <- matrix(c(rnorm(5, mean=1), rnorm(5, mean=2), rnorm(5, mean=3)), nrow=5, ncol=3)
+y <- matrix(c(1.5071455,  1.4937756, -0.4521358,  1.8829621,  1.6294081,  1.9951077,
+              0.8807919,  2.5982152,  1.7855620,  0.7040642,  3.3431765,  1.8295392,
+              4.1830681,  3.6269605,  2.8459972),
+            nrow=5, ncol=3)
+ytrue <- matrix(c(rep(1,5), rep(2,5), rep(3,5)),
+                nrow=5, ncol=3)
+test_jags <- tempfile()
+cat('model {
+  for(i in 1:n) {
+    for(j in 1:ngrp) {
+      y[i,j] ~ dnorm(mu[j], tau)
+    }
+  }
+
+  for(j in 1:ngrp) {
+    mu[j] ~ dnorm(0, 0.001)
+  }
+
+  tau <- pow(sig, -2)
+  sig ~ dunif(0, 10)
+}', file=test_jags)
+test_data <- list(y=y, n=nrow(y), ngrp=ncol(y))
+kfold1 <- kfold(p="y",
+                k=5,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+kfold2 <- kfold(p="y",
+                k=5, fold_dims = 2,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+kfold3 <- kfold(p="y",
+                k=5, fold_dims = 1,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+kfold4 <- kfold(p="y",
+                k=5, fold_dims = 1, loocv=TRUE,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+kfold5 <- kfold(p="y",
+                k=5, fold_dims = 1:5, loocv=TRUE,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+kfold6 <- kfold(p="y",
+                k=5, fold_dims = 1, loocv=TRUE,
+                addl_p = c("mu","sig"), save_postpred = TRUE,
+                model.file=test_jags, data=test_data,
+                n.chains=2, n.iter=1000,
+                n.burnin=500, n.thin=1,
+                parallel=FALSE)
+test_that("kfold", {
+  expect_null(dim(jagshelper:::rmse(y, ytrue)))
+  expect_null(dim(jagshelper:::mae(y, ytrue)))
+  expect_equal(jagshelper:::rmse(y, ytrue), 0.8336916, tolerance=0.0000001)
+  expect_equal(jagshelper:::mae(y, ytrue), 0.711719, tolerance=0.0000001)
+
+  expect_equal(dim(kfold1$pred_y), dim(y))
+  expect_equal(kfold1$data_y, y)
+  expect_equal(dim(kfold1$fold), dim(y))
+  expect_equal(max(kfold1$fold), 5)
+
+  expect_equal(kfold2$fold, matrix(1:3, nrow=5, ncol=3, byrow=TRUE))
+  expect_equal(kfold3$fold, matrix(1:5, nrow=5, ncol=3))
+  expect_equal(kfold4$fold, matrix(1:5, nrow=5, ncol=3))
+  expect_equal(kfold5$fold, matrix(1:15, nrow=5, ncol=3))
+
+  expect_equal(length(kfold1), 5)
+  expect_equal(length(kfold6), 7)
+  expect_equal(length(kfold6$addl_p), 5)
+  expect_equal(dim(kfold6$addl_p[[1]]$mu), c(1000, 3))
+  expect_equal(length(kfold6$addl_p[[1]]$sig), 1000)
+  expect_equal(apply(kfold6$postpred_y, 2:3, median), kfold6$pred_y)
+
+  expect_error(kfold(model.file=test_jags, data=test_data, p=y),
+               "Argument p= must be a character")
+  expect_error(kfold(model.file=test_jags, data=test_data, p="steve"),
+               "Argument p= must correspond to the name of the data object to test")
+  expect_error(kfold(model.file=test_jags, data=test_data, p=c("y","a")),
+               "Only one data object or parameter may be used at once")
+})

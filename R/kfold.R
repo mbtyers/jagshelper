@@ -1,135 +1,3 @@
-library(jagshelper)
-library(jagsUI)
-
-# specify model, which is written to a temporary file
-asdf_jags <- tempfile()
-cat('model {
-  for(i in 1:n) {
-    y[i] ~ dnorm(mu[i], tau)
-    ypp[i] ~ dnorm(mu[i], tau)
-    mu[i] <- b0 + b1*x[i] + a[grp[i]]
-  }
-
-  for(j in 1:ngrp) {
-    a[j] ~ dnorm(0, tau_a)
-  }
-
-  tau <- pow(sig, -2)
-  sig ~ dunif(0, 10)
-  b0 ~ dnorm(0, 0.001)
-  b1 ~ dnorm(0, 0.001)
-
-  tau_a <- pow(sig_a, -2)
-  sig_a ~ dunif(0, 10)
-}', file=asdf_jags)
-
-
-# simulate data to go with the example model
-n <- 60
-x <- rnorm(n, sd=3)
-grp <- sample(1:3, n, replace=T)
-y <- rnorm(n, mean=grp-x)
-
-# bundle data to pass into JAGS
-asdf_data <- list(x=x,
-                  y=y,
-                  n=length(x),
-                  grp=as.numeric(as.factor(grp)),
-                  ngrp=length(unique(grp)))
-
-# JAGS controls
-niter <- 10000
-# ncores <- 3
-ncores <- min(10, parallel::detectCores()-1)
-
-{
-  tstart <- Sys.time()
-  print(tstart)
-  asdf_jags_out <- jagsUI::jags(model.file=asdf_jags, data=asdf_data,
-                                parameters.to.save=c("b0","b1","sig","a","sig_a"),
-                                n.chains=ncores, parallel=T, n.iter=niter,
-                                n.burnin=niter/2, n.thin=niter/2000)
-  print(Sys.time() - tstart)
-}
-
-nbyname(asdf_jags_out)
-plotRhats(asdf_jags_out)
-traceworstRhat(asdf_jags_out, parmfrow = c(3, 3))
-
-
-
-
-#### test case where y is a matrix
-
-asdf_jags <- tempfile()
-cat('model {
-  for(i in 1:n) {
-    for(j in 1:ngrp) {
-      y[i,j] ~ dnorm(mu[i,j], tau)
-      mu[i,j] <- b0 + b1*x[i,j] + a[j]
-    }
-
-  }
-
-  for(j in 1:ngrp) {
-    a[j] ~ dnorm(0, tau_a)
-  }
-
-  tau <- pow(sig, -2)
-  sig ~ dunif(0, 10)
-  b0 ~ dnorm(0, 0.001)
-  b1 ~ dnorm(0, 0.001)
-
-  tau_a <- pow(sig_a, -2)
-  sig_a ~ dunif(0, 10)
-}', file=asdf_jags)
-
-
-# simulate data to go with the example model
-n <- 60
-x <- matrix(rnorm(n, sd=3),
-            nrow=20, ncol=3)
-# grp <- sample(1:3, n, replace=T)
-y <- matrix(rnorm(n, mean=rep(1:3, each=20)-x),
-            nrow=20, ncol=3)
-
-# bundle data to pass into JAGS
-asdf_data <- list(x=x,
-                  y=y,
-                  n=nrow(x),
-                  # grp=as.numeric(as.factor(grp)),
-                  ngrp=ncol(x))
-
-# JAGS controls
-niter <- 10000
-# ncores <- 3
-ncores <- min(10, parallel::detectCores()-1)
-
-{
-  tstart <- Sys.time()
-  print(tstart)
-  asdf_jags_out <- jagsUI::jags(model.file=asdf_jags, data=asdf_data,
-                                parameters.to.save=c("b0","b1","sig","a","sig_a","mu"),
-                                n.chains=ncores, parallel=T, n.iter=niter,
-                                n.burnin=niter/2, n.thin=niter/2000)
-  print(Sys.time() - tstart)
-}
-
-nbyname(asdf_jags_out)
-plotRhats(asdf_jags_out)
-traceworstRhat(asdf_jags_out, parmfrow = c(3, 3))
-
-
-
-
-
-
-### actually starting on the function!
-# define which data objects to withold data (char)
-# define which model output params will correspond (char - will be ypp i think, or maybe y)
-# how many folds (default to 5)
-# model file
-
 rmse <- function(x1, x2) sqrt(mean((x1-x2)^2, na.rm=TRUE))
 mae <- function(x1, x2) mean(abs(x1-x2), na.rm=TRUE)
 
@@ -149,45 +17,6 @@ allocate <- function(n, k) {
   return(grp)
 }
 
-# return what:  ---> i think all of these!!
-# - just RMSE, just MAE
-# - prediction vector (from medians)
-# - MCMC matrix? maybe this is more fair
-# - also, MCMC of specified parameters, for the purpose of lppd
-
-# think if there will be a use case for multiple data vectors  ---> I think just one
-
-# what if there is a data matrix (not vector)?
-
-# document etc
-
-# any difference between y and ypp? assuming there won't be
-
-
-## to do:
-# + structure output object with $rms_pred, $ma_pred, $pred
-#   - also $postpred if post=TRUE ?
-#   - posteriors for addl parameters if !is.null(addl_p)??? - dims will be weird
-# + figure out how to handle when data_y is a matrix
-#   - add optional fold_byrow and fold_bycolumn
-#   - fold & allocate should work ok as-is when allocation is random
-#   ====> I feel like i should be able to generalize to an array
-
-#   - need a test case where data is matrix
-
-
-# # trying a generalization thingy
-# data_y <- array(dim=c(2,3,4))
-# fold_dims <- 2:1
-# rpt_dims <- (1:length(dim(data_y)))[-fold_dims]
-# # rpt_bydim <- dim(data_y)
-# # rpt_bydim[fold_dims] <- 1
-# nfold <- prod(dim(data_y)[fold_dims])
-# fold <- aperm(a = array(1:nfold,
-#                         dim=c(dim(data_y)[fold_dims], dim(data_y)[rpt_dims])),
-#               perm = order(c(fold_dims, rpt_dims)))
-# fold
-
 
 #' Automated K-fold or Leave One Out Cross Validation
 #' @description Runs k-fold or Leave One Out Cross Validation for a specified
@@ -202,9 +31,6 @@ allocate <- function(n, k) {
 #' (Prediction) Error and Mean Absolute (Prediction) Error.  However, it is likely
 #' that these measures will not be meaningful by themselves; rather, as a metric
 #' for scoring a set of candidate models.
-#' @param df Output object returned from `jagsUI::jags()`; or alternately,
-#' two-dimensional `data.frame` or matrix in which parameter node element is
-#' given by column and MCMC iteration is given by row.
 #' @param model.file Path to file containing the model written in BUGS code,
 #' passed directly to \link[jagsUI]{jags}.
 #' @param data The named list of data objects,
@@ -242,18 +68,80 @@ allocate <- function(n, k) {
 #' if these are supplied in argument `addl_p=`.
 #' * `$fold`: A vector, matrix, or array corresponding to the original data,
 #' giving the numerical values of the corresponding fold used
-#' @seealso \link{overlayenvelope}, \link{caterpillar}
+#' @seealso \link{qq_postpred}, \link{plot_postpred}, \link{plotRhats}, \link{traceworstRhat}
 #' @author Matt Tyers
 #' @examples
-#' ## I need examples
+#' #### test case where y is a matrix
+#' asdf_jags <- tempfile()
+#' cat('model {
+#'   for(i in 1:n) {
+#'     for(j in 1:ngrp) {
+#'       y[i,j] ~ dnorm(mu[i,j], tau)
+#'       mu[i,j] <- b0 + b1*x[i,j] + a[j]
+#'     }
+#'   }
+#'
+#'   for(j in 1:ngrp) {
+#'     a[j] ~ dnorm(0, tau_a)
+#'   }
+#'
+#'   tau <- pow(sig, -2)
+#'   sig ~ dunif(0, 10)
+#'   b0 ~ dnorm(0, 0.001)
+#'   b1 ~ dnorm(0, 0.001)
+#'
+#'   tau_a <- pow(sig_a, -2)
+#'   sig_a ~ dunif(0, 10)
+#' }', file=asdf_jags)
+#'
+#'
+#' # simulate data to go with the example model
+#' n <- 45
+#' x <- matrix(rnorm(n, sd=3),
+#'             nrow=20, ncol=3)
+#' y <- matrix(rnorm(n, mean=rep(1:3, each=20)-x),
+#'             nrow=20, ncol=3)
+#'
+# bundle data to pass into JAGS
+#' asdf_data <- list(x=x,
+#'                   y=y,
+#'                   n=nrow(x),
+#'                   ngrp=ncol(x))
+#'
+#' # JAGS controls
+#' niter <- 1000
+#' ncores <- 2
+#' # ncores <- min(10, parallel::detectCores()-1)
+#'
+#' ## random assignment of folds
+#' kfold1 <- kfold(p="y",
+#'                 k=5,
+#'                 model.file=asdf_jags, data=asdf_data,
+#'                 n.chains=ncores, n.iter=niter,
+#'                 n.burnin=niter/2, n.thin=niter/1000,
+#'                 parallel=FALSE)
+#' str(kfold1)
+#' kfold1$fold
+#'
+#' ## Performing LOOCV, but assigning folds by row of input data
+#' kfold2 <- kfold(p="y",
+#'                 loocv=TRUE, fold_dims=1,
+#'                 model.file=asdf_jags, data=asdf_data,
+#'                 n.chains=ncores, n.iter=niter,
+#'                 n.burnin=niter/2, n.thin=niter/1000,
+#'                 parallel=FALSE)
+#' str(kfold2)
+#' kfold2$fold
+#' @importFrom utils setTxtProgressBar txtProgressBar
 #' @export
 kfold <- function(model.file, data,
                   p, addl_p=NULL, save_postpred=FALSE,
                   k=10, loocv=FALSE,
                   fold_dims=NULL,
-                  # fold_byrow=FALSE, fold_bycolumn=FALSE,    ### or fold_by = c(NA,"row","column")
                   ...) {
-  if(length(p) > 1) stop("Only one data object or parameter may be used at once.")
+  if(!inherits(p, "character")) stop("Argument p= must be a character")
+  if(length(p) > 1) stop("Only one data object or parameter may be used at once")
+  if(!(p %in% names(data))) stop("Argument p= must correspond to the name of the data object to test")
 
   data_y <- data[[p]]
 
@@ -262,29 +150,10 @@ kfold <- function(model.file, data,
   }
   fold_dims <- fold_dims[fold_dims <= length(dim(data_y))]
 
-  ## generalize fold_dim?
-  # if((!fold_byrow & !fold_bycolumn) | is.null(dim(data_y)) | min(dim(data_y)==1)) {
-  #   fold <- allocate(n=length(data_y), k=k)
-  #   if(length(dim(data_y))==2) {
-  #     fold <- matrix(fold, nrow=nrow(data_y), ncol=ncol(data_y))
-  #   }
-  # } else {    ## see if i can generalize to array in this section
-  #   if(fold_byrow) {
-  #     fold <- matrix(allocate(n=nrow(data_y), k=k),
-  #                    nrow=nrow(data_y), ncol=ncol(data_y))
-  #   }
-  #   if(fold_bycolumn) {   # should make sure they can't both be true
-  #     fold <- matrix(allocate(n=ncol(data_y), k=k),
-  #                    nrow=nrow(data_y), ncol=ncol(data_y),
-  #                    byrow=TRUE)
-  #   }
-  # }
   if(is.null(dim(data_y)) | min(dim(data_y)==1)) {
     # if data_y is a vector
-
     fold <- allocate(n=length(data_y), k=k)
   } else {
-
     # if data_y is a matrix or array
     if(is.null(fold_dims)) {
       fold <- array(allocate(n=length(data_y), k=k), dim=dim(data_y))
@@ -305,7 +174,7 @@ kfold <- function(model.file, data,
 
   if(interactive()) pb <- txtProgressBar(style=3)
 
-  for(i_fold in seq(k)) {
+  for(i_fold in seq(max(fold))) {
     data_fold <- data
     data_fold[[p]][fold==i_fold] <- NA
 
@@ -349,7 +218,7 @@ kfold <- function(model.file, data,
       addl_p_post[[i_fold]] <- out_fold$sims.list[addl_p]
     }
 
-    if(interactive()) setTxtProgressBar(pb=pb, value=i_fold/k)
+    if(interactive()) setTxtProgressBar(pb=pb, value=i_fold/max(fold))
   }
   out <- list(pred_y=pred_y, data_y=data_y)
   if(save_postpred) {
@@ -363,42 +232,4 @@ kfold <- function(model.file, data,
   out$fold <- fold
   return(out)
 }
-aa <- kfold(p="y",
-            save_postpred = TRUE,
-            addl_p = c("a","sig_a"),
-  model.file=asdf_jags, data=asdf_data,
-      n.chains=ncores, parallel=T, n.iter=niter,
-      n.burnin=niter/2, n.thin=niter/2000)
-str(aa)
 
-
-
-
-
-# kk <- c(3,5,10,30,60)
-# nrep <- 50
-# rmsemat <- matrix(nrow=nrep, ncol=length(kk))
-# for(j in seq_along(kk)) {
-#   for(i in 1:nrep) {
-#     rmsemat[i,j] <- kfold(k=kk[j],
-#                           pdata="y", pmodel="y", #try y here too
-#                           model.file=asdf_jags, data=asdf_data,
-#                           n.chains=ncores, parallel=T, n.iter=niter,
-#                           n.burnin=niter/2, n.thin=niter/2000)
-#     print(c(j,i))
-#   }
-# }
-# par(mfrow=c(1,1))
-# boxplot(rmsemat)
-# nrep <- 25
-# for(j in seq_along(kk)) {
-#   for(i in 1:nrep) {
-#     rmsemat[i,j] <- kfold(k=kk[j],
-#                           pdata="y", pmodel="ypp", #try y here too
-#                           model.file=asdf_jags, data=asdf_data,
-#                           n.chains=ncores, parallel=T, n.iter=niter,
-#                           n.burnin=niter/2, n.thin=niter/2000)
-#     print(c(j,i))
-#   }
-# }
-# boxplot(rmsemat)

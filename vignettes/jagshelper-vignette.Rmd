@@ -142,6 +142,12 @@ posterior predictive residual distribution overlayed with the data residuals, th
 a plot of the residual standard deviation calculated over a moving window.  By 
 default, these three plots are given with respect to the data sequence, then with respect to the data supplied for x, then with respect to fitted values.
 
+-   The function `kfold()` provides automated k-fold or leave-one-out cross validation for a specified component of a JAGS data object, for a specified JAGS model.
+
+JAGS is run internally `k` times (or alternately, the size of the dataset), withholding each of `k` "folds" of the input data and drawing posterior predictive samples corresponding to the withheld data, which can then be compared to the input data to assess model predictive power.
+
+Global measures of predictive power are provided in output: Root Mean Square (Prediction) Error and Mean Absolute (Prediction) Error. However, it is likely that these measures will not be meaningful by themselves; rather, as a metric for scoring a set of candidate models.
+
 -   The function `pairstrace_jags()` gives methods for plotting
     two-dimensional trace plots, scatter plots, or contour plots, in
     which each possible pairing of parameter nodes are plotted with
