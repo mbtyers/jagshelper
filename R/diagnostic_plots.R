@@ -17,7 +17,7 @@
 #' @param parmfrow Optional call to `par(mfrow)` for the number of rows & columns of plot window.  Returns the graphics device to previous state afterward.
 #' @param ... additional plotting arguments or arguments to `tracedens_jags()`
 #' @return `NULL`
-#' @seealso \link{plotRhats}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}, \link{plot_postpred}
+#' @seealso \link{plotRhats}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}, \link{plot_postpred}, \link{kfold}
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
 #' Using Multiple Sequences. *Statistical Science, 7*(4), 457–472. http://www.jstor.org/stable/2246093
@@ -182,7 +182,7 @@ traceworstRhat <- function(x,p=NULL,n.eff=FALSE,margin=NULL,parmfrow=NULL,...) {
 #' `margin=2` will separate the array by column.  If the default (`NULL`) is accepted, the function will split by the smallest dimension,
 #' therefore splitting into the fewest groups.
 #' @return `NULL`
-#' @seealso \link{traceworstRhat}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}, \link{plot_postpred}
+#' @seealso \link{traceworstRhat}, \link{check_Rhat}, \link{qq_postpred}, \link{ts_postpred}, \link{plot_postpred}, \link{kfold}
 #' @param ... additional plotting arguments
 #' @author Matt Tyers
 #' @references Gelman, A., & Rubin, D. B. (1992). Inference from Iterative Simulation
@@ -540,7 +540,7 @@ comparepriors <- function(x, parmfrow=NULL,...) {
 #' samples corresponding to a data vector, the construction of which must be
 #' left to the user.  This can be accomplished within JAGS, or using appropriate
 #' simulation from the posterior samples.
-#' @seealso \link{ts_postpred}, \link{plot_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @seealso \link{ts_postpred}, \link{plot_postpred}, \link{kfold}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
 #' # first, a quick look at the example data...
@@ -630,7 +630,7 @@ qq_postpred <- function(ypp, y, p=NULL, add=FALSE, ...) { # ypp is a matrix, y i
 #' samples corresponding to a data vector, the construction of which must be
 #' left to the user.  This can be accomplished within JAGS, or using appropriate
 #' simulation from the posterior samples.
-#' @seealso \link{qq_postpred}, \link{plot_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @seealso \link{qq_postpred}, \link{plot_postpred}, \link{kfold}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
 #' # first, a quick look at the example data...
@@ -792,7 +792,7 @@ sd_postpred <- function(ypp, y, p=NULL, x=NULL, ...) {
 #' samples corresponding to a data vector, the construction of which must be
 #' left to the user.  This can be accomplished within JAGS, or using appropriate
 #' simulation from the posterior samples.
-#' @seealso \link{qq_postpred}, \link{ts_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+#' @seealso \link{qq_postpred}, \link{ts_postpred}, \link{kfold}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 #' @author Matt Tyers
 #' @examples
 #' # first, a quick look at the example data...

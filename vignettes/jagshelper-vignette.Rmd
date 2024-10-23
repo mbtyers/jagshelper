@@ -304,7 +304,7 @@ yy <- SS_out$sims.list$cycle[,41]
 par(mfrow = c(2, 2))
 plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="Cross Geometry")
 crossplot(xx, yy, add=TRUE, col=1)
-plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="G Geometry")
+plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="X Geometry")
 crossplot(xx, yy, add=TRUE, col=1,
           drawcross=FALSE, drawx=TRUE)
 plot(xx, yy, col=adjustcolor(1, alpha.f=.1), pch=16, main="Blob Geometry")

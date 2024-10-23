@@ -113,7 +113,7 @@ plot_postpred(ypp=SS_out, p="ypp", y=SS_data$y, x=SS_data$x)
 par(mfrow = parmfrow) # resetting graphics state
 }
 \seealso{
-\link{qq_postpred}, \link{ts_postpred}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
+\link{qq_postpred}, \link{ts_postpred}, \link{kfold}, \link{check_Rhat}, \link{check_neff}, \link{traceworstRhat}, \link{plotRhats}
 }
 \author{
 Matt Tyers
