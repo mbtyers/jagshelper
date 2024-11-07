@@ -1,4 +1,4 @@
-## jagshelper 0.4.1 (Oct 2024)
+## jagshelper 0.4.1 (Nov 2024)
 
 * Minor patch to fix a typo in documentation
 
