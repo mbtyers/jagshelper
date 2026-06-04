@@ -172,6 +172,7 @@ test_that("overlayenvelope", {
 test_that("caterpillar", {
   SS_df <- jags_df(SS_out)
   trend <- pull_post(SS_df, "trend")
+  rate <- pull_post(SS_df, "rate")
   expect_silent(caterpillar(trend, x=SS_data$x))
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=.5))
   expect_silent(caterpillar(trend, x=SS_data$x ,ci=c(.1,.5,.9)))
@@ -191,6 +192,17 @@ test_that("caterpillar", {
   expect_silent(caterpillar(SS_out, p="trend", transform="exp"))
   expect_silent(caterpillar(SS_out, p="trend", transform="expit"))
   expect_error(caterpillar(SS_out, p="trend", transform="somethingelse"))
+
+  expect_silent(caterpillar(trend, x=SS_data$x, horizontal=TRUE))
+  expect_silent(caterpillar(trend, x=exp(0.2*seq_along(SS_data$x)), log="x"))
+  expect_silent(caterpillar(trend, x=exp(0.2*seq_along(SS_data$x)), log="y", horizontal=TRUE))
+  expect_silent(caterpillar(rate, x=SS_data$x, horizontal=TRUE))
+  expect_silent(caterpillar(rate, horizontal=TRUE))
+  expect_silent(caterpillar(rate, x=SS_data$x, horizontal=TRUE,
+                            xax=rep(letters, 3)[seq_along(SS_data$x)]))
+  expect_silent(caterpillar(rate, horizontal=TRUE,
+                            xax=rep(letters, 3)[seq_along(SS_data$x)]))
+  expect_silent(caterpillar(rate, x=SS_data$x, horizontal=TRUE, xorder=TRUE))
 })
 
 test_that("traceworstRhat", {

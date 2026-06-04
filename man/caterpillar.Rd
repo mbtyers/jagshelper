@@ -21,6 +21,8 @@ caterpillar(
   main = NULL,
   ylim = NULL,
   xax = NA,
+  xorder = FALSE,
+  horizontal = FALSE,
   transform = c("none", "exp", "expit"),
   medlwd = lwd,
   medwd = 1,
@@ -63,6 +65,10 @@ that expresses MCMC iterations of a single parameter node.}
 
 \item{xax}{Vector of possible x-axis tick labels.  Defaults to the \code{data.frame} column names.}
 
+\item{xorder}{Whether to draw interval bars in order of posterior median.  Defaults to FALSE.}
+
+\item{horizontal}{Whether to produce a horizontal plot, that is, with intervals on the x-axis.  Defaults to FALSE.}
+
 \item{transform}{Should the y-axis be (back)transformed?  Options are \code{"exp"},
 indicating exponential, or \code{"expit"}, indicating inverse-logit. Defaults to
 \code{"none"}, indicating no transformation.  Note: if \code{transform="exp"}is used, consider
@@ -92,6 +98,9 @@ caterpillar(a)
 caterpillar(a, ci=seq(.1,.9,by=.1))
 caterpillar(a, lwd=2)
 caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
+
+caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"),
+            horizontal = TRUE)
 
 
 ## usage with input as jagsUI object

@@ -23,6 +23,8 @@
 #' @param main Plot title.  If the default (`NULL`) is accepted and argument `p` is used, `p` will be used for the title.
 #' @param ylim Y-axis limits.  If the default (`NULL`) is accepted, the limits will be determined automatically.
 #' @param xax Vector of possible x-axis tick labels.  Defaults to the `data.frame` column names.
+#' @param xorder Whether to draw interval bars in order of posterior median.  Defaults to FALSE.
+#' @param horizontal Whether to produce a horizontal plot, that is, with intervals on the x-axis.  Defaults to FALSE.
 #' @param transform Should the y-axis be (back)transformed?  Options are `"exp"`,
 #' indicating exponential, or `"expit"`, indicating inverse-logit. Defaults to
 #' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
@@ -41,6 +43,9 @@
 #' caterpillar(a, ci=seq(.1,.9,by=.1))
 #' caterpillar(a, lwd=2)
 #' caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
+#'
+#' caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"),
+#'             horizontal = TRUE)
 #'
 #'
 #' ## usage with input as jagsUI object
@@ -65,6 +70,7 @@ caterpillar <- function(df,
                         lwd=1, col=4, add=FALSE,
                         xlab="", ylab="", main=NULL, ylim=NULL,
                         xax=NA,
+                        xorder = FALSE, horizontal=FALSE,
                         transform=c("none", "exp", "expit"),
                         medlwd=lwd, medwd=1,...) {
   # ci <- rev(sort(ci))
@@ -119,6 +125,29 @@ caterpillar <- function(df,
 
   df <- as.matrix(df)  ################
 
+  ### new
+  dots <- list(...)  # probably a more efficient way to do this
+  xaxlog <- FALSE
+  if(!is.null(dots$log)) {
+    if(!horizontal & dots$log %in% c("x","xy")) {
+      xaxlog <- TRUE
+    }
+    if(horizontal & dots$log %in% c("y","xy")) {
+      xaxlog <- TRUE
+    }
+  }
+  ### new
+
+  ### new
+  if(any(is.na(x)) & !all(is.na(x))) {
+    df <- df[, !is.na(x)]
+    if(any(!is.na(xax))) {
+      xax <- xax[!is.na(x)]
+    }
+    x <- x[!is.na(x)]
+  }
+  ### new
+
   transform <- match.arg(transform)
   if(transform == "exp") df <- exp(df)
   if(transform == "expit") df <- expit(df)
@@ -131,27 +160,126 @@ caterpillar <- function(df,
     hiq <- t(as.matrix(hiq))
   }
   med <- apply(df, 2, median, na.rm=T)
-  if(all(is.na(x))) x <- 1:ncol(df)
+  # if(all(is.na(x))) x <- 1:ncol(df)
+
+  ## new
+  xorig <- x
+  xaxorig <- xax
+  if (all(is.na(x))) {
+    x <- 1:ncol(df)
+  }
+  if(xorder) {
+    x <- rank(med, na.last=TRUE,ties.method="first")
+  }
+  ## new
 
   ### this was smarterized, make sure it doesn't break other code!!!
   # d <- ifelse(length(x)>1, diff(x[1:2]), 1)  #########
-  d <- ifelse(length(x)>1, diff(range(x, na.rm=TRUE))/length(x), 1)  #########
+  # d <- ifelse(length(x)>1, diff(range(x, na.rm=TRUE))/length(x), 1)  #########
+
+  ## new
+  if(xaxlog) {
+    d <- ifelse(length(x) > 1, diff(range(log(x), na.rm = TRUE))/length(x), 1)
+  } else {
+    d <- ifelse(length(x) > 1, diff(range(x, na.rm = TRUE))/length(x), 1)
+  }
+  ## new
 
   nn <- ncol(df)
   if(all(is.na(xax))) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd
   if(!add) {
     if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
-    # xlims <- range(x-(.2*d),x+(.2*d))
-    xlims <- range(x-(.5*d*(1+(length(x)==1))),x+(.5*d*(1+(length(x)==1))))
-    plot(NA, type='l', xlim=xlims, xlab=xlab, ylab=ylab, main=main, ylim=ylim, xaxt="n", ...=...)
-    axis(1,x,labels=xax, las=list(...)$las)
+    # xlims <- range(x-(.5*d*(1+(length(x)==1))),x+(.5*d*(1+(length(x)==1))))
+
+    ## new
+    if(xaxlog) {
+      xlims <- exp(range(log(x) - (0.5 * d * (1 + (length(x) == 1))),
+                         log(x) + (0.5 * d * (1 + (length(x) == 1)))))
+    } else {
+      xlims <- range(x - (0.5 * d * (1 + (length(x) == 1))),
+                     x + (0.5 * d * (1 + (length(x) == 1))))
+    }
+    ## new
+
+    # plot(NA, type='l', xlim=xlims, xlab=xlab, ylab=ylab, main=main, ylim=ylim, xaxt="n", ...=...)
+    # axis(1,x,labels=xax, las=list(...)$las)
+
+    ## new
+    if(!horizontal) {
+      if(all(is.na(xorig)) | !all(is.na(xaxorig))) {
+        plot(NA, type = "l", xlim = xlims, xlab = xlab, ylab = ylab,
+             main = main, ylim = ylim, xaxt = "n", ... = ...)
+        axis(1, x, labels = xax, las = list(...)$las)
+      } else {
+        plot(NA, type = "l", xlim = xlims, xlab = xlab, ylab = ylab,
+             main = main, ylim = ylim, ... = ...)
+      }
+    } else {
+      if(all(is.na(xorig)) | !all(is.na(xaxorig))) {
+        plot(NA, type = "l", ylim = rev(xlims), xlab = xlab, ylab = ylab,
+             main = main, xlim = ylim, yaxt = "n", ... = ...)
+        axis(2, x, labels = xax, las = list(...)$las)
+      } else {
+        plot(NA, type = "l", ylim = xlims, xlab = xlab, ylab = ylab,
+             main = main, xlim = ylim, ... = ...) # ylim = rev(xlims)
+      }
+    }
+    ## new
   }
   if(median) {
-    segments(x0=x-.2*d*medwd,x1=x+.2*d*medwd,y0=med,y1=med,col=col,lwd=medlwd, lend=1)
+    # segments(x0=x-.2*d*medwd,x1=x+.2*d*medwd,y0=med,y1=med,col=col,lwd=medlwd, lend=1)
+
+    ## new
+    if(!horizontal) {
+      if(xaxlog) {
+        segments(x0 = exp(log(x) - 0.2 * d * medwd),
+                 x1 = exp(log(x) + 0.2 * d * medwd),
+                 y0 = med, y1 = med, col = col, lwd = medlwd,
+                 lend = 1)
+      } else {
+        segments(x0 = x - 0.2 * d * medwd, x1 = x + 0.2 * d *
+                   medwd, y0 = med, y1 = med, col = col, lwd = medlwd,
+                 lend = 1)
+      }
+    } else {
+      if(xaxlog) {
+        segments(y0 = exp(log(x) - 0.2 * d * medwd),
+                 y1 = exp(log(x) + 0.2 * d * medwd),
+                 x0 = med, x1 = med, col = col, lwd = medlwd,
+                 lend = 1)
+      } else {
+        segments(y0 = x - 0.2 * d * medwd, y1 = x + 0.2 * d *
+                   medwd, x0 = med, x1 = med, col = col, lwd = medlwd,
+                 lend = 1)
+      }
+    }
+    ## new
   }
-  if(mean) points(x,colMeans(df, na.rm=T), pch=16, col=col)
-  for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
+  # if(mean) points(x,colMeans(df, na.rm=T), pch=16, col=col)
+  # for(i in 1:length(ci)) segments(x0=x,x1=x,y0=loq[i,],y1=hiq[i,],col=col,lwd=lwds[i],lend=1)
+
+  ## new
+  if(!horizontal) {
+    if (mean) {
+      points(x=x, y=colMeans(df, na.rm = T), pch = 16, col = col)
+    }
+    for (i in 1:length(ci)) {
+      segments(x0 = x, x1 = x,
+               y0 = loq[i, ], y1 = hiq[i, ],
+               col = col, lwd = lwds[i], lend = 1)
+    }
+  } else {
+    if (mean) {
+      points(y=x, x=colMeans(df, na.rm = T), pch = 16, col = col)
+    }
+    for (i in 1:length(ci)) {
+      segments(y0 = x, y1 = x,
+               x0 = loq[i, ], x1 = hiq[i, ],
+               col = col, lwd = lwds[i], lend = 1)
+    }
+  }
+  ## new
 }
 
 
