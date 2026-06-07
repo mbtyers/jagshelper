@@ -203,6 +203,23 @@ test_that("caterpillar", {
   expect_silent(caterpillar(rate, horizontal=TRUE,
                             xax=rep(letters, 3)[seq_along(SS_data$x)]))
   expect_silent(caterpillar(rate, x=SS_data$x, horizontal=TRUE, xorder=TRUE))
+
+  expect_silent(caterpillar(rate, xlim_add=-20))
+  expect_silent(caterpillar(rate, ylim_add=-20))
+  expect_silent(caterpillar(rate, xlim_add=-20, horizontal=TRUE))
+  expect_silent(caterpillar(rate, ylim_add=-20, horizontal=TRUE))
+  expect_silent(caterpillar(rate, xlim_add=-20, x=seq_along(SS_data$x)))
+  expect_silent(caterpillar(rate, ylim_add=-20, x=seq_along(SS_data$x)))
+  expect_silent(caterpillar(rate, xlim_add=-20, x=seq_along(SS_data$x), horizontal=TRUE))
+  expect_silent(caterpillar(rate, ylim_add=-20, x=seq_along(SS_data$x), horizontal=TRUE))
+  expect_silent(caterpillar(rate, padwd=2))
+  expect_silent(caterpillar(rate, padwd=2, horizontal=TRUE))
+  expect_silent(caterpillar(rate[,1]))
+  expect_silent(caterpillar(rate[,1], horizontal=TRUE))
+  expect_silent(caterpillar(rate[,1], x=42))
+  expect_silent(caterpillar(rate[,1], x=42, horizontal=TRUE))
+  expect_silent(caterpillar(rate[,1], x=42, log="x"))
+  expect_silent(caterpillar(rate[,1], x=42, log="y", horizontal=TRUE))
 })
 
 test_that("traceworstRhat", {

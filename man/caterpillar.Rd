@@ -8,6 +8,7 @@ caterpillar(
   df,
   p = NULL,
   x = NA,
+  na.rm = FALSE,
   row = NULL,
   column = NULL,
   median = TRUE,
@@ -19,13 +20,17 @@ caterpillar(
   xlab = "",
   ylab = "",
   main = NULL,
+  xlim = NULL,
   ylim = NULL,
+  xlim_add = NULL,
+  ylim_add = NULL,
   xax = NA,
   xorder = FALSE,
   horizontal = FALSE,
   transform = c("none", "exp", "expit"),
   medlwd = lwd,
   medwd = 1,
+  padwd = 1,
   ...
 )
 }
@@ -38,6 +43,8 @@ that expresses MCMC iterations of a single parameter node.}
 \item{p}{Parameter name, if input to \code{df} is a \code{jagsUI} output object.}
 
 \item{x}{Vector of X-coordinates for plotting.}
+
+\item{na.rm}{Whether to exclude NA columns.  Defaults to FALSE.}
 
 \item{row}{Row to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 
@@ -61,7 +68,13 @@ that expresses MCMC iterations of a single parameter node.}
 
 \item{main}{Plot title.  If the default (\code{NULL}) is accepted and argument \code{p} is used, \code{p} will be used for the title.}
 
+\item{xlim}{X-axis limits.  If the default (\code{NULL}) is accepted, the limits will be determined automatically.}
+
 \item{ylim}{Y-axis limits.  If the default (\code{NULL}) is accepted, the limits will be determined automatically.}
+
+\item{xlim_add}{Additional X-axis limit.  Defaults to \code{NULL}.  May be useful in having a axis start at 0.}
+
+\item{ylim_add}{Additional Y-axis limit.  Defaults to \code{NULL}.  May be useful in having a axis start at 0.}
 
 \item{xax}{Vector of possible x-axis tick labels.  Defaults to the \code{data.frame} column names.}
 
@@ -76,7 +89,9 @@ adding additional plotting argument \code{log="y"}.}
 
 \item{medlwd}{Line width of median line}
 
-\item{medwd}{Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?}
+\item{medwd}{Relative width of median line.  Defaults to 1, and acts as a multiplicative adjustment.}
+
+\item{padwd}{Relative width of padding beyond the median line.  Defaults to 1, and acts as a multiplicative adjustment.}
 
 \item{...}{additional plotting arguments}
 }

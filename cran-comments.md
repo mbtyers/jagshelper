@@ -10,7 +10,7 @@ There were no ERRORs, WARNINGs, or NOTEs.
 This is a relatively new package and there are no downstream dependencies.
 
 ## Test environments
-* Windows 10 (local): R 4.4.1
-* Winbuilder: R 4.4.1
+* Windows 11 (local): R 4.6.0
+* Winbuilder: R 4.6.0
 * Winbuilder: R-devel
-* Macbuilder (OS 13.3.1): R 4.4.0
+* Macbuilder (macOS Tahoe 26.2): R 4.6.0

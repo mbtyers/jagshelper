@@ -10,6 +10,7 @@
 #' that expresses MCMC iterations of a single parameter node.
 #' @param p Parameter name, if input to `df` is a `jagsUI` output object.
 #' @param x Vector of X-coordinates for plotting.
+#' @param na.rm Whether to exclude NA columns.  Defaults to FALSE.
 #' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param column Column to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param median Whether to include medians
@@ -21,7 +22,10 @@
 #' @param xlab X-axis label
 #' @param ylab Y-axis label
 #' @param main Plot title.  If the default (`NULL`) is accepted and argument `p` is used, `p` will be used for the title.
+#' @param xlim X-axis limits.  If the default (`NULL`) is accepted, the limits will be determined automatically.
 #' @param ylim Y-axis limits.  If the default (`NULL`) is accepted, the limits will be determined automatically.
+#' @param xlim_add Additional X-axis limit.  Defaults to `NULL`.  May be useful in having a axis start at 0.
+#' @param ylim_add Additional Y-axis limit.  Defaults to `NULL`.  May be useful in having a axis start at 0.
 #' @param xax Vector of possible x-axis tick labels.  Defaults to the `data.frame` column names.
 #' @param xorder Whether to draw interval bars in order of posterior median.  Defaults to FALSE.
 #' @param horizontal Whether to produce a horizontal plot, that is, with intervals on the x-axis.  Defaults to FALSE.
@@ -30,7 +34,8 @@
 #' `"none"`, indicating no transformation.  Note: if `transform="exp"`is used, consider
 #' adding additional plotting argument `log="y"`.
 #' @param medlwd Line width of median line
-#' @param medwd Relative width of median line.  Defaults to 1, perhaps smaller numbers will look better?
+#' @param medwd Relative width of median line.  Defaults to 1, and acts as a multiplicative adjustment.
+#' @param padwd Relative width of padding beyond the median line.  Defaults to 1, and acts as a multiplicative adjustment.
 #' @param ... additional plotting arguments
 #' @return `NULL`
 #' @seealso \link{envelope}, \link{crossplot}
@@ -64,15 +69,18 @@
 caterpillar <- function(df,
                         p=NULL,
                         x=NA,
+                        na.rm=FALSE,
                         row=NULL, column=NULL,
                         median=TRUE, mean=FALSE,
                         ci=c(0.5,0.95),
                         lwd=1, col=4, add=FALSE,
-                        xlab="", ylab="", main=NULL, ylim=NULL,
+                        xlab="", ylab="", main=NULL,
+                        xlim=NULL, ylim=NULL,
+                        xlim_add=NULL, ylim_add=NULL,
                         xax=NA,
                         xorder = FALSE, horizontal=FALSE,
                         transform=c("none", "exp", "expit"),
-                        medlwd=lwd, medwd=1,...) {
+                        medlwd=lwd, medwd=1, padwd=1,...) {
   # ci <- rev(sort(ci))
   # loq <- apply(df, 2, quantile, p=(1-ci)/2, na.rm=T)
   # hiq <- apply(df, 2, quantile, p=1-(1-ci)/2, na.rm=T)
@@ -124,6 +132,19 @@ caterpillar <- function(df,
   if(is.null(main)) main <- ""
 
   df <- as.matrix(df)  ################
+  if(na.rm) {
+    keep <- which(!is.na(colMeans(df)))
+    df <- df[, keep]
+    if(!all(is.na(x))) {
+      x <- x[keep]
+    }
+    if(!all(is.na(xax))) {
+      xax <- xax[keep]
+    }
+    if(length(col) > 1) {
+      col <- col[keep]
+    }
+  }
 
   ### new
   dots <- list(...)  # probably a more efficient way to do this
@@ -143,6 +164,9 @@ caterpillar <- function(df,
     df <- df[, !is.na(x)]
     if(any(!is.na(xax))) {
       xax <- xax[!is.na(x)]
+    }
+    if(length(col) > 1) {
+      col <- col[!is.na(x)]
     }
     x <- x[!is.na(x)]
   }
@@ -178,27 +202,59 @@ caterpillar <- function(df,
   # d <- ifelse(length(x)>1, diff(range(x, na.rm=TRUE))/length(x), 1)  #########
 
   ## new
+  maxl <- min(length(x), 20)
   if(xaxlog) {
-    d <- ifelse(length(x) > 1, diff(range(log(x), na.rm = TRUE))/length(x), 1)
+    d <- ifelse(length(x) > 1, diff(range(log(x), na.rm = TRUE))/maxl, 1)
   } else {
-    d <- ifelse(length(x) > 1, diff(range(x, na.rm = TRUE))/length(x), 1)
+    d <- ifelse(length(x) > 1, diff(range(x, na.rm = TRUE))/maxl, 1)
   }
+  # halfwidth <- 0.2*d  ## is the old way
+  # mextra <- 0.3*d  ## is the old way
+
+  halfwidth <- 0.2*d*(1 - 0.05*(length(x)^(-2)))
+  mextra <- padwd*halfwidth#d*length(x)^(-2)
   ## new
 
   nn <- ncol(df)
   if(all(is.na(xax))) xax<-names(df)
   lwds <- (1+2*(1:length(ci)-1))*lwd
   if(!add) {
-    if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
+    # if(is.null(ylim)) ylim <- range(loq,hiq,na.rm=T)
+    ci_lim <- range(loq, hiq, na.rm=TRUE)
+
     # xlims <- range(x-(.5*d*(1+(length(x)==1))),x+(.5*d*(1+(length(x)==1))))
 
     ## new
     if(xaxlog) {
-      xlims <- exp(range(log(x) - (0.5 * d * (1 + (length(x) == 1))),
-                         log(x) + (0.5 * d * (1 + (length(x) == 1)))))
+      # xlims <- exp(range(log(x) - ((halfwidth+mextra)* (1 + (length(x) == 1))),
+      #                    log(x) + ((halfwidth+mextra) * (1 + (length(x) == 1)))))
+      ### was xlims
+      cat_lim <- exp(c(min(log(x)) - ((halfwidth+mextra)* (1 + (length(x) == 1))),
+                       max(log(x)) + ((halfwidth+mextra) * (1 + (length(x) == 1)))))
     } else {
-      xlims <- range(x - (0.5 * d * (1 + (length(x) == 1))),
-                     x + (0.5 * d * (1 + (length(x) == 1))))
+      # xlims <- range(x - ((halfwidth+mextra) * (1 + (length(x) == 1))),
+      #                x + ((halfwidth+mextra) * (1 + (length(x) == 1))))
+      cat_lim <- c(min(x) - ((halfwidth+mextra) * (1 + (length(x) == 1))),
+                   max(x) + ((halfwidth+mextra) * (1 + (length(x) == 1))))
+    }
+    if(!horizontal) {
+      if(!is.null(xlim)) {
+        cat_lim <- xlim
+      }
+      if(!is.null(ylim)) {
+        ci_lim <- ylim
+      }
+      cat_lim <- range(cat_lim, xlim_add)
+      ci_lim <- range(ci_lim, ylim_add)
+    } else {
+      if(!is.null(xlim)) {
+        ci_lim <- xlim
+      }
+      if(!is.null(ylim)) {
+        cat_lim <- ylim
+      }
+      cat_lim <- range(cat_lim, ylim_add)
+      ci_lim <- range(ci_lim, xlim_add)
     }
     ## new
 
@@ -208,21 +264,25 @@ caterpillar <- function(df,
     ## new
     if(!horizontal) {
       if(all(is.na(xorig)) | !all(is.na(xaxorig))) {
-        plot(NA, type = "l", xlim = xlims, xlab = xlab, ylab = ylab,
-             main = main, ylim = ylim, xaxt = "n", ... = ...)
-        axis(1, x, labels = xax, las = list(...)$las)
+        plot(NA, type = "l", xlim = cat_lim, xlab = xlab, ylab = ylab,
+             main = main, ylim = ci_lim, xaxt = "n", ... = ...)
+        axis(side=1, at=x,
+             labels = xax[seq_along(x)],
+             las = list(...)$las)
       } else {
-        plot(NA, type = "l", xlim = xlims, xlab = xlab, ylab = ylab,
-             main = main, ylim = ylim, ... = ...)
+        plot(NA, type = "l", xlim = cat_lim, xlab = xlab, ylab = ylab,
+             main = main, ylim = ci_lim, ... = ...)
       }
     } else {
       if(all(is.na(xorig)) | !all(is.na(xaxorig))) {
-        plot(NA, type = "l", ylim = rev(xlims), xlab = xlab, ylab = ylab,
-             main = main, xlim = ylim, yaxt = "n", ... = ...)
-        axis(2, x, labels = xax, las = list(...)$las)
+        plot(NA, type = "l", ylim = rev(cat_lim), xlab = xlab, ylab = ylab,
+             main = main, xlim = ci_lim, yaxt = "n", ... = ...)
+        axis(side=2, at=x,
+             labels = xax[seq_along(x)],
+             las = list(...)$las)
       } else {
-        plot(NA, type = "l", ylim = xlims, xlab = xlab, ylab = ylab,
-             main = main, xlim = ylim, ... = ...) # ylim = rev(xlims)
+        plot(NA, type = "l", ylim = cat_lim, xlab = xlab, ylab = ylab,
+             main = main, xlim = ci_lim, ... = ...) # ylim = rev(xlims)
       }
     }
     ## new
@@ -233,24 +293,26 @@ caterpillar <- function(df,
     ## new
     if(!horizontal) {
       if(xaxlog) {
-        segments(x0 = exp(log(x) - 0.2 * d * medwd),
-                 x1 = exp(log(x) + 0.2 * d * medwd),
+        segments(x0 = exp(log(x) - halfwidth * medwd),
+                 x1 = exp(log(x) + halfwidth * medwd),
                  y0 = med, y1 = med, col = col, lwd = medlwd,
                  lend = 1)
       } else {
-        segments(x0 = x - 0.2 * d * medwd, x1 = x + 0.2 * d *
-                   medwd, y0 = med, y1 = med, col = col, lwd = medlwd,
+        segments(x0 = x - halfwidth * medwd,
+                 x1 = x + halfwidth * medwd,
+                 y0 = med, y1 = med, col = col, lwd = medlwd,
                  lend = 1)
       }
     } else {
       if(xaxlog) {
-        segments(y0 = exp(log(x) - 0.2 * d * medwd),
-                 y1 = exp(log(x) + 0.2 * d * medwd),
+        segments(y0 = exp(log(x) - halfwidth * medwd),
+                 y1 = exp(log(x) + halfwidth * medwd),
                  x0 = med, x1 = med, col = col, lwd = medlwd,
                  lend = 1)
       } else {
-        segments(y0 = x - 0.2 * d * medwd, y1 = x + 0.2 * d *
-                   medwd, x0 = med, x1 = med, col = col, lwd = medlwd,
+        segments(y0 = x - halfwidth * medwd,
+                 y1 = x + halfwidth * medwd,
+                 x0 = med, x1 = med, col = col, lwd = medlwd,
                  lend = 1)
       }
     }

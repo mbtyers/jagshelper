@@ -1,3 +1,13 @@
+## jagshelper 0.4.2 (June 2026)
+
+* Added `horizontal=` and `xorder=` arguments to `caterpillar()`
+
+* Added `padwd=` and `xlim_add=` & `xlim_add=` arguments to `caterpillar()`
+
+* Made median line width in `caterpillar()` a bit smarter
+
+* Bug fixes in `caterpillar()`
+
 ## jagshelper 0.4.1 (Nov 2024)
 
 * Minor patch to fix a typo in documentation
