@@ -210,7 +210,10 @@ inputs, but now also accept a `jagsUI` output object and parameter name.
 
 It is anticipated that `caterpillar()` could be used for effect sizes
 associated with a categorical variable, in which plotting order may or
-may not matter.
+may not matter.  However, interval bars may also be plotted with respect
+to a quantitative variable as supplied by a numeric vector input.  
+`caterpillar()` plots may be oriented vertically (default) or horizontal
+(shown below).
 
 By contrast, `envelope()` is intended for a matrix associated with a
 sequence of parameter nodes, such as in a time series.
@@ -223,7 +226,7 @@ of parameter nodes.
 ```{r,fig.width=5,fig.height=8}
 old_parmfrow <- par("mfrow")  # storing old graphics state
 par(mfrow=c(3,1))
-caterpillar(asdf_jags_out, "a")
+caterpillar(asdf_jags_out, "a", horizontal=TRUE)
 envelope(SS_out, "trend", x=SS_data$x)
 plotdens(asdf_jags_out, "a")
 par(mfrow=old_parmfrow)  # resetting graphics state
