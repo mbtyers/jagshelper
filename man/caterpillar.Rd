@@ -31,6 +31,7 @@ caterpillar(
   medlwd = lwd,
   medwd = 1,
   padwd = 1,
+  all_ticks = FALSE,
   ...
 )
 }
@@ -93,6 +94,8 @@ adding additional plotting argument \code{log="y"}.}
 
 \item{padwd}{Relative width of padding beyond the median line.  Defaults to 1, and acts as a multiplicative adjustment.}
 
+\item{all_ticks}{Whether to force plotting of all axis tick labels.  Defaults to \code{FALSE}.}
+
 \item{...}{additional plotting arguments}
 }
 \value{
@@ -115,7 +118,7 @@ caterpillar(a, lwd=2)
 caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"))
 
 caterpillar(a, xax=c("effect 1", "effect 2", "effect 3"),
-            horizontal = TRUE)
+            horizontal = TRUE, las=1)
 
 
 ## usage with input as jagsUI object
