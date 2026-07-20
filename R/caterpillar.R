@@ -10,7 +10,7 @@
 #' that expresses MCMC iterations of a single parameter node.
 #' @param p Parameter name, if input to `df` is a `jagsUI` output object.
 #' @param x Vector of X-coordinates for plotting.
-#' @param na.rm Whether to exclude NA columns.  Defaults to FALSE.
+#' @param na.rm Whether to exclude NA columns.  Defaults to TRUE.
 #' @param row Row to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param column Column to subset, in the case of a 2-d matrix of parameter nodes in-model.
 #' @param median Whether to include medians
@@ -70,7 +70,7 @@
 caterpillar <- function(df,
                         p=NULL,
                         x=NA,
-                        na.rm=FALSE,
+                        na.rm=TRUE,   # think about why this would't be
                         row=NULL, column=NULL,
                         median=TRUE, mean=FALSE,
                         ci=c(0.5,0.95),
@@ -136,7 +136,8 @@ caterpillar <- function(df,
   df <- as.matrix(df)  ################
   if(na.rm) {
     keep <- which(!is.na(colMeans(df)))
-    df <- df[, keep]
+    # df <- as.matrix(df[, keep])  ################
+    df <- df[, keep, drop=FALSE]
     if(!all(is.na(x))) {
       x <- x[keep]
     }
@@ -159,11 +160,16 @@ caterpillar <- function(df,
       xaxlog <- TRUE
     }
   }
+  if(add & par("xlog")) {
+    xaxlog <- TRUE
+  }
   ### new
 
   ### new
   if(any(is.na(x)) & !all(is.na(x))) {
-    df <- df[, !is.na(x)]
+    # df <- df[, !is.na(x)]
+    df <- df[, which(!is.na(x) & seq_along(x) %in% 1:ncol(df)),
+             drop=FALSE]
     if(any(!is.na(xax))) {
       xax <- xax[!is.na(x)]
     }

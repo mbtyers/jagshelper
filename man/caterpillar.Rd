@@ -8,7 +8,7 @@ caterpillar(
   df,
   p = NULL,
   x = NA,
-  na.rm = FALSE,
+  na.rm = TRUE,
   row = NULL,
   column = NULL,
   median = TRUE,
@@ -45,7 +45,7 @@ that expresses MCMC iterations of a single parameter node.}
 
 \item{x}{Vector of X-coordinates for plotting.}
 
-\item{na.rm}{Whether to exclude NA columns.  Defaults to FALSE.}
+\item{na.rm}{Whether to exclude NA columns.  Defaults to TRUE.}
 
 \item{row}{Row to subset, in the case of a 2-d matrix of parameter nodes in-model.}
 

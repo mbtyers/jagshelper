@@ -220,6 +220,10 @@ test_that("caterpillar", {
   expect_silent(caterpillar(rate[,1], x=42, horizontal=TRUE))
   expect_silent(caterpillar(rate[,1], x=42, log="x"))
   expect_silent(caterpillar(rate[,1], x=42, log="y", horizontal=TRUE))
+  expect_silent(caterpillar(rate[,1:2]))
+  expect_silent(caterpillar(rate[,1:2], x=1:2))
+  expect_silent(caterpillar(rate[,1:2], x=c(1, NA), na.rm=FALSE))
+  expect_silent(caterpillar(rate[,1:2], x=c(1, NA), na.rm=TRUE))
 
 
   expect_silent(caterpillar(rate, all_ticks=TRUE))

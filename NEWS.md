@@ -1,3 +1,7 @@
+## jagshelper 0.4.3 (July 2026)
+
+* Bug fixes in `caterpillar()`
+
 ## jagshelper 0.4.2 (June 2026)
 
 * Added `horizontal=` and `xorder=` arguments to `caterpillar()`
