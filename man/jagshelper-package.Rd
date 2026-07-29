@@ -17,7 +17,7 @@ Functions are provided to help run Bayesian analyses in JAGS using
 Package: \tab jagshelper\cr
 Type: \tab Package\cr
 Version: \tab 0.4.3\cr
-Date: \tab 2026-07-20\cr
+Date: \tab 2026-07-29\cr
 License: \tab GPL-2\cr
 }
 The jagshelper package is intended to extend and streamline Bayesian analysis using the `jagsUI` package.
